@@ -8,6 +8,7 @@ import {
   Bot,
   Calendar,
   Check,
+  CheckSquare,
   Edit2,
   Send,
   TrendingUp,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import type { backendInterface as FullBackend, Task } from "../backend.d";
 import { useActor } from "../hooks/useActor";
 import type { AuthUser, FollowUp, Lead, LeadStatus } from "../types";
 import {
@@ -22,6 +24,7 @@ import {
   followUpToBackend,
   leadFromBackend,
 } from "../utils/backendAdapters";
+import CentreHeadDashboard from "./CentreHeadDashboard";
 
 const PIPELINE_COLUMNS: LeadStatus[] = [
   "New Inquiry",
@@ -34,17 +37,17 @@ const PIPELINE_COLUMNS: LeadStatus[] = [
 
 const AI_SUGGESTIONS: Record<LeadStatus, string> = {
   "New Inquiry":
-    "Hi! Thank you for your inquiry about Mahara Schools. We'd love to tell you more about our programs and how we can support your child's education. Would you be available for a brief call this week?",
+    "Hi! Thank you for your inquiry about Mahara Schools. We'd love to tell you more about our programmes and how we can support your child's early learning journey. Would you be available for a brief call this week?",
   Qualified:
     "Hello! Following up on our recent conversation — we think Mahara would be a great fit for your family. I'd love to schedule a campus tour at your convenience. Please let me know your preferred dates!",
   "Campus Tour":
-    "Thank you for visiting our campus! It was wonderful meeting you. Based on your interests, I've attached our STEM program brochure. Are you ready to proceed with the application?",
+    "Thank you for visiting our campus! It was wonderful meeting you. Based on your child's age, I've prepared our programme brochure. Are you ready to proceed with the application?",
   "Application Sent":
-    "Your application is with our admissions board. We'll have a decision within 5 business days. In the meantime, feel free to reach out with any questions!",
+    "Your application is with our admissions team. We'll have a response within 3–5 working days. In the meantime, please feel free to reach out with any questions!",
   Enrolled:
-    "Welcome to the Mahara Schools family! We're so excited to have you with us. Your orientation package will be sent shortly. Please don't hesitate to reach out.",
+    "Welcome to the Mahara Schools family! We're so excited to have your child with us. Your orientation kit will be sent shortly. Please don't hesitate to reach out.",
   Rejected:
-    "Thank you for considering Mahara Schools. While we're unable to accommodate your request at this time, we encourage you to reapply for the next academic year. We wish you all the best!",
+    "Thank you for considering Mahara Schools. While we're unable to accommodate your request at this time, we warmly encourage you to reapply for the next term. We wish you all the best!",
 };
 
 function initials(name: string) {
@@ -57,12 +60,12 @@ function initials(name: string) {
 }
 
 const AVATAR_COLORS = [
-  "#4F8F92",
-  "#7B9E87",
-  "#9B7BAE",
-  "#C67B5C",
-  "#5B7FAE",
-  "#AE7B9B",
+  "#78C8C8",
+  "#6BA3D6",
+  "#B8A7CC",
+  "#F4A8BE",
+  "#A8CB48",
+  "#F5C518",
 ];
 function avatarColor(name: string) {
   let hash = 0;
@@ -76,9 +79,18 @@ interface Props {
 }
 
 export default function DashboardPage({ user }: Props) {
-  const { actor } = useActor();
+  if (user.role === "CentreHead") {
+    return <CentreHeadDashboard user={user} />;
+  }
+  return <FounderAdminDashboard user={user} />;
+}
+
+function FounderAdminDashboard({ user }: Props) {
+  const { actor: _actor } = useActor();
+  const actor = _actor as unknown as FullBackend | null;
   const [leads, setLeads] = useState<Lead[]>([]);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiEditing, setAiEditing] = useState(false);
   const [aiSent, setAiSent] = useState(false);
@@ -86,10 +98,11 @@ export default function DashboardPage({ user }: Props) {
   useEffect(() => {
     if (!actor) return;
     setLoading(true);
-    Promise.all([actor.getLeads(), actor.getFollowUps()])
-      .then(([ls, fus]) => {
-        setLeads(ls.map(leadFromBackend));
-        setFollowUps(fus.map(followUpFromBackend));
+    Promise.all([actor.getLeads(), actor.getFollowUps(), actor.getTasks()])
+      .then(([ls, fus, tsks]) => {
+        setLeads((ls as any).map(leadFromBackend));
+        setFollowUps((fus as any).map(followUpFromBackend));
+        setTasks(tsks);
       })
       .catch(() => toast.error("Failed to load dashboard data"))
       .finally(() => setLoading(false));
@@ -112,6 +125,9 @@ export default function DashboardPage({ user }: Props) {
   const followUpsDueToday = followUps.filter(
     (f) => !f.completed && f.dueDate <= today,
   ).length;
+  const tasksDueToday = tasks.filter(
+    (t) => !t.completed && t.dueDate === today,
+  ).length;
 
   const grouped = useMemo(() => {
     const map: Record<LeadStatus, Lead[]> = {} as Record<LeadStatus, Lead[]>;
@@ -130,7 +146,7 @@ export default function DashboardPage({ user }: Props) {
     if (!fu) return;
     const updated = { ...fu, completed: true };
     try {
-      await actor.updateFollowUp(followUpToBackend(updated));
+      await actor.updateFollowUp(followUpToBackend(updated) as any);
       setFollowUps((prev) => prev.map((f) => (f.id === id ? updated : f)));
       toast.success("Follow-up marked complete");
     } catch {
@@ -148,7 +164,7 @@ export default function DashboardPage({ user }: Props) {
   const hour = now.getHours();
   const greeting =
     hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-  const dateStr = now.toLocaleDateString("en-AE", {
+  const dateStr = now.toLocaleDateString("en-IN", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -162,8 +178,8 @@ export default function DashboardPage({ user }: Props) {
           <Skeleton className="h-7 w-64 mb-1" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
           ))}
         </div>
@@ -179,10 +195,15 @@ export default function DashboardPage({ user }: Props) {
           {greeting}, {user.name}!
         </h2>
         <p className="text-sm text-muted-foreground mt-0.5">{dateStr}</p>
+        {user.role === "Founder" && (
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Mahara Schools — Kondapur & Bachupally, Hyderabad
+          </p>
+        )}
       </div>
 
       <div
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         data-ocid="dashboard.stats.panel"
       >
         <Card className="shadow-card border-border">
@@ -190,7 +211,7 @@ export default function DashboardPage({ user }: Props) {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Total Leads
+                  Total Enquiries
                 </p>
                 <p className="text-[32px] font-bold text-foreground leading-none mt-1.5">
                   {leads.length}
@@ -198,9 +219,9 @@ export default function DashboardPage({ user }: Props) {
               </div>
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: "#EEF8F8" }}
+                style={{ background: "#E8F6F6" }}
               >
-                <Users size={20} style={{ color: "#4F8F92" }} />
+                <Users size={20} style={{ color: "#78C8C8" }} />
               </div>
             </div>
           </CardContent>
@@ -219,7 +240,7 @@ export default function DashboardPage({ user }: Props) {
                   </p>
                   <span
                     className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                    style={{ background: "#DCFCE7", color: "#16A34A" }}
+                    style={{ background: "#EEF7E0", color: "#5A8A1A" }}
                   >
                     +2.4%
                   </span>
@@ -227,9 +248,9 @@ export default function DashboardPage({ user }: Props) {
               </div>
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: "#EEF8F8" }}
+                style={{ background: "#EEF7E0" }}
               >
-                <TrendingUp size={20} style={{ color: "#4F8F92" }} />
+                <TrendingUp size={20} style={{ color: "#A8CB48" }} />
               </div>
             </div>
           </CardContent>
@@ -249,14 +270,40 @@ export default function DashboardPage({ user }: Props) {
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{
-                  background: followUpsDueToday > 0 ? "#FEF3C7" : "#EEF8F8",
+                  background: followUpsDueToday > 0 ? "#FFF8E0" : "#EEF2FA",
                 }}
               >
                 <Calendar
                   size={20}
                   style={{
-                    color: followUpsDueToday > 0 ? "#D97706" : "#4F8F92",
+                    color: followUpsDueToday > 0 ? "#D4A017" : "#6BA3D6",
                   }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card border-border">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Tasks Due Today
+                </p>
+                <p className="text-[32px] font-bold text-foreground leading-none mt-1.5">
+                  {tasksDueToday}
+                </p>
+              </div>
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: tasksDueToday > 0 ? "#FFF3E0" : "#FEF9E7",
+                }}
+              >
+                <CheckSquare
+                  size={20}
+                  style={{ color: tasksDueToday > 0 ? "#F59E0B" : "#F5C518" }}
                 />
               </div>
             </div>
@@ -283,8 +330,8 @@ export default function DashboardPage({ user }: Props) {
                     {col}
                   </span>
                   <span
-                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                    style={{ background: "#4F8F92", color: "white" }}
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
+                    style={{ background: "#78C8C8" }}
                   >
                     {grouped[col].length}
                   </span>
@@ -321,10 +368,7 @@ export default function DashboardPage({ user }: Props) {
                     </div>
                   ))}
                   {grouped[col].length === 0 && (
-                    <div
-                      className="text-[10px] text-muted-foreground text-center py-4 italic"
-                      data-ocid={`pipeline.${col.toLowerCase().replace(/ /g, "_")}.empty_state`}
-                    >
+                    <div className="text-[10px] text-muted-foreground text-center py-4 italic">
                       No leads
                     </div>
                   )}
@@ -341,7 +385,7 @@ export default function DashboardPage({ user }: Props) {
           >
             <CardHeader className="pb-2 pt-4 px-4">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Bot size={15} style={{ color: "#4F8F92" }} />
+                <Bot size={15} style={{ color: "#78C8C8" }} />
                 AI-Suggested Reply
               </CardTitle>
             </CardHeader>
@@ -382,23 +426,24 @@ export default function DashboardPage({ user }: Props) {
                   {aiSent ? (
                     <div
                       className="flex items-center gap-1.5 text-xs font-semibold"
-                      style={{ color: "#16A34A" }}
+                      style={{ color: "#5A8A1A" }}
                       data-ocid="dashboard.ai_reply.success_state"
                     >
-                      <Check size={14} />
-                      Reply sent!
+                      <Check size={14} /> Reply sent!
                     </div>
                   ) : (
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 h-7 text-xs"
-                        style={{ background: "#4F8F92" }}
+                        className="flex-1 h-7 text-xs text-white"
+                        style={{
+                          background:
+                            "linear-gradient(90deg, #78C8C8, #6BA3D6)",
+                        }}
                         onClick={handleSendReply}
                         data-ocid="dashboard.ai_reply.primary_button"
                       >
-                        <Send size={12} className="mr-1" />
-                        Send Reply
+                        <Send size={12} className="mr-1" /> Send Reply
                       </Button>
                       <Button
                         size="sm"
@@ -450,7 +495,7 @@ export default function DashboardPage({ user }: Props) {
                       <AvatarFallback
                         className="text-[10px]"
                         style={{
-                          background: lead ? avatarColor(lead.name) : "#4F8F92",
+                          background: lead ? avatarColor(lead.name) : "#78C8C8",
                           color: "white",
                         }}
                       >

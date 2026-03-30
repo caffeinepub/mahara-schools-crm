@@ -131,7 +131,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
   }
 
   const CATEGORY_COLORS: Record<string, string> = {
-    Event: "#4F8F92",
+    Event: "#78C8C8",
     Notice: "#C67B5C",
     Announcement: "#7B9E87",
   };
@@ -147,16 +147,20 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
       <header
         className="sticky top-0 z-10 px-4 py-3 flex items-center justify-between shadow-sm"
         style={{
-          background: "linear-gradient(90deg, #4F8F92 0%, #6EA9AA 100%)",
+          background: "linear-gradient(90deg, #78C8C8 0%, #6BA3D6 100%)",
         }}
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-            <School size={16} className="text-white" />
+            <img
+              src="/assets/mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png"
+              alt="Mahara"
+              className="w-6 h-6 object-contain"
+            />
           </div>
           <div>
             <p className="text-white font-bold text-sm leading-tight">
-              MAHARA SCHOOLS
+              Mahara Schools
             </p>
             <p className="text-white/70 text-[10px] uppercase tracking-wider">
               Teacher Portal
@@ -187,7 +191,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
             <Card
               className="border-0 shadow-md"
               style={{
-                background: "linear-gradient(135deg, #4F8F92 0%, #6EA9AA 100%)",
+                background: "linear-gradient(135deg, #78C8C8 0%, #6BA3D6 100%)",
               }}
             >
               <CardContent className="p-5">
@@ -226,7 +230,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
               <Card className="shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Users size={16} style={{ color: "#4F8F92" }} />
+                    <Users size={16} style={{ color: "#78C8C8" }} />
                     My Class Students
                     {teacher && (
                       <Badge variant="outline" className="ml-auto text-[10px]">
@@ -256,7 +260,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
                         >
                           <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                            style={{ background: "#4F8F92" }}
+                            style={{ background: "#78C8C8" }}
                           >
                             {s.name.charAt(0)}
                           </div>
@@ -277,7 +281,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
               <Card className="shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <CalendarDays size={16} style={{ color: "#4F8F92" }} />
+                    <CalendarDays size={16} style={{ color: "#78C8C8" }} />
                     Recent School Updates
                   </CardTitle>
                 </CardHeader>
@@ -302,7 +306,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
                               className="text-[10px] px-1.5 py-0"
                               style={{
                                 background:
-                                  CATEGORY_COLORS[u.category] ?? "#4F8F92",
+                                  CATEGORY_COLORS[u.category] ?? "#78C8C8",
                               }}
                             >
                               {u.category}
@@ -327,7 +331,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
             <Card className="shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <BookOpen size={16} style={{ color: "#4F8F92" }} />
+                  <BookOpen size={16} style={{ color: "#78C8C8" }} />
                   Add Worksheet for {teacher?.grade ?? "your class"}
                 </CardTitle>
               </CardHeader>
@@ -416,7 +420,7 @@ export default function TeacherDashboard({ user, onLogout }: Props) {
 
                   <Button
                     type="submit"
-                    style={{ background: "#4F8F92" }}
+                    style={{ background: "#78C8C8" }}
                     disabled={saving}
                     data-ocid="teacher.worksheet.submit_button"
                   >

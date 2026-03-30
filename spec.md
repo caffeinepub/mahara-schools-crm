@@ -1,45 +1,33 @@
-# Mahara Schools CRM
+# Mahara Schools CRM — Privyr-Style Enhancement
 
 ## Current State
-- Full CRM with Admin, Agent, Parent roles
-- Parent Portal: Report Cards, Worksheets, Updates, Calendar (view only)
-- Admin CRM: Leads, Campaigns, Management (Branches, Team Members, Lead Sources), AI Suggestions
-- Backend: persistent on-chain storage, seeded data for leads, parents, students, report cards, worksheets, events
-- No upload UI for report cards or worksheets in the admin CRM
-- No Teacher role or Teacher dashboard
-- No CentreHead role
+Full CRM with leads, follow-ups, campaigns, role-based dashboards (Founder/Admin/CentreHead/Teacher/Parent), Academics section, AI Reply suggestions, Parent Portal. Backend has Lead, FollowUp, Campaign, Branch, LeadSource, TeamMember, Teacher, Student, ReportCard, Worksheet, SchoolUpdate, CalendarEvent.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **New roles hierarchy**: Founder (top admin) > CentreHead (per branch) > Teacher (per class)
-- **Teacher type** in backend: teacherName, branchId, grade (class they teach), username
-- **Seed new accounts**: founder/founder123, centrehead1/ch123 (Dubai), centrehead2/ch456 (Abu Dhabi), teacher1/teacher123 (Nursery, Dubai), teacher2/teacher456 (Grade 1, Abu Dhabi)
-- **Teacher Dashboard**: Shows their branch, class/grade, list of students in their class, ability to add worksheets for their grade, view school updates
-- **Admin/Founder/CentreHead upload UI**: New "Academics" section in CRM sidebar with forms to:
-  - Add Worksheet (title, grade, subjects/activities)
-  - Add Report Card (select student, term, subjects with grades, teacher comment)
-  - View and delete existing worksheets and report cards
-- **Hierarchy view** in Management page: shows org chart — Founder > CentreHeads by branch > Teachers
+- **LeadActivity** type: timestamped log per lead (call logged, note added, stage moved, WhatsApp opened, email sent, campus tour scheduled)
+- **LeadNote** type: multiple notes per lead with author and timestamp
+- **Task** type: assignable tasks with due date, priority, optional lead linkage, completion status
+- **Lead Detail Drawer**: full side panel for a lead showing — activity timeline, notes, quick action buttons (Call via tel: link, WhatsApp via wa.me link, Send Email via mailto:, Move Stage), follow-ups, add note form
+- **Reports & Analytics page**: lead source breakdown (pie/bar), conversion funnel (stage distribution), new leads by month trend, top agents by enrolled count, branch comparison
+- **Tasks page**: list of all tasks, create/edit/complete/delete, filter by assigned agent, due today / overdue / upcoming
+- **Lead list enhancements**: live search by name/phone/email, filter by status + source + branch, sort by date/status, pagination or virtual scroll
+- **Quick Actions in lead cards**: one-click Call, WhatsApp, stage move buttons visible on hover
 
 ### Modify
-- `AuthUser` type: extend role to include `"Founder" | "CentreHead" | "Teacher"`
-- `store.ts`: update role union type
-- `App.tsx`: route Teacher role to TeacherDashboard; Founder/CentreHead get full CRM access
-- `LoginPage.tsx`: update demo credentials hint
-- Seed data: add Founder, CentreHead, Teacher users
-- `initSeedData`: add teacher records linked to branches
+- DashboardPage: add overdue follow-ups count and tasks due today to stats row
+- Leads page: add search bar, filter dropdowns, quick action buttons per lead card
 
 ### Remove
 - Nothing removed
 
 ## Implementation Plan
-1. Update backend main.mo: add Teacher type, seed Founder/CentreHead/Teacher users and teacher records, add getTeachers/getTeachersByBranch/addTeacher/updateTeacher/deleteTeacher methods, add getReportCardsByBranch helper
-2. Update types.ts: extend AuthUser role union
-3. Update store.ts: extend role union
-4. Update App.tsx: add routing for Teacher and Founder/CentreHead roles
-5. Create TeacherDashboard page: shows class info, students list, add worksheet form, school updates
-6. Add Academics page in CRM: upload worksheet form, upload report card form, list/delete existing
-7. Update Sidebar and AppShell: add Academics nav item for Admin/Founder/CentreHead
-8. Update Management page: add hierarchy section showing org structure
-9. Update LoginPage: add new demo credentials
+1. Update `main.mo`: add LeadActivity, LeadNote, Task stable maps + full CRUD + seed data
+2. Update `backend.d.ts`: add new types and interface methods
+3. Add `LeadDetailDrawer.tsx`: sheet/drawer showing lead info, timeline, notes, quick actions
+4. Add `ReportsPage.tsx`: analytics with recharts (bar, pie, funnel)
+5. Add `TasksPage.tsx`: task list with create/edit/complete
+6. Update `DashboardPage.tsx`: add tasks due today + overdue follow-ups to stats
+7. Update leads list in DashboardPage/LeadsSection: search, filter, quick action buttons
+8. Update `App.tsx`: add Reports and Tasks to sidebar nav

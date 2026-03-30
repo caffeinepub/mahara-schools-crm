@@ -6,6 +6,8 @@ import CampaignsPage from "../pages/CampaignsPage";
 import DashboardPage from "../pages/DashboardPage";
 import LeadManagementPage from "../pages/LeadManagementPage";
 import ManagementPage from "../pages/ManagementPage";
+import ReportsPage from "../pages/ReportsPage";
+import TasksPage from "../pages/TasksPage";
 import type { AuthUser } from "../types";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
@@ -27,6 +29,8 @@ export default function AppShell({ user, page, setPage, onLogout }: Props) {
     management: "Management",
     "ai-reply": "AI Suggestions",
     academics: "Academics",
+    reports: "Reports & Analytics",
+    tasks: "Tasks",
   };
 
   return (
@@ -75,6 +79,8 @@ export default function AppShell({ user, page, setPage, onLogout }: Props) {
           {page === "management" && <ManagementPage />}
           {page === "ai-reply" && <AIReplyPage />}
           {page === "academics" && <AcademicsPage />}
+          {page === "reports" && <ReportsPage />}
+          {page === "tasks" && <TasksPage />}
         </main>
       </div>
     </div>

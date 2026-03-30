@@ -51,18 +51,22 @@ export default function ParentPortal({ user, onLogout }: Props) {
     <div className="min-h-screen" style={{ background: "#F0F7F7" }}>
       <header
         style={{
-          background: "linear-gradient(90deg, #4F8F92 0%, #64A0A3 100%)",
+          background: "linear-gradient(90deg, #78C8C8 0%, #64A0A3 100%)",
         }}
         className="sticky top-0 z-40 shadow-md"
       >
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-white" />
+              <img
+                src="/assets/mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png"
+                alt="Mahara"
+                className="w-6 h-6 object-contain"
+              />
             </div>
             <div>
               <h1 className="text-white font-bold text-base leading-tight tracking-tight">
-                MAHARA SCHOOLS
+                Mahara Schools
               </h1>
               <p className="text-white/70 text-xs">Parent Portal</p>
             </div>

@@ -27,9 +27,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  MessageCircle,
+  Pencil,
+  Phone,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import LeadDetailDrawer from "../components/LeadDetailDrawer";
 import { useActor } from "../hooks/useActor";
 import type { Lead, LeadStatus } from "../types";
 import { leadFromBackend, leadToBackend } from "../utils/backendAdapters";
@@ -43,20 +52,19 @@ const STATUSES: LeadStatus[] = [
   "Rejected",
 ];
 const SOURCES = ["Website", "Referral", "Social Media", "Exhibition"];
-const AGENTS = ["Sara Ahmed", "Khalid Mansoor", "Fatima Al-Zaabi"];
+const AGENTS = ["Priya Sharma", "Rajan Kumar", "Anitha Reddy"];
 const GRADES = [
+  "Daycare (18M-7Y)",
+  "Pre-Nursery (Age 2-3)",
+  "Nursery (Age 3-4)",
+  "KG I (Age 4-5)",
+  "KG II (Age 5-6)",
+  "Primary",
   "Grade 1",
   "Grade 2",
   "Grade 3",
   "Grade 4",
   "Grade 5",
-  "Grade 6",
-  "Grade 7",
-  "Grade 8",
-  "Grade 9",
-  "Grade 10",
-  "Grade 11",
-  "Grade 12",
 ];
 
 const STATUS_BADGE: Record<LeadStatus, string> = {
@@ -89,10 +97,10 @@ const EMPTY: Lead = {
   name: "",
   email: "",
   phone: "",
-  gradeLevel: "Grade 1",
+  gradeLevel: "Daycare (18M-7Y)",
   source: "Website",
   status: "New Inquiry",
-  assignedAgent: "Sara Ahmed",
+  assignedAgent: "Priya Sharma",
   notes: "",
   createdAt: "",
 };
@@ -110,6 +118,7 @@ export default function LeadManagementPage() {
   const [editing, setEditing] = useState<Lead>(EMPTY);
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   useEffect(() => {
     if (!actor) return;
@@ -143,7 +152,8 @@ export default function LeadManagementPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(lead: Lead) {
+  function openEdit(lead: Lead, e: React.MouseEvent) {
+    e.stopPropagation();
     setEditing({ ...lead });
     setIsNew(false);
     setDialogOpen(true);
@@ -283,7 +293,7 @@ export default function LeadManagementPage() {
                 <TableHead>Status</TableHead>
                 <TableHead>Agent</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
+                <TableHead className="w-28">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -302,6 +312,7 @@ export default function LeadManagementPage() {
                 <TableRow
                   key={lead.id}
                   className="cursor-pointer hover:bg-muted/30"
+                  onClick={() => setSelectedLead(lead)}
                   data-ocid={`leads.item.${i + 1}`}
                 >
                   <TableCell className="pl-4">
@@ -342,9 +353,29 @@ export default function LeadManagementPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <a
+                        href={`tel:${lead.phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1.5 rounded hover:bg-green-50 transition-colors"
+                        title="Call"
+                        data-ocid={`leads.call.button.${i + 1}`}
+                      >
+                        <Phone size={13} className="text-green-600" />
+                      </a>
+                      <a
+                        href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1.5 rounded hover:bg-green-50 transition-colors"
+                        title="WhatsApp"
+                        data-ocid={`leads.whatsapp.button.${i + 1}`}
+                      >
+                        <MessageCircle size={13} className="text-green-500" />
+                      </a>
                       <button
                         type="button"
-                        onClick={() => openEdit(lead)}
+                        onClick={(e) => openEdit(lead, e)}
                         className="p-1.5 rounded hover:bg-muted transition-colors"
                         data-ocid={`leads.edit_button.${i + 1}`}
                       >
@@ -352,7 +383,10 @@ export default function LeadManagementPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setDeleteId(lead.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(lead.id);
+                        }}
                         className="p-1.5 rounded hover:bg-destructive/10 transition-colors"
                         data-ocid={`leads.delete_button.${i + 1}`}
                       >
@@ -366,6 +400,17 @@ export default function LeadManagementPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <LeadDetailDrawer
+        lead={selectedLead}
+        open={!!selectedLead}
+        onClose={() => setSelectedLead(null)}
+        onLeadUpdate={(updatedLead) =>
+          setLeads((prev) =>
+            prev.map((l) => (l.id === updatedLead.id ? updatedLead : l)),
+          )
+        }
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg" data-ocid="leads.dialog">

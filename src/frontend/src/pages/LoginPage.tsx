@@ -11,6 +11,9 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
 
+const LOGO =
+  "/assets/mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png";
+
 interface Props {
   onLogin: (username: string, password: string) => Promise<boolean>;
 }
@@ -37,22 +40,29 @@ export default function LoginPage({ onLogin }: Props) {
       className="min-h-screen flex items-center justify-center"
       style={{
         background:
-          "linear-gradient(135deg, #4F8F92 0%, #6EA9AA 60%, #EEF2F3 100%)",
+          "linear-gradient(135deg, #78C8C8 0%, #64A0A3 40%, #B8A7CC 100%)",
       }}
     >
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 mb-4">
-            <span className="text-2xl">🎓</span>
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white shadow-lg mb-4 p-2">
+            <img
+              src={LOGO}
+              alt="Mahara Schools"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-white font-bold text-2xl tracking-tight">
-            MAHARA SCHOOLS
+          <h1 className="text-white font-bold text-2xl tracking-tight drop-shadow">
+            Mahara Schools
           </h1>
-          <p className="text-white/70 text-sm mt-1">CRM & Staff Portal</p>
+          <p className="text-white/80 text-sm mt-1">
+            International Pre-School & Day Care
+          </p>
+          <p className="text-white/60 text-xs mt-0.5">CRM & Staff Portal</p>
         </div>
 
-        <Card className="shadow-card border-0">
+        <Card className="shadow-xl border-0">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Welcome back</CardTitle>
             <CardDescription>Sign in to your account</CardDescription>
@@ -95,7 +105,10 @@ export default function LoginPage({ onLogin }: Props) {
               <Button
                 type="submit"
                 className="w-full font-semibold"
-                style={{ background: "#4F8F92" }}
+                style={{
+                  background:
+                    "linear-gradient(90deg, #78C8C8 0%, #64A0A3 100%)",
+                }}
                 disabled={loading}
                 data-ocid="login.submit_button"
               >
@@ -113,10 +126,10 @@ export default function LoginPage({ onLogin }: Props) {
                 Admin: <strong>admin / admin123</strong>
               </p>
               <p>
-                Agent: <strong>agent / agent123</strong>
+                Centre Head (Kondapur): <strong>centrehead1 / ch123</strong>
               </p>
               <p>
-                Centre Head (Dubai): <strong>centrehead1 / ch123</strong>
+                Centre Head (Bachupally): <strong>centrehead2 / ch456</strong>
               </p>
               <p>
                 Teacher (Nursery): <strong>teacher1 / teacher123</strong>
@@ -127,6 +140,10 @@ export default function LoginPage({ onLogin }: Props) {
             </div>
           </CardContent>
         </Card>
+
+        <p className="text-center text-white/50 text-[10px] mt-4">
+          Kondapur: +91 628170-8102 &nbsp;|&nbsp; Bachupally: +91 7488-456789
+        </p>
       </div>
     </div>
   );

@@ -119,6 +119,35 @@ export interface CalendarEvent {
   color: string;
 }
 
+export interface LeadActivity {
+  id: string;
+  leadId: string;
+  activityType: string;
+  description: string;
+  performedBy: string;
+  timestamp: string;
+}
+
+export interface LeadNote {
+  id: string;
+  leadId: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  assignedTo: string;
+  dueDate: string;
+  priority: string;
+  completed: boolean;
+  leadId: string;
+  createdAt: string;
+}
+
 export interface backendInterface {
   login(credentials: { username: string; password: string }): Promise<{ username: string; role: string; name: string } | null>;
   initSeedData(): Promise<void>;
@@ -188,4 +217,20 @@ export interface backendInterface {
   addCalendarEvent(e: CalendarEvent): Promise<string>;
   updateCalendarEvent(e: CalendarEvent): Promise<void>;
   deleteCalendarEvent(id: string): Promise<void>;
+
+  getActivitiesByLead(leadId: string): Promise<LeadActivity[]>;
+  getAllLeadActivities(): Promise<LeadActivity[]>;
+  addLeadActivity(a: LeadActivity): Promise<string>;
+  deleteLeadActivity(id: string): Promise<void>;
+
+  getNotesByLead(leadId: string): Promise<LeadNote[]>;
+  addLeadNote(n: LeadNote): Promise<string>;
+  deleteLeadNote(id: string): Promise<void>;
+
+  getTasks(): Promise<Task[]>;
+  getTasksByAssignee(assignedTo: string): Promise<Task[]>;
+  getTasksByLead(leadId: string): Promise<Task[]>;
+  addTask(t: Task): Promise<string>;
+  updateTask(t: Task): Promise<void>;
+  deleteTask(id: string): Promise<void>;
 }
