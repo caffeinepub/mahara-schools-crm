@@ -1,12 +1,20 @@
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import AppShell from "./components/AppShell";
+import ParentPortal from "./components/ParentPortal";
 import { useActor } from "./hooks/useActor";
 import LoginPage from "./pages/LoginPage";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import { clearAuth, getAuthUser, setAuthUser } from "./store";
 import type { AuthUser } from "./types";
 
-export type Page = "dashboard" | "leads" | "campaigns" | "management";
+export type Page =
+  | "dashboard"
+  | "leads"
+  | "campaigns"
+  | "management"
+  | "ai-reply"
+  | "academics";
 
 export default function App() {
   const { actor } = useActor();
@@ -14,13 +22,11 @@ export default function App() {
   const [page, setPage] = useState<Page>("dashboard");
   const [seeded, setSeeded] = useState(false);
 
-  // Restore session
   useEffect(() => {
     const stored = getAuthUser();
-    if (stored) setUser(stored);
+    if (stored) setUser(stored as AuthUser);
   }, []);
 
-  // Seed backend data (idempotent)
   useEffect(() => {
     if (actor && !seeded) {
       actor
@@ -40,7 +46,7 @@ export default function App() {
       if (result) {
         const authUser: AuthUser = {
           username: result.username,
-          role: result.role as "Admin" | "Agent",
+          role: result.role as AuthUser["role"],
           name: result.name,
         };
         setAuthUser(authUser);
@@ -62,6 +68,24 @@ export default function App() {
     return (
       <>
         <LoginPage onLogin={handleLogin} />
+        <Toaster />
+      </>
+    );
+  }
+
+  if (user.role === "Parent") {
+    return (
+      <>
+        <ParentPortal user={user} onLogout={handleLogout} />
+        <Toaster />
+      </>
+    );
+  }
+
+  if (user.role === "Teacher") {
+    return (
+      <>
+        <TeacherDashboard user={user} onLogout={handleLogout} />
         <Toaster />
       </>
     );

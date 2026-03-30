@@ -25,7 +25,9 @@ export default function LoginPage({ onLogin }: Props) {
     setLoading(true);
     const ok = await onLogin(username, password);
     if (!ok) {
-      toast.error("Invalid credentials. Try admin/admin123 or agent/agent123.");
+      toast.error(
+        "Invalid credentials. Please check your username and password.",
+      );
     }
     setLoading(false);
   }
@@ -47,13 +49,13 @@ export default function LoginPage({ onLogin }: Props) {
           <h1 className="text-white font-bold text-2xl tracking-tight">
             MAHARA SCHOOLS
           </h1>
-          <p className="text-white/70 text-sm mt-1">CRM — Admissions Portal</p>
+          <p className="text-white/70 text-sm mt-1">CRM & Staff Portal</p>
         </div>
 
         <Card className="shadow-card border-0">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Welcome back</CardTitle>
-            <CardDescription>Sign in to your CRM account</CardDescription>
+            <CardDescription>Sign in to your account</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,7 +70,7 @@ export default function LoginPage({ onLogin }: Props) {
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
+                  placeholder="Enter username"
                   required
                   data-ocid="login.input"
                 />
@@ -100,10 +102,29 @@ export default function LoginPage({ onLogin }: Props) {
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-            <p className="text-[11px] text-muted-foreground text-center mt-4">
-              Demo: <strong>admin / admin123</strong> or{" "}
-              <strong>agent / agent123</strong>
-            </p>
+            <div className="mt-4 rounded-lg bg-muted/60 px-3 py-2.5 text-[11px] text-muted-foreground space-y-1">
+              <p className="font-semibold text-foreground/70 mb-1">
+                Demo Credentials
+              </p>
+              <p>
+                Founder: <strong>founder / founder123</strong>
+              </p>
+              <p>
+                Admin: <strong>admin / admin123</strong>
+              </p>
+              <p>
+                Agent: <strong>agent / agent123</strong>
+              </p>
+              <p>
+                Centre Head (Dubai): <strong>centrehead1 / ch123</strong>
+              </p>
+              <p>
+                Teacher (Nursery): <strong>teacher1 / teacher123</strong>
+              </p>
+              <p>
+                Parent Portal: <strong>parent1 / parent123</strong>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

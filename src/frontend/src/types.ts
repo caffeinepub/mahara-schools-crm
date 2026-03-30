@@ -59,8 +59,76 @@ export interface TeamMember {
   branchId: string;
 }
 
+export interface Teacher {
+  id: string;
+  username: string;
+  name: string;
+  branchId: string;
+  grade: string;
+  subjects: string;
+}
+
 export interface AuthUser {
   username: string;
-  role: "Admin" | "Agent";
+  role: "Founder" | "Admin" | "CentreHead" | "Teacher" | "Agent" | "Parent";
   name: string;
+}
+
+export interface Student {
+  id: string;
+  name: string;
+  grade: string;
+  parentUsername: string;
+  admissionNumber: string;
+}
+
+export interface SubjectGrade {
+  subject: string;
+  grade: string;
+  marks: string;
+  remarks: string;
+}
+
+export interface ReportCard {
+  id: string;
+  studentId: string;
+  term: string;
+  academicYear: string;
+  subjects: SubjectGrade[];
+  overallGrade: string;
+  attendance: string;
+  teacherComment: string;
+  date: string;
+}
+
+export interface WorksheetSubject {
+  subject: string;
+  activities: string;
+  homework: string;
+  notes: string;
+}
+
+export interface Worksheet {
+  id: string;
+  grade: string;
+  title: string;
+  date: string;
+  teacherName: string;
+  subjects: WorksheetSubject[];
+}
+
+export interface SchoolUpdate {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  category: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  category: string;
+  color: string;
 }

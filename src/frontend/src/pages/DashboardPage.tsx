@@ -4,7 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Check, Edit2, Send, TrendingUp, Users } from "lucide-react";
+import {
+  Bot,
+  Calendar,
+  Check,
+  Edit2,
+  Send,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useActor } from "../hooks/useActor";
@@ -28,13 +36,13 @@ const AI_SUGGESTIONS: Record<LeadStatus, string> = {
   "New Inquiry":
     "Hi! Thank you for your inquiry about Mahara Schools. We'd love to tell you more about our programs and how we can support your child's education. Would you be available for a brief call this week?",
   Qualified:
-    "Hello! Following up on our recent conversation \u2014 we think Mahara would be a great fit for your family. I'd love to schedule a campus tour at your convenience. Please let me know your preferred dates!",
+    "Hello! Following up on our recent conversation — we think Mahara would be a great fit for your family. I'd love to schedule a campus tour at your convenience. Please let me know your preferred dates!",
   "Campus Tour":
     "Thank you for visiting our campus! It was wonderful meeting you. Based on your interests, I've attached our STEM program brochure. Are you ready to proceed with the application?",
   "Application Sent":
     "Your application is with our admissions board. We'll have a decision within 5 business days. In the meantime, feel free to reach out with any questions!",
   Enrolled:
-    "Welcome to the Mahara Schools family! \uD83C\uDF89 We're so excited to have you with us. Your orientation package will be sent shortly. Please don't hesitate to reach out.",
+    "Welcome to the Mahara Schools family! We're so excited to have you with us. Your orientation package will be sent shortly. Please don't hesitate to reach out.",
   Rejected:
     "Thank you for considering Mahara Schools. While we're unable to accommodate your request at this time, we encourage you to reapply for the next academic year. We wish you all the best!",
 };
@@ -154,7 +162,7 @@ export default function DashboardPage({ user }: Props) {
           <Skeleton className="h-7 w-64 mb-1" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
           ))}
@@ -173,7 +181,10 @@ export default function DashboardPage({ user }: Props) {
         <p className="text-sm text-muted-foreground mt-0.5">{dateStr}</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4" data-ocid="dashboard.stats.panel">
+      <div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        data-ocid="dashboard.stats.panel"
+      >
         <Card className="shadow-card border-border">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-start justify-between">
@@ -253,7 +264,7 @@ export default function DashboardPage({ user }: Props) {
         </Card>
       </div>
 
-      <div className="flex gap-5">
+      <div className="flex flex-col lg:flex-row gap-5">
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-foreground mb-3">
             Lead Pipeline
@@ -323,16 +334,14 @@ export default function DashboardPage({ user }: Props) {
           </div>
         </div>
 
-        <div className="w-72 flex-shrink-0 space-y-4">
+        <div className="lg:w-72 flex-shrink-0 space-y-4">
           <Card
             className="shadow-card border-border"
             data-ocid="dashboard.ai_reply.card"
           >
             <CardHeader className="pb-2 pt-4 px-4">
               <CardTitle className="text-sm flex items-center gap-2">
-                <span className="w-5 h-5 rounded flex items-center justify-center text-base">
-                  \uD83E\uDD16
-                </span>
+                <Bot size={15} style={{ color: "#4F8F92" }} />
                 AI-Suggested Reply
               </CardTitle>
             </CardHeader>

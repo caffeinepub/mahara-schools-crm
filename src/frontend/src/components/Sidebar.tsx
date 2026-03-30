@@ -1,4 +1,6 @@
 import {
+  BookOpen,
+  Bot,
   Building2,
   ChevronRight,
   LayoutDashboard,
@@ -8,21 +10,74 @@ import {
   Users,
 } from "lucide-react";
 import type { Page } from "../App";
+import type { AuthUser } from "../types";
 
 interface Props {
+  user: AuthUser;
   page: Page;
   setPage: (p: Page) => void;
   onLogout: () => void;
+  onClose?: () => void;
 }
 
-const navItems: { id: Page; label: string; icon: React.ElementType }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "leads", label: "Lead Management", icon: Users },
-  { id: "campaigns", label: "Campaigns", icon: Megaphone },
-  { id: "management", label: "Management", icon: Building2 },
+const allNavItems: {
+  id: Page;
+  label: string;
+  icon: React.ElementType;
+  roles: AuthUser["role"][];
+}[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    roles: ["Founder", "Admin", "CentreHead", "Agent"],
+  },
+  {
+    id: "leads",
+    label: "Lead Management",
+    icon: Users,
+    roles: ["Founder", "Admin", "Agent"],
+  },
+  {
+    id: "campaigns",
+    label: "Campaigns",
+    icon: Megaphone,
+    roles: ["Founder", "Admin", "Agent"],
+  },
+  {
+    id: "ai-reply",
+    label: "AI Suggestions",
+    icon: Bot,
+    roles: ["Founder", "Admin", "Agent"],
+  },
+  {
+    id: "academics",
+    label: "Academics",
+    icon: BookOpen,
+    roles: ["Founder", "Admin", "CentreHead"],
+  },
+  {
+    id: "management",
+    label: "Management",
+    icon: Building2,
+    roles: ["Founder", "Admin", "CentreHead"],
+  },
 ];
 
-export default function Sidebar({ page, setPage, onLogout }: Props) {
+export default function Sidebar({
+  user,
+  page,
+  setPage,
+  onLogout,
+  onClose,
+}: Props) {
+  const navItems = allNavItems.filter((item) => item.roles.includes(user.role));
+
+  function handleNav(id: Page) {
+    setPage(id);
+    onClose?.();
+  }
+
   return (
     <aside
       className="w-[250px] flex-shrink-0 flex flex-col h-full"
@@ -47,6 +102,14 @@ export default function Sidebar({ page, setPage, onLogout }: Props) {
         </div>
       </div>
 
+      {/* Role badge */}
+      <div className="px-6 py-2 border-b border-white/10">
+        <p className="text-white/60 text-[10px] uppercase tracking-widest">
+          {user.role}
+        </p>
+        <p className="text-white text-xs font-medium truncate">{user.name}</p>
+      </div>
+
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
@@ -57,7 +120,7 @@ export default function Sidebar({ page, setPage, onLogout }: Props) {
               type="button"
               key={item.id}
               data-ocid={`nav.${item.id}.link`}
-              onClick={() => setPage(item.id)}
+              onClick={() => handleNav(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 active
                   ? "bg-black/20 text-white"

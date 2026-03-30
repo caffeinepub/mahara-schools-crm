@@ -1,12 +1,16 @@
-// This file is kept for reference only.
-// All data is now persisted in the ICP backend canister.
-// Auth session is kept in localStorage for UX continuity.
-
 const AUTH_KEY = "mahara_auth";
+
+export type UserRole =
+  | "Founder"
+  | "Admin"
+  | "CentreHead"
+  | "Teacher"
+  | "Agent"
+  | "Parent";
 
 export function getAuthUser(): {
   username: string;
-  role: "Admin" | "Agent";
+  role: UserRole;
   name: string;
 } | null {
   const raw = localStorage.getItem(AUTH_KEY);
@@ -15,7 +19,7 @@ export function getAuthUser(): {
 
 export function setAuthUser(user: {
   username: string;
-  role: "Admin" | "Agent";
+  role: UserRole;
   name: string;
 }): void {
   localStorage.setItem(AUTH_KEY, JSON.stringify(user));

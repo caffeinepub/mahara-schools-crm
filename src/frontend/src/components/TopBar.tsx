@@ -5,15 +5,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import type { AuthUser } from "../types";
 
 interface Props {
   title: string;
   user: AuthUser;
+  onMenuClick?: () => void;
 }
 
-export default function TopBar({ title, user }: Props) {
+export default function TopBar({ title, user, onMenuClick }: Props) {
   const initials = user.name
     .split(" ")
     .map((n) => n[0])
@@ -22,12 +23,22 @@ export default function TopBar({ title, user }: Props) {
     .slice(0, 2);
 
   return (
-    <header className="h-14 bg-white border-b border-border flex items-center px-6 gap-4 flex-shrink-0">
+    <header className="h-14 bg-white border-b border-border flex items-center px-4 gap-3 flex-shrink-0">
+      {/* Hamburger - mobile only */}
+      <button
+        type="button"
+        className="md:hidden p-1.5 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
+        onClick={onMenuClick}
+        data-ocid="topbar.menu.button"
+      >
+        <Menu size={20} className="text-muted-foreground" />
+      </button>
+
       <h1 className="text-foreground font-semibold text-base flex-shrink-0">
         {title}
       </h1>
 
-      <div className="flex-1 max-w-xs mx-auto">
+      <div className="flex-1 max-w-xs mx-auto hidden sm:block">
         <input
           type="text"
           placeholder="Search leads, campaigns..."
@@ -60,7 +71,7 @@ export default function TopBar({ title, user }: Props) {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="text-left">
+              <div className="text-left hidden sm:block">
                 <p className="text-xs font-semibold text-foreground leading-tight">
                   {user.name}
                 </p>

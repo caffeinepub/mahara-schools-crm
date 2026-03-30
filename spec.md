@@ -1,29 +1,45 @@
 # Mahara Schools CRM
 
 ## Current State
-Full CRM frontend with localStorage only. Backend is an empty actor. Data is lost across devices/sessions. Features: lead management, follow-ups, campaigns, branches, lead sources, team members, and a simple credential-based login.
+- Full CRM with Admin, Agent, Parent roles
+- Parent Portal: Report Cards, Worksheets, Updates, Calendar (view only)
+- Admin CRM: Leads, Campaigns, Management (Branches, Team Members, Lead Sources), AI Suggestions
+- Backend: persistent on-chain storage, seeded data for leads, parents, students, report cards, worksheets, events
+- No upload UI for report cards or worksheets in the admin CRM
+- No Teacher role or Teacher dashboard
+- No CentreHead role
 
 ## Requested Changes (Diff)
 
 ### Add
-- Motoko backend with persistent stable storage for: Leads, FollowUps, Campaigns, Branches, LeadSources, TeamMembers
-- Backend CRUD operations for all entities
-- Simple credential-based user authentication stored in backend (admin/admin123, agent/agent123)
-- Seed data initialization (only if empty)
-- Frontend replaces all localStorage calls with backend canister calls
+- **New roles hierarchy**: Founder (top admin) > CentreHead (per branch) > Teacher (per class)
+- **Teacher type** in backend: teacherName, branchId, grade (class they teach), username
+- **Seed new accounts**: founder/founder123, centrehead1/ch123 (Dubai), centrehead2/ch456 (Abu Dhabi), teacher1/teacher123 (Nursery, Dubai), teacher2/teacher456 (Grade 1, Abu Dhabi)
+- **Teacher Dashboard**: Shows their branch, class/grade, list of students in their class, ability to add worksheets for their grade, view school updates
+- **Admin/Founder/CentreHead upload UI**: New "Academics" section in CRM sidebar with forms to:
+  - Add Worksheet (title, grade, subjects/activities)
+  - Add Report Card (select student, term, subjects with grades, teacher comment)
+  - View and delete existing worksheets and report cards
+- **Hierarchy view** in Management page: shows org chart — Founder > CentreHeads by branch > Teachers
 
 ### Modify
-- store.ts → replaced with backend API calls via useActor hook
-- App.tsx login handler calls backend.login(username, password)
-- All pages fetch data from backend instead of localStorage
+- `AuthUser` type: extend role to include `"Founder" | "CentreHead" | "Teacher"`
+- `store.ts`: update role union type
+- `App.tsx`: route Teacher role to TeacherDashboard; Founder/CentreHead get full CRM access
+- `LoginPage.tsx`: update demo credentials hint
+- Seed data: add Founder, CentreHead, Teacher users
+- `initSeedData`: add teacher records linked to branches
 
 ### Remove
-- localStorage usage for data persistence (may keep session auth in localStorage for UX)
+- Nothing removed
 
 ## Implementation Plan
-1. Generate Motoko backend with stable vars for all 6 entity types plus user auth
-2. Expose CRUD query/update functions for Leads, FollowUps, Campaigns, Branches, LeadSources, TeamMembers
-3. Expose login query that returns user info
-4. Frontend: create a backend service layer that wraps actor calls
-5. Update all pages (Dashboard, LeadManagement, Campaigns, Management) to use async backend calls with loading states
-6. Seed data written to backend on first init
+1. Update backend main.mo: add Teacher type, seed Founder/CentreHead/Teacher users and teacher records, add getTeachers/getTeachersByBranch/addTeacher/updateTeacher/deleteTeacher methods, add getReportCardsByBranch helper
+2. Update types.ts: extend AuthUser role union
+3. Update store.ts: extend role union
+4. Update App.tsx: add routing for Teacher and Founder/CentreHead roles
+5. Create TeacherDashboard page: shows class info, students list, add worksheet form, school updates
+6. Add Academics page in CRM: upload worksheet form, upload report card form, list/delete existing
+7. Update Sidebar and AppShell: add Academics nav item for Admin/Founder/CentreHead
+8. Update Management page: add hierarchy section showing org structure
+9. Update LoginPage: add new demo credentials
