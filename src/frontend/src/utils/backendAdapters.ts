@@ -1,29 +1,15 @@
 /**
- * Conversion helpers between backend (bigint nanoseconds) and frontend (string) types.
+ * Pass-through helpers — backend now uses string dates, no conversion needed.
  */
 import type {
-  Campaign as BackendCampaign,
-  FollowUp as BackendFollowUp,
-  Lead as BackendLead,
-} from "../backend";
-import type { Campaign, FollowUp, Lead } from "../types";
+  Campaign,
+  CampaignSend,
+  CampaignTemplate,
+  FollowUp,
+  Lead,
+} from "../types";
 
-// nanoseconds bigint -> ISO string
-export function nsToIso(ns: bigint): string {
-  return new Date(Number(ns / 1_000_000n)).toISOString();
-}
-
-// nanoseconds bigint -> date string YYYY-MM-DD
-export function nsToDate(ns: bigint): string {
-  return nsToIso(ns).slice(0, 10);
-}
-
-// ISO or date string -> nanoseconds bigint
-export function isoToNs(iso: string): bigint {
-  return BigInt(Date.parse(iso)) * 1_000_000n;
-}
-
-export function leadFromBackend(l: BackendLead): Lead {
+export function leadFromBackend(l: any): Lead {
   return {
     id: l.id,
     name: l.name,
@@ -34,65 +20,72 @@ export function leadFromBackend(l: BackendLead): Lead {
     status: l.status as Lead["status"],
     assignedAgent: l.assignedAgent,
     notes: l.notes,
-    createdAt: nsToIso(l.createdAt),
+    createdAt: l.createdAt,
   };
 }
 
-export function leadToBackend(l: Lead): BackendLead {
-  return {
-    id: l.id,
-    name: l.name,
-    email: l.email,
-    phone: l.phone,
-    gradeLevel: l.gradeLevel,
-    source: l.source,
-    status: l.status,
-    assignedAgent: l.assignedAgent,
-    notes: l.notes,
-    createdAt: isoToNs(l.createdAt || new Date().toISOString()),
-  };
+export function leadToBackend(l: Lead): any {
+  return { ...l };
 }
 
-export function followUpFromBackend(f: BackendFollowUp): FollowUp {
+export function followUpFromBackend(f: any): FollowUp {
   return {
     id: f.id,
     leadId: f.leadId,
     followUpType: f.followUpType as FollowUp["followUpType"],
     assignedTo: f.assignedTo,
-    dueDate: nsToDate(f.dueDate),
+    dueDate: f.dueDate,
     completed: f.completed,
     notes: f.notes,
   };
 }
 
-export function followUpToBackend(f: FollowUp): BackendFollowUp {
-  return {
-    id: f.id,
-    leadId: f.leadId,
-    followUpType: f.followUpType,
-    assignedTo: f.assignedTo,
-    dueDate: isoToNs(f.dueDate),
-    completed: f.completed,
-    notes: f.notes,
-  };
+export function followUpToBackend(f: FollowUp): any {
+  return { ...f };
 }
 
-export function campaignFromBackend(c: BackendCampaign): Campaign {
+export function campaignFromBackend(c: any): Campaign {
   return {
     id: c.id,
     name: c.name,
     description: c.description,
     status: c.status as Campaign["status"],
-    createdAt: nsToIso(c.createdAt),
+    createdAt: c.createdAt,
   };
 }
 
-export function campaignToBackend(c: Campaign): BackendCampaign {
+export function campaignToBackend(c: Campaign): any {
+  return { ...c };
+}
+
+export function campaignTemplateFromBackend(t: any): CampaignTemplate {
   return {
-    id: c.id,
-    name: c.name,
-    description: c.description,
-    status: c.status,
-    createdAt: isoToNs(c.createdAt || new Date().toISOString()),
+    id: t.id,
+    name: t.name,
+    mediaType: t.mediaType as CampaignTemplate["mediaType"],
+    mediaUrl: t.mediaUrl || "",
+    messageText: t.messageText || "",
+    createdAt: t.createdAt,
   };
+}
+
+export function campaignTemplateToBackend(t: CampaignTemplate): any {
+  return { ...t };
+}
+
+export function campaignSendFromBackend(s: any): CampaignSend {
+  return {
+    id: s.id,
+    campaignId: s.campaignId,
+    templateId: s.templateId,
+    leadId: s.leadId,
+    leadName: s.leadName,
+    sentAt: s.sentAt,
+    sentBy: s.sentBy,
+    note: s.note || "",
+  };
+}
+
+export function campaignSendToBackend(s: CampaignSend): any {
+  return { ...s };
 }

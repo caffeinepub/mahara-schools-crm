@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -28,6 +29,8 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Download,
+  FileSpreadsheet,
   Loader2,
   MessageCircle,
   Pencil,
@@ -35,9 +38,11 @@ import {
   Plus,
   Search,
   Trash2,
+  Upload,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 import LeadDetailDrawer from "../components/LeadDetailDrawer";
 import { useActor } from "../hooks/useActor";
 import type { Lead, LeadStatus } from "../types";
@@ -76,6 +81,26 @@ const STATUS_BADGE: Record<LeadStatus, string> = {
   Rejected: "bg-red-100 text-red-700 border-red-200",
 };
 
+const LEAD_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "gradeLevel",
+  "source",
+  "assignedAgent",
+  "notes",
+] as const;
+
+const LEAD_FIELD_LABELS: Record<string, string> = {
+  name: "Name",
+  email: "Email",
+  phone: "Phone",
+  gradeLevel: "Grade Level",
+  source: "Source",
+  assignedAgent: "Assigned Agent",
+  notes: "Notes",
+};
+
 function initials(name: string) {
   return name
     .split(" ")
@@ -105,6 +130,48 @@ const EMPTY: Lead = {
   createdAt: "",
 };
 
+function autoMapColumns(headers: string[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const h of headers) {
+    const lower = h.toLowerCase().trim();
+    if (/\bname\b/.test(lower)) map.name = h;
+    else if (/email/.test(lower)) map.email = h;
+    else if (/phone|mobile|tel/.test(lower)) map.phone = h;
+    else if (/grade/.test(lower)) map.gradeLevel = h;
+    else if (/source/.test(lower)) map.source = h;
+    else if (/agent/.test(lower)) map.assignedAgent = h;
+    else if (/note/.test(lower)) map.notes = h;
+  }
+  return map;
+}
+
+function downloadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ["Name", "Email", "Phone", "Grade", "Source", "Agent", "Notes"],
+    [
+      "Aarav Sharma",
+      "aarav@example.com",
+      "+91 9876543210",
+      "KG I (Age 4-5)",
+      "Website",
+      "Priya Sharma",
+      "Interested in KG program",
+    ],
+    [
+      "Diya Patel",
+      "diya@example.com",
+      "+91 9123456789",
+      "Nursery (Age 3-4)",
+      "Referral",
+      "Rajan Kumar",
+      "Parent called, wants campus tour",
+    ],
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Leads");
+  XLSX.writeFile(wb, "mahara_leads_template.xlsx");
+}
+
 export default function LeadManagementPage() {
   const { actor } = useActor();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -119,6 +186,19 @@ export default function LeadManagementPage() {
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+
+  // Import state
+  const [importOpen, setImportOpen] = useState(false);
+  const [importStep, setImportStep] = useState<
+    "upload" | "map" | "importing" | "done"
+  >("upload");
+  const [importHeaders, setImportHeaders] = useState<string[]>([]);
+  const [importRows, setImportRows] = useState<any[][]>([]);
+  const [importFieldMap, setImportFieldMap] = useState<Record<string, string>>(
+    {},
+  );
+  const [importProgress, setImportProgress] = useState({ done: 0, total: 0 });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!actor) return;
@@ -190,6 +270,86 @@ export default function LeadManagementPage() {
     } catch {
       toast.error("Failed to delete lead");
     }
+  }
+
+  async function handleFileUpload(file: File) {
+    try {
+      const data = await file.arrayBuffer();
+      const wb = XLSX.read(data, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<any[]>(ws, {
+        header: 1,
+      }) as any[][];
+      if (rows.length < 2) {
+        toast.error("File is empty or has no data rows");
+        return;
+      }
+      const headers = (rows[0] as string[]).map((h) => String(h || "").trim());
+      const dataRows = rows
+        .slice(1)
+        .filter((r) => r.some((c) => c !== undefined && c !== ""));
+      setImportHeaders(headers);
+      setImportRows(dataRows);
+      setImportFieldMap(autoMapColumns(headers));
+      setImportStep("map");
+    } catch {
+      toast.error(
+        "Failed to parse file. Please use a valid .xlsx or .csv file.",
+      );
+    }
+  }
+
+  async function handleImport() {
+    if (!actor) return;
+    setImportStep("importing");
+    setImportProgress({ done: 0, total: importRows.length });
+    let done = 0;
+    let failed = 0;
+    for (const row of importRows) {
+      const getValue = (field: string) => {
+        const colName = importFieldMap[field];
+        if (!colName) return "";
+        const idx = importHeaders.indexOf(colName);
+        return idx >= 0 ? String(row[idx] ?? "").trim() : "";
+      };
+      const lead: Lead = {
+        id: `imp${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
+        name: getValue("name") || "Unknown",
+        email: getValue("email"),
+        phone: getValue("phone"),
+        gradeLevel: getValue("gradeLevel") || "Daycare (18M-7Y)",
+        source: getValue("source") || "Website",
+        status: "New Inquiry",
+        assignedAgent: getValue("assignedAgent") || "Priya Sharma",
+        notes: getValue("notes"),
+        createdAt: new Date().toISOString(),
+      };
+      try {
+        await actor.addLead(leadToBackend(lead));
+        done++;
+      } catch {
+        failed++;
+      }
+      setImportProgress({ done: done + failed, total: importRows.length });
+    }
+    const updated = await actor.getLeads();
+    setLeads(updated.map(leadFromBackend));
+    setImportStep("done");
+    setImportProgress({ done, total: importRows.length });
+    if (failed > 0) {
+      toast.error(`${done} imported, ${failed} failed`);
+    } else {
+      toast.success(`${done} leads imported successfully!`);
+    }
+  }
+
+  function resetImport() {
+    setImportStep("upload");
+    setImportHeaders([]);
+    setImportRows([]);
+    setImportFieldMap({});
+    setImportProgress({ done: 0, total: 0 });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   if (loading) {
@@ -270,16 +430,31 @@ export default function LeadManagementPage() {
             ))}
           </SelectContent>
         </Select>
-        <Button
-          size="sm"
-          className="h-9 ml-auto"
-          style={{ background: "#4F8F92" }}
-          onClick={openNew}
-          data-ocid="leads.add.primary_button"
-        >
-          <Plus size={14} className="mr-1" />
-          Add Lead
-        </Button>
+        <div className="flex items-center gap-2 ml-auto">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-9 gap-1.5"
+            onClick={() => {
+              setImportOpen(true);
+              resetImport();
+            }}
+            data-ocid="leads.import.secondary_button"
+          >
+            <FileSpreadsheet size={14} />
+            Import CSV/Excel
+          </Button>
+          <Button
+            size="sm"
+            className="h-9"
+            style={{ background: "#4F8F92" }}
+            onClick={openNew}
+            data-ocid="leads.add.primary_button"
+          >
+            <Plus size={14} className="mr-1" />
+            Add Lead
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-card border-border">
@@ -412,6 +587,7 @@ export default function LeadManagementPage() {
         }
       />
 
+      {/* Add / Edit Lead Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg" data-ocid="leads.dialog">
           <DialogHeader>
@@ -560,6 +736,7 @@ export default function LeadManagementPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm" data-ocid="leads.delete.dialog">
           <DialogHeader>
@@ -584,6 +761,236 @@ export default function LeadManagementPage() {
               Delete
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import CSV/Excel Dialog */}
+      <Dialog
+        open={importOpen}
+        onOpenChange={(open) => {
+          setImportOpen(open);
+          if (!open) resetImport();
+        }}
+      >
+        <DialogContent className="max-w-2xl" data-ocid="leads.import.dialog">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileSpreadsheet size={18} style={{ color: "#4F8F92" }} />
+              Import Leads from CSV / Excel
+            </DialogTitle>
+          </DialogHeader>
+
+          {importStep === "upload" && (
+            <div className="space-y-4 py-2">
+              <button
+                type="button"
+                className="border-2 border-dashed border-border rounded-xl p-10 text-center w-full cursor-pointer hover:border-[#4F8F92]/60 hover:bg-[#EEF8F8]/40 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) handleFileUpload(file);
+                }}
+                data-ocid="leads.import.dropzone"
+              >
+                <Upload
+                  size={32}
+                  className="mx-auto mb-3 text-muted-foreground"
+                />
+                <p className="text-sm font-semibold text-foreground">
+                  Drop your file here or click to browse
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Supports .xlsx, .xls, .csv files
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file);
+                  }}
+                />
+              </button>
+              <div className="flex items-center justify-between bg-muted/40 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground">
+                  Not sure of the format? Download our template:
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs gap-1.5"
+                  onClick={downloadTemplate}
+                  data-ocid="leads.import.download_button"
+                >
+                  <Download size={12} />
+                  Download Template
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {importStep === "map" && (
+            <div className="space-y-4 py-2">
+              <div>
+                <p className="text-sm font-semibold mb-1">
+                  Map CSV Columns to Lead Fields
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {importRows.length} data rows found. Map each lead field to a
+                  column from your file.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {LEAD_FIELDS.map((field) => (
+                  <div key={field} className="space-y-1">
+                    <Label className="text-xs font-medium">
+                      {LEAD_FIELD_LABELS[field]}
+                    </Label>
+                    <Select
+                      value={importFieldMap[field] || "__none__"}
+                      onValueChange={(v) =>
+                        setImportFieldMap((prev) => ({
+                          ...prev,
+                          [field]: v === "__none__" ? "" : v,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="-- skip --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">-- skip --</SelectItem>
+                        {importHeaders.map((h) => (
+                          <SelectItem key={h} value={h}>
+                            {h}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+
+              {importRows.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Preview (first 3 rows)
+                  </p>
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-xs">
+                      <thead className="bg-muted/40">
+                        <tr>
+                          {importHeaders.map((h) => (
+                            <th
+                              key={h}
+                              className="px-3 py-1.5 text-left font-medium text-muted-foreground"
+                            >
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importRows.slice(0, 3).map((row) => (
+                          <tr
+                            key={
+                              String(row[0] ?? "") +
+                              String(row[1] ?? "") +
+                              String(row[2] ?? "")
+                            }
+                            className="border-t border-border"
+                          >
+                            {importHeaders.map((header) => (
+                              <td
+                                key={header}
+                                className="px-3 py-1.5 text-foreground"
+                              >
+                                {String(
+                                  row[importHeaders.indexOf(header)] ?? "",
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <DialogFooter className="gap-2">
+                <Button variant="outline" size="sm" onClick={resetImport}>
+                  Back
+                </Button>
+                <Button
+                  size="sm"
+                  style={{ background: "#4F8F92" }}
+                  onClick={handleImport}
+                  disabled={!importFieldMap.name}
+                  data-ocid="leads.import.submit_button"
+                >
+                  Import {importRows.length} Lead
+                  {importRows.length !== 1 ? "s" : ""}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+
+          {importStep === "importing" && (
+            <div className="py-8 space-y-4 text-center">
+              <Loader2
+                size={32}
+                className="animate-spin mx-auto"
+                style={{ color: "#4F8F92" }}
+              />
+              <p className="text-sm font-semibold">Importing leads...</p>
+              <p className="text-xs text-muted-foreground">
+                {importProgress.done} / {importProgress.total}
+              </p>
+              <Progress
+                value={
+                  importProgress.total > 0
+                    ? (importProgress.done / importProgress.total) * 100
+                    : 0
+                }
+                className="h-2 max-w-xs mx-auto"
+              />
+              <p className="text-xs text-muted-foreground">
+                Please wait, do not close this window.
+              </p>
+            </div>
+          )}
+
+          {importStep === "done" && (
+            <div className="py-8 space-y-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                <span className="text-2xl">✓</span>
+              </div>
+              <p className="text-sm font-semibold text-green-700">
+                {importProgress.done} lead{importProgress.done !== 1 ? "s" : ""}{" "}
+                imported successfully!
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Your leads are now available in the table.
+              </p>
+              <DialogFooter className="justify-center">
+                <Button
+                  style={{ background: "#4F8F92" }}
+                  onClick={() => {
+                    setImportOpen(false);
+                    resetImport();
+                  }}
+                  data-ocid="leads.import.close_button"
+                >
+                  Done
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

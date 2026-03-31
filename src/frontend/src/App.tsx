@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import { clearAuth, getAuthUser, setAuthUser } from "./store";
 import type { AuthUser } from "./types";
+import { setupSecurity } from "./utils/security";
 
 export type Page =
   | "dashboard"
@@ -23,6 +24,11 @@ export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
   const [seeded, setSeeded] = useState(false);
+
+  // Security hardening: run once on mount
+  useEffect(() => {
+    setupSecurity();
+  }, []);
 
   useEffect(() => {
     const stored = getAuthUser();

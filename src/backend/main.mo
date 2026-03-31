@@ -36,6 +36,26 @@ actor {
     createdAt : Text;
   };
 
+  type CampaignTemplate = {
+    id : Text;
+    name : Text;
+    mediaType : Text;
+    mediaUrl : Text;
+    messageText : Text;
+    createdAt : Text;
+  };
+
+  type CampaignSend = {
+    id : Text;
+    campaignId : Text;
+    templateId : Text;
+    leadId : Text;
+    leadName : Text;
+    sentAt : Text;
+    sentBy : Text;
+    note : Text;
+  };
+
   type Branch = {
     id : Text;
     name : Text;
@@ -161,6 +181,8 @@ actor {
   stable var leadsData : [(Text, Lead)] = [];
   stable var followUpsData : [(Text, FollowUp)] = [];
   stable var campaignsData : [(Text, Campaign)] = [];
+  stable var campaignTemplatesData : [(Text, CampaignTemplate)] = [];
+  stable var campaignSendsData : [(Text, CampaignSend)] = [];
   stable var branchesData : [(Text, Branch)] = [];
   stable var leadSourcesData : [(Text, LeadSource)] = [];
   stable var teamMembersData : [(Text, TeamMember)] = [];
@@ -177,10 +199,13 @@ actor {
   stable var seeded : Bool = false;
   stable var seededV6 : Bool = false;
   stable var seededV7 : Bool = false;
+  stable var seededV8 : Bool = false;
 
   let leads = Map.fromIter<Text, Lead>(leadsData.vals());
   let followUps = Map.fromIter<Text, FollowUp>(followUpsData.vals());
   let campaigns = Map.fromIter<Text, Campaign>(campaignsData.vals());
+  let campaignTemplates = Map.fromIter<Text, CampaignTemplate>(campaignTemplatesData.vals());
+  let campaignSends = Map.fromIter<Text, CampaignSend>(campaignSendsData.vals());
   let branches = Map.fromIter<Text, Branch>(branchesData.vals());
   let leadSources = Map.fromIter<Text, LeadSource>(leadSourcesData.vals());
   let teamMembers = Map.fromIter<Text, TeamMember>(teamMembersData.vals());
@@ -199,6 +224,8 @@ actor {
     leadsData := leads.entries().toArray();
     followUpsData := followUps.entries().toArray();
     campaignsData := campaigns.entries().toArray();
+    campaignTemplatesData := campaignTemplates.entries().toArray();
+    campaignSendsData := campaignSends.entries().toArray();
     branchesData := branches.entries().toArray();
     leadSourcesData := leadSources.entries().toArray();
     teamMembersData := teamMembers.entries().toArray();
@@ -234,31 +261,35 @@ actor {
 
   public shared func initSeedData() : async () {
     if (seededV6) {
-      // Only seed new V7 data if not done yet
       if (not seededV7) {
         seededV7 := true;
-        // Seed lead activities
         leadActivities.add("la1", { id = "la1"; leadId = "l1"; activityType = "Call"; description = "Called family — interested in Nursery programme starting June 2026. Will visit campus."; performedBy = "Priya Sharma"; timestamp = "2026-03-20T09:30:00Z" });
         leadActivities.add("la2", { id = "la2"; leadId = "l1"; activityType = "Stage Change"; description = "Stage moved from New Inquiry to Qualified"; performedBy = "Priya Sharma"; timestamp = "2026-03-21T10:00:00Z" });
         leadActivities.add("la3", { id = "la3"; leadId = "l2"; activityType = "WhatsApp"; description = "Sent daycare schedule and fee structure via WhatsApp."; performedBy = "Rajan Kumar"; timestamp = "2026-03-18T11:00:00Z" });
         leadActivities.add("la4", { id = "la4"; leadId = "l3"; activityType = "Campus Tour"; description = "Campus tour completed at Kondapur. Family impressed with facilities."; performedBy = "Priya Sharma"; timestamp = "2026-03-22T10:30:00Z" });
         leadActivities.add("la5", { id = "la5"; leadId = "l4"; activityType = "Email"; description = "Application form emailed to family for Bachupally branch."; performedBy = "Rajan Kumar"; timestamp = "2026-03-10T12:00:00Z" });
         leadActivities.add("la6", { id = "la6"; leadId = "l5"; activityType = "Enrolled"; description = "Enrollment confirmed. Starting Term 3, April 2026. Fees paid."; performedBy = "Priya Sharma"; timestamp = "2026-03-05T09:00:00Z" });
-        // Lead notes
         leadNotes.add("ln1", { id = "ln1"; leadId = "l1"; content = "Family has two children — second child may also enroll in Pre Nursery next year. Very interested, follow up after campus tour."; createdBy = "Priya Sharma"; createdAt = "2026-03-21T10:05:00Z" });
         leadNotes.add("ln2", { id = "ln2"; leadId = "l2"; content = "Needs full-day slot 9AM-7PM. Father is a doctor with early morning shifts. Mother will drop and pick up."; createdBy = "Rajan Kumar"; createdAt = "2026-03-18T11:30:00Z" });
         leadNotes.add("ln3", { id = "ln3"; leadId = "l3"; content = "Tour went very well. Father asked about transport facility — follow up with bus route details for Kondapur area."; createdBy = "Priya Sharma"; createdAt = "2026-03-22T10:45:00Z" });
-        // Tasks
         tasks.add("tk1", { id = "tk1"; title = "Send Nursery fee structure to Arjun's family"; description = "Email detailed fee breakup for Nursery programme including Term 3 dates."; assignedTo = "Priya Sharma"; dueDate = "2026-04-01"; priority = "High"; completed = false; leadId = "l1"; createdAt = "2026-03-21T10:00:00Z" });
         tasks.add("tk2", { id = "tk2"; title = "Send bus route details — Kondapur"; description = "Share transport routes and contact for Srinivas Rao family"; assignedTo = "Priya Sharma"; dueDate = "2026-04-02"; priority = "Medium"; completed = false; leadId = "l3"; createdAt = "2026-03-22T11:00:00Z" });
         tasks.add("tk3", { id = "tk3"; title = "Follow up on Meera Iyer application"; description = "Check if application form has been submitted for Bachupally Pre Nursery."; assignedTo = "Rajan Kumar"; dueDate = "2026-03-31"; priority = "High"; completed = false; leadId = "l4"; createdAt = "2026-03-10T12:30:00Z" });
         tasks.add("tk4", { id = "tk4"; title = "Prepare Open Day invites"; description = "Send Open Day invitations for April 2026 to all Qualified and Campus Tour leads."; assignedTo = "admin"; dueDate = "2026-04-05"; priority = "Medium"; completed = false; leadId = ""; createdAt = "2026-03-25T09:00:00Z" });
         tasks.add("tk5", { id = "tk5"; title = "Update Admissions Campaign report"; description = "Compile conversion stats for Admissions 2026-27 campaign for Founder review."; assignedTo = "admin"; dueDate = "2026-04-10"; priority = "Low"; completed = false; leadId = ""; createdAt = "2026-03-25T09:30:00Z" });
       };
+      if (not seededV8) {
+        seededV8 := true;
+        campaignTemplates.add("ct1", { id = "ct1"; name = "Summer Camp 2026 — Video Promo"; mediaType = "video"; mediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; messageText = "\u{1F31E} This Summer, Give Your Child More Than Just Holidays!\n\nAt Mahara Summer Camp 2026, every day is filled with fun, learning, and confidence-building experiences \u{1F680}\n\nFrom creative activities \u{1F973} to physical development \u{1F3CB}, your child will explore, grow, and shine in a safe and nurturing environment.\n\n\u{2728} Build confidence & communication\n\u{2728} Improve focus & discipline\n\u{2728} Hands-on art, craft & DIY fun\n\u{2728} Dance & movement-based learning\n\u{2728} Taekwondo for strength & self-confidence\n\n\u{1F9D1} Personal Attention for Every Child\n\u{231B} Limited Seats \u{2013} Batch Filling Fast!\n\n\u{1F4CD} Bachupally | Kondapur"; createdAt = "2026-03-25T10:00:00Z" });
+        campaignTemplates.add("ct2", { id = "ct2"; name = "Admissions Open 2026-27 — Image"; mediaType = "image"; mediaUrl = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600"; messageText = "\u{1F393} Admissions Now Open for 2026-27!\n\nDear {name},\n\nWe are thrilled to announce that Mahara Schools is now accepting applications for {grade} for the academic year 2026-27.\n\n\u{2705} World-class curriculum\n\u{2705} Experienced & passionate educators\n\u{2705} Safe & nurturing environment\n\u{2705} Both Kondapur & Bachupally campuses\n\nSeats are limited — secure your child's place today!\n\n\u{1F4DE} Call us: +91 62817-08102\n\u{1F310} maharaschools.com"; createdAt = "2026-03-25T10:05:00Z" });
+        campaignSends.add("cs1", { id = "cs1"; campaignId = "c1"; templateId = "ct2"; leadId = "l1"; leadName = "Arjun Reddy's Parents"; sentAt = "2026-03-26T09:00:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
+        campaignSends.add("cs2", { id = "cs2"; campaignId = "c1"; templateId = "ct1"; leadId = "l3"; leadName = "Srinivas Rao"; sentAt = "2026-03-26T09:30:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
+      };
       return;
     };
     seededV6 := true;
     seededV7 := true;
+    seededV8 := true;
 
     for (k in users.keys().toArray().vals()) { users.remove(k) };
     for (k in branches.keys().toArray().vals()) { branches.remove(k) };
@@ -273,6 +304,8 @@ actor {
     for (k in leadActivities.keys().toArray().vals()) { leadActivities.remove(k) };
     for (k in leadNotes.keys().toArray().vals()) { leadNotes.remove(k) };
     for (k in tasks.keys().toArray().vals()) { tasks.remove(k) };
+    for (k in campaignTemplates.keys().toArray().vals()) { campaignTemplates.remove(k) };
+    for (k in campaignSends.keys().toArray().vals()) { campaignSends.remove(k) };
 
     users.add("founder", { username = "founder"; password = "founder123"; role = "Founder"; fullName = "Manaswini Bandi" });
     users.add("admin", { username = "admin"; password = "admin123"; role = "Admin"; fullName = "Admin — Mahara Schools" });
@@ -337,7 +370,6 @@ actor {
     calendarEvents.add("ce5", { id = "ce5"; title = "Milestone Meet"; date = "2026-03-28"; category = "CCMeet"; color = "#B8A7CC" });
     calendarEvents.add("ce6", { id = "ce6"; title = "Term 3 Begins"; date = "2026-04-07"; category = "Event"; color = "#78C8C8" });
 
-    // Lead Activities
     leadActivities.add("la1", { id = "la1"; leadId = "l1"; activityType = "Call"; description = "Called family — interested in Nursery programme starting June 2026. Will visit campus."; performedBy = "Priya Sharma"; timestamp = "2026-03-20T09:30:00Z" });
     leadActivities.add("la2", { id = "la2"; leadId = "l1"; activityType = "Stage Change"; description = "Stage moved from New Inquiry to Qualified"; performedBy = "Priya Sharma"; timestamp = "2026-03-21T10:00:00Z" });
     leadActivities.add("la3", { id = "la3"; leadId = "l2"; activityType = "WhatsApp"; description = "Sent daycare schedule and fee structure via WhatsApp."; performedBy = "Rajan Kumar"; timestamp = "2026-03-18T11:00:00Z" });
@@ -345,16 +377,20 @@ actor {
     leadActivities.add("la5", { id = "la5"; leadId = "l4"; activityType = "Email"; description = "Application form emailed to family for Bachupally branch."; performedBy = "Rajan Kumar"; timestamp = "2026-03-10T12:00:00Z" });
     leadActivities.add("la6", { id = "la6"; leadId = "l5"; activityType = "Enrolled"; description = "Enrollment confirmed. Starting Term 3, April 2026. Fees paid."; performedBy = "Priya Sharma"; timestamp = "2026-03-05T09:00:00Z" });
 
-    // Lead Notes
     leadNotes.add("ln1", { id = "ln1"; leadId = "l1"; content = "Family has two children — second child may also enroll in Pre Nursery next year."; createdBy = "Priya Sharma"; createdAt = "2026-03-21T10:05:00Z" });
     leadNotes.add("ln2", { id = "ln2"; leadId = "l2"; content = "Needs full-day slot 9AM-7PM. Father is a doctor with early morning shifts."; createdBy = "Rajan Kumar"; createdAt = "2026-03-18T11:30:00Z" });
     leadNotes.add("ln3", { id = "ln3"; leadId = "l3"; content = "Tour went very well. Father asked about transport facility — follow up with bus route details."; createdBy = "Priya Sharma"; createdAt = "2026-03-22T10:45:00Z" });
 
-    // Tasks
     tasks.add("tk1", { id = "tk1"; title = "Send Nursery fee structure to Arjun family"; description = "Email detailed fee breakup for Nursery programme."; assignedTo = "Priya Sharma"; dueDate = "2026-04-01"; priority = "High"; completed = false; leadId = "l1"; createdAt = "2026-03-21T10:00:00Z" });
     tasks.add("tk2", { id = "tk2"; title = "Send bus route details — Kondapur"; description = "Share transport routes and contact for Srinivas Rao family"; assignedTo = "Priya Sharma"; dueDate = "2026-04-02"; priority = "Medium"; completed = false; leadId = "l3"; createdAt = "2026-03-22T11:00:00Z" });
     tasks.add("tk3", { id = "tk3"; title = "Follow up on Meera Iyer application"; description = "Check if application form has been submitted for Bachupally Pre Nursery."; assignedTo = "Rajan Kumar"; dueDate = "2026-03-31"; priority = "High"; completed = false; leadId = "l4"; createdAt = "2026-03-10T12:30:00Z" });
     tasks.add("tk4", { id = "tk4"; title = "Prepare Open Day invites"; description = "Send invitations to all Qualified and Campus Tour leads."; assignedTo = "admin"; dueDate = "2026-04-05"; priority = "Medium"; completed = false; leadId = ""; createdAt = "2026-03-25T09:00:00Z" });
+
+    campaignTemplates.add("ct1", { id = "ct1"; name = "Summer Camp 2026 — Video Promo"; mediaType = "video"; mediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; messageText = "\u{1F31E} This Summer, Give Your Child More Than Just Holidays!\n\nAt Mahara Summer Camp 2026, every day is filled with fun, learning, and confidence-building experiences \u{1F680}\n\n\u{2728} Build confidence & communication\n\u{2728} Improve focus & discipline\n\u{2728} Hands-on art, craft & DIY fun\n\u{2728} Dance & movement-based learning\n\n\u{1F9D1} Personal Attention for Every Child\n\u{231B} Limited Seats \u{2013} Batch Filling Fast!\n\n\u{1F4CD} Bachupally | Kondapur"; createdAt = "2026-03-25T10:00:00Z" });
+    campaignTemplates.add("ct2", { id = "ct2"; name = "Admissions Open 2026-27 — Image"; mediaType = "image"; mediaUrl = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600"; messageText = "\u{1F393} Admissions Now Open for 2026-27!\n\nDear {name},\n\nWe are thrilled to announce that Mahara Schools is accepting applications for {grade}.\n\n\u{2705} World-class curriculum\n\u{2705} Experienced & passionate educators\n\u{2705} Safe & nurturing environment\n\n\u{1F4DE} Call us: +91 62817-08102\n\u{1F310} maharaschools.com"; createdAt = "2026-03-25T10:05:00Z" });
+
+    campaignSends.add("cs1", { id = "cs1"; campaignId = "c1"; templateId = "ct2"; leadId = "l1"; leadName = "Arjun Reddy's Parents"; sentAt = "2026-03-26T09:00:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
+    campaignSends.add("cs2", { id = "cs2"; campaignId = "c1"; templateId = "ct1"; leadId = "l3"; leadName = "Srinivas Rao"; sentAt = "2026-03-26T09:30:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
   };
 
   // Leads
@@ -386,6 +422,30 @@ actor {
   };
   public shared func updateCampaign(c : Campaign) : async () { campaigns.add(c.id, c) };
   public shared func deleteCampaign(id : Text) : async () { campaigns.remove(id) };
+
+  // Campaign Templates
+  public query func getCampaignTemplates() : async [CampaignTemplate] { campaignTemplates.values().toArray() };
+  public shared func addCampaignTemplate(t : CampaignTemplate) : async Text {
+    let id = await genId();
+    campaignTemplates.add(id, { t with id });
+    id;
+  };
+  public shared func updateCampaignTemplate(t : CampaignTemplate) : async () { campaignTemplates.add(t.id, t) };
+  public shared func deleteCampaignTemplate(id : Text) : async () { campaignTemplates.remove(id) };
+
+  // Campaign Sends
+  public query func getCampaignSends() : async [CampaignSend] { campaignSends.values().toArray() };
+  public query func getCampaignSendsByCampaign(campaignId : Text) : async [CampaignSend] {
+    campaignSends.values().toArray().filter(func(s : CampaignSend) : Bool { s.campaignId == campaignId });
+  };
+  public query func getCampaignSendsByLead(leadId : Text) : async [CampaignSend] {
+    campaignSends.values().toArray().filter(func(s : CampaignSend) : Bool { s.leadId == leadId });
+  };
+  public shared func addCampaignSend(s : CampaignSend) : async Text {
+    let id = await genId();
+    campaignSends.add(id, { s with id });
+    id;
+  };
 
   // Branches
   public query func getBranches() : async [Branch] { branches.values().toArray() };

@@ -41,6 +41,26 @@ export interface Campaign {
   createdAt: string;
 }
 
+export interface CampaignTemplate {
+  id: string;
+  name: string;
+  mediaType: "none" | "image" | "video" | "gif" | "document";
+  mediaUrl: string;
+  messageText: string;
+  createdAt: string;
+}
+
+export interface CampaignSend {
+  id: string;
+  campaignId: string;
+  templateId: string;
+  leadId: string;
+  leadName: string;
+  sentAt: string;
+  sentBy: string;
+  note: string;
+}
+
 export interface Branch {
   id: string;
   name: string;

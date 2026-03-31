@@ -33,6 +33,26 @@ export interface Campaign {
   createdAt: string;
 }
 
+export interface CampaignTemplate {
+  id: string;
+  name: string;
+  mediaType: string;
+  mediaUrl: string;
+  messageText: string;
+  createdAt: string;
+}
+
+export interface CampaignSend {
+  id: string;
+  campaignId: string;
+  templateId: string;
+  leadId: string;
+  leadName: string;
+  sentAt: string;
+  sentBy: string;
+  note: string;
+}
+
 export interface Branch {
   id: string;
   name: string;
@@ -166,6 +186,16 @@ export interface backendInterface {
   addCampaign(c: Campaign): Promise<string>;
   updateCampaign(c: Campaign): Promise<void>;
   deleteCampaign(id: string): Promise<void>;
+
+  getCampaignTemplates(): Promise<CampaignTemplate[]>;
+  addCampaignTemplate(t: CampaignTemplate): Promise<string>;
+  updateCampaignTemplate(t: CampaignTemplate): Promise<void>;
+  deleteCampaignTemplate(id: string): Promise<void>;
+
+  getCampaignSends(): Promise<CampaignSend[]>;
+  getCampaignSendsByCampaign(campaignId: string): Promise<CampaignSend[]>;
+  getCampaignSendsByLead(leadId: string): Promise<CampaignSend[]>;
+  addCampaignSend(s: CampaignSend): Promise<string>;
 
   getBranches(): Promise<Branch[]>;
   addBranch(b: Branch): Promise<string>;

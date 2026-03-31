@@ -14,7 +14,6 @@ import {
   Bar,
   BarChart,
   Cell,
-  Legend,
   Line,
   LineChart,
   Pie,
@@ -252,7 +251,7 @@ export default function ReportsPage() {
                 No data yet
               </p>
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Pie
                     data={sourceData}
@@ -260,7 +259,7 @@ export default function ReportsPage() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
+                    outerRadius={90}
                     label={({ name, percent }) =>
                       `${name} (${(percent * 100).toFixed(0)}%)`
                     }
@@ -274,7 +273,6 @@ export default function ReportsPage() {
                     ))}
                   </Pie>
                   <Tooltip />
-                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -289,7 +287,7 @@ export default function ReportsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={pipelineData} layout="vertical">
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis
@@ -325,7 +323,7 @@ export default function ReportsPage() {
                 No data yet
               </p>
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={monthlyData}>
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
