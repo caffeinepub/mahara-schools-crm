@@ -17,25 +17,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   BookOpen,
   Building2,
+  Calendar,
   ChevronRight,
   Crown,
   GraduationCap,
+  KeyRound,
   Loader2,
+  Mail,
   Pencil,
+  Phone,
   Plus,
   Trash2,
-  UserSquare,
+  UserCircle,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActor } from "../hooks/useActor";
-import type { Branch, LeadSource, Teacher, TeamMember } from "../types";
+import type {
+  AuthUser,
+  Branch,
+  LeadSource,
+  StaffProfile,
+  Teacher,
+  TeamMember,
+  UserAccount,
+} from "../types";
 
 const GRADES = [
   "Pre Nursery",
@@ -52,9 +71,896 @@ const GRADES = [
   "Grade 8",
   "Grade 9",
   "Grade 10",
-  "Grade 11",
-  "Grade 12",
 ];
+
+// ---- Staff Hierarchy ----
+function StaffHierarchyTab() {
+  const { actor: rawActor } = useActor();
+  const actor = rawActor as any;
+  const [staffProfiles, setStaffProfiles] = useState<StaffProfile[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<StaffProfile | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [_addBranchId, setAddBranchId] = useState("");
+  const [addRole, setAddRole] = useState("Teacher");
+  const [editingProfile, setEditingProfile] = useState<StaffProfile>({
+    id: "",
+    name: "",
+    designation: "",
+    contactNumber: "",
+    branchId: "",
+    role: "Teacher",
+    dailyActivities: "",
+    notes: "",
+    email: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  useEffect(() => {
+    if (!actor) return;
+    Promise.all([actor.getStaffProfiles(), actor.getBranches()])
+      .then(([profiles, bs]: [StaffProfile[], Branch[]]) => {
+        setStaffProfiles(profiles);
+        setBranches(bs);
+      })
+      .catch(() => toast.error("Failed to load staff profiles"))
+      .finally(() => setLoading(false));
+  }, [actor]);
+
+  function branchName(id: string) {
+    return branches.find((b) => b.id === id)?.name ?? id;
+  }
+
+  function openAdd(branchId: string, role: string) {
+    setAddBranchId(branchId);
+    setAddRole(role);
+    setEditingProfile({
+      id: "",
+      name: "",
+      designation: role === "CentreHead" ? "Centre Head" : "Class Teacher",
+      contactNumber: "",
+      branchId,
+      role,
+      dailyActivities: "",
+      notes: "",
+      email: "",
+    });
+    setIsEditMode(false);
+    setAddOpen(true);
+  }
+
+  function openEdit(sp: StaffProfile) {
+    setEditingProfile({ ...sp });
+    setIsEditMode(true);
+    setAddOpen(true);
+    setSelected(null);
+  }
+
+  async function handleSave() {
+    if (!actor) return;
+    setSaving(true);
+    try {
+      if (isEditMode) {
+        await actor.updateStaffProfile(editingProfile);
+        toast.success("Staff profile updated");
+      } else {
+        await actor.addStaffProfile(editingProfile);
+        toast.success("Staff member added");
+      }
+      const updated = await actor.getStaffProfiles();
+      setStaffProfiles(updated);
+      setAddOpen(false);
+    } catch {
+      toast.error("Failed to save staff profile");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!actor) return;
+    try {
+      await actor.deleteStaffProfile(id);
+      setStaffProfiles((p) => p.filter((sp) => sp.id !== id));
+      setSelected(null);
+      toast.success("Staff member removed");
+    } catch {
+      toast.error("Failed to remove staff member");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-20 rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  const centreHeads = (branchId: string) =>
+    staffProfiles.filter(
+      (sp) => sp.branchId === branchId && sp.role === "CentreHead",
+    );
+  const teachers = (branchId: string) =>
+    staffProfiles.filter(
+      (sp) => sp.branchId === branchId && sp.role === "Teacher",
+    );
+
+  return (
+    <div className="space-y-4" data-ocid="hierarchy.panel">
+      {/* Founder */}
+      <div
+        className="flex items-center gap-3 p-4 rounded-xl border-2"
+        style={{ borderColor: "#4F8F92", background: "#F0F7F7" }}
+      >
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ background: "#4F8F92" }}
+        >
+          <Crown size={18} className="text-white" />
+        </div>
+        <div>
+          <p className="font-bold text-sm">Ms. Manaswini Bandi</p>
+          <p className="text-xs text-muted-foreground">
+            Founder &amp; Digital Marketing
+          </p>
+        </div>
+        <Badge
+          className="ml-auto text-[10px]"
+          style={{ background: "#4F8F92" }}
+        >
+          Founder
+        </Badge>
+      </div>
+
+      {/* Branches with Centre Heads and Teachers */}
+      <div className="ml-4 space-y-5">
+        {branches.map((branch, bi) => (
+          <div
+            key={branch.id}
+            className="space-y-2"
+            data-ocid={`hierarchy.branch.item.${bi + 1}`}
+          >
+            {/* Branch label */}
+            <div className="flex items-center gap-1.5 mb-2">
+              <div className="w-6 h-px bg-border" />
+              <ChevronRight size={12} className="text-muted-foreground" />
+              <span
+                className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                style={{ background: "#E8F4F4", color: "#3A8A8D" }}
+              >
+                {branch.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                — {branch.location}
+              </span>
+            </div>
+
+            {/* Centre Heads */}
+            <div className="ml-6 space-y-1.5">
+              {centreHeads(branch.id).map((sp, ci) => (
+                <button
+                  key={sp.id}
+                  type="button"
+                  onClick={() => setSelected(sp)}
+                  className="w-full text-left flex items-center gap-3 p-3 rounded-lg border bg-card shadow-xs hover:bg-muted/30 transition-colors"
+                  data-ocid={`hierarchy.centrehead.item.${ci + 1}`}
+                >
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: "#6EA9AA" }}
+                  >
+                    <Building2 size={15} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold">{sp.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {sp.designation}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    Centre Head
+                  </Badge>
+                  <ChevronRight size={14} className="text-muted-foreground" />
+                </button>
+              ))}
+              {centreHeads(branch.id).length === 0 && (
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    No centre head assigned
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => openAdd(branch.id, "CentreHead")}
+                    className="text-xs text-teal-600 underline hover:no-underline"
+                  >
+                    + Assign
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Teachers */}
+            <div className="ml-10 space-y-1.5">
+              {teachers(branch.id).map((sp, ti) => (
+                <button
+                  key={sp.id}
+                  type="button"
+                  onClick={() => setSelected(sp)}
+                  className="w-full text-left flex items-center gap-3 p-2.5 rounded-lg border bg-muted/20 hover:bg-muted/40 transition-colors"
+                  data-ocid={`hierarchy.teacher.item.${ti + 1}`}
+                >
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                    style={{ background: "#7B9E87" }}
+                  >
+                    {sp.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium">{sp.name}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {sp.designation}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    Teacher
+                  </Badge>
+                  <ChevronRight size={12} className="text-muted-foreground" />
+                </button>
+              ))}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => openAdd(branch.id, "Teacher")}
+                className="text-xs h-7 border-dashed"
+              >
+                <Plus size={11} className="mr-1" /> Add Teacher
+              </Button>
+            </div>
+
+            {/* Add Centre Head button if none exist */}
+            {centreHeads(branch.id).length < 1 ? null : (
+              <div className="ml-6">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openAdd(branch.id, "CentreHead")}
+                  className="text-xs h-7 border-dashed"
+                >
+                  <Plus size={11} className="mr-1" /> Add Centre Head
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {branches.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          No branches configured.
+        </p>
+      )}
+
+      {/* Staff Detail Sheet */}
+      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <SheetContent className="w-[380px] sm:max-w-[420px] overflow-y-auto">
+          {selected && (
+            <>
+              <SheetHeader className="pb-4 border-b">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                    style={{
+                      background:
+                        selected.role === "CentreHead" ? "#6EA9AA" : "#7B9E87",
+                    }}
+                  >
+                    {selected.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)}
+                  </div>
+                  <div>
+                    <SheetTitle className="text-base">
+                      {selected.name}
+                    </SheetTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {selected.designation}
+                    </p>
+                    <Badge
+                      className="text-[10px] mt-1"
+                      style={{
+                        background:
+                          selected.role === "CentreHead"
+                            ? "#6EA9AA"
+                            : "#7B9E87",
+                      }}
+                    >
+                      {selected.role === "CentreHead"
+                        ? "Centre Head"
+                        : "Teacher"}
+                    </Badge>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              <div className="space-y-4 py-4">
+                {/* Branch */}
+                <div className="flex items-start gap-2">
+                  <Building2
+                    size={15}
+                    className="text-muted-foreground mt-0.5 flex-shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      Branch
+                    </p>
+                    <p className="text-sm">{branchName(selected.branchId)}</p>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="flex items-start gap-2">
+                  <Phone
+                    size={15}
+                    className="text-muted-foreground mt-0.5 flex-shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      Contact
+                    </p>
+                    <p className="text-sm">{selected.contactNumber || "—"}</p>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex items-start gap-2">
+                  <Mail
+                    size={15}
+                    className="text-muted-foreground mt-0.5 flex-shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      Email
+                    </p>
+                    <p className="text-sm">{selected.email || "—"}</p>
+                  </div>
+                </div>
+
+                {/* Daily Activities */}
+                <div className="flex items-start gap-2">
+                  <Calendar
+                    size={15}
+                    className="text-muted-foreground mt-0.5 flex-shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      Daily Activities
+                    </p>
+                    <div className="mt-1 space-y-1">
+                      {selected.dailyActivities ? (
+                        selected.dailyActivities.split(",").map((act) => (
+                          <p
+                            key={act.trim().slice(0, 30)}
+                            className="text-sm leading-relaxed"
+                          >
+                            • {act.trim()}
+                          </p>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No activities listed
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                {selected.notes && (
+                  <div className="flex items-start gap-2">
+                    <UserCircle
+                      size={15}
+                      className="text-muted-foreground mt-0.5 flex-shrink-0"
+                    />
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        Notes
+                      </p>
+                      <p className="text-sm">{selected.notes}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 pt-4 border-t">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openEdit(selected)}
+                  className="flex-1"
+                >
+                  <Pencil size={13} className="mr-1" /> Edit Profile
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(selected.id)}
+                  className="flex-1"
+                >
+                  <Trash2 size={13} className="mr-1" /> Remove
+                </Button>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Add/Edit Staff Dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditMode
+                ? "Edit Staff Profile"
+                : `Add ${addRole === "CentreHead" ? "Centre Head" : "Teacher"}`}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Full Name</Label>
+              <Input
+                value={editingProfile.name}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({ ...p, name: e.target.value }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Designation</Label>
+              <Input
+                placeholder="e.g. Class Teacher — Nursery"
+                value={editingProfile.designation}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({
+                    ...p,
+                    designation: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Contact Number</Label>
+              <Input
+                placeholder="+91 98xxx-xxxxx"
+                value={editingProfile.contactNumber}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({
+                    ...p,
+                    contactNumber: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Email</Label>
+              <Input
+                type="email"
+                placeholder="name@maharaschools.com"
+                value={editingProfile.email}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({ ...p, email: e.target.value }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Role</Label>
+              <Select
+                value={editingProfile.role}
+                onValueChange={(v) =>
+                  setEditingProfile((p) => ({ ...p, role: v }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CentreHead">Centre Head</SelectItem>
+                  <SelectItem value="Teacher">Teacher</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Branch</Label>
+              <Select
+                value={editingProfile.branchId}
+                onValueChange={(v) =>
+                  setEditingProfile((p) => ({ ...p, branchId: v }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">
+                Daily Activities (comma-separated)
+              </Label>
+              <Textarea
+                placeholder="9AM Assembly, 10AM English, 11AM Maths..."
+                rows={3}
+                value={editingProfile.dailyActivities}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({
+                    ...p,
+                    dailyActivities: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Notes</Label>
+              <Textarea
+                rows={2}
+                value={editingProfile.notes}
+                onChange={(e) =>
+                  setEditingProfile((p) => ({ ...p, notes: e.target.value }))
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              style={{ background: "#4F8F92" }}
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ---- User Accounts Tab ----
+function UserAccountsTab() {
+  const { actor: rawActor } = useActor();
+  const actor = rawActor as any;
+  const [accounts, setAccounts] = useState<UserAccount[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isNew, setIsNew] = useState(false);
+  const [editing, setEditing] = useState<UserAccount>({
+    id: "",
+    username: "",
+    password: "",
+    role: "Teacher",
+    fullName: "",
+    email: "",
+  });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const ROLE_OPTIONS = [
+    "Founder",
+    "Admin",
+    "CentreHead",
+    "Teacher",
+    "Agent",
+    "Parent",
+  ];
+  const ROLE_COLORS: Record<string, string> = {
+    Founder: "#4F8F92",
+    Admin: "#6EA9AA",
+    CentreHead: "#7B9E87",
+    Teacher: "#9B7BAE",
+    Agent: "#C67B5C",
+    Parent: "#5B7FAE",
+  };
+
+  useEffect(() => {
+    if (!actor) return;
+    actor
+      .getUserAccounts()
+      .then((accs: UserAccount[]) => setAccounts(accs))
+      .catch(() => toast.error("Failed to load user accounts"))
+      .finally(() => setLoading(false));
+  }, [actor]);
+
+  function openNew() {
+    setEditing({
+      id: "",
+      username: "",
+      password: "",
+      role: "Teacher",
+      fullName: "",
+      email: "",
+    });
+    setIsNew(true);
+    setOpen(true);
+  }
+
+  function openEdit(a: UserAccount) {
+    setEditing({ ...a });
+    setIsNew(false);
+    setOpen(true);
+  }
+
+  async function handleSave() {
+    if (!actor) return;
+    if (!editing.username || !editing.password || !editing.fullName) {
+      toast.error("Username, password, and full name are required");
+      return;
+    }
+    setSaving(true);
+    try {
+      if (isNew) {
+        await actor.addUserAccount(editing);
+        toast.success("User account created");
+      } else {
+        await actor.updateUserAccount(editing);
+        toast.success("User account updated");
+      }
+      const updated = await actor.getUserAccounts();
+      setAccounts(updated);
+      setOpen(false);
+    } catch {
+      toast.error("Failed to save user account");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!actor) return;
+    try {
+      await actor.deleteUserAccount(id);
+      setAccounts((p) => p.filter((a) => a.id !== id));
+      setDeleteId(null);
+      toast.success("User account deleted");
+    } catch {
+      toast.error("Failed to delete user account");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-16 rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          Create and manage login credentials for all staff.
+        </p>
+        <Button
+          size="sm"
+          style={{ background: "#4F8F92" }}
+          onClick={openNew}
+          data-ocid="accounts.add.primary_button"
+        >
+          <Plus size={14} className="mr-1" /> Create Account
+        </Button>
+      </div>
+
+      {accounts.length === 0 && (
+        <Card>
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
+            No custom accounts yet. Create one to give staff a login.
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="space-y-2">
+        {accounts.map((a, i) => (
+          <Card
+            key={a.id}
+            className="shadow-xs"
+            data-ocid={`accounts.item.${i + 1}`}
+          >
+            <CardContent className="flex items-center gap-3 py-3 px-4">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                style={{ background: ROLE_COLORS[a.role] ?? "#4F8F92" }}
+              >
+                {a.fullName
+                  .split(" ")
+                  .map((n: string) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">{a.fullName}</p>
+                <div className="flex flex-wrap gap-1 mt-0.5">
+                  <Badge
+                    className="text-[10px]"
+                    style={{ background: ROLE_COLORS[a.role] ?? "#4F8F92" }}
+                  >
+                    {a.role}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    @{a.username}
+                  </span>
+                  {a.email && (
+                    <span className="text-xs text-muted-foreground">
+                      {a.email}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => openEdit(a)}
+                  className="p-1.5 rounded hover:bg-muted"
+                  data-ocid={`accounts.edit_button.${i + 1}`}
+                >
+                  <Pencil size={13} className="text-muted-foreground" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(a.id)}
+                  className="p-1.5 rounded hover:bg-destructive/10"
+                  data-ocid={`accounts.delete_button.${i + 1}`}
+                >
+                  <Trash2 size={13} className="text-destructive" />
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-sm" data-ocid="accounts.dialog">
+          <DialogHeader>
+            <DialogTitle>
+              {isNew ? "Create User Account" : "Edit User Account"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Full Name</Label>
+              <Input
+                value={editing.fullName}
+                onChange={(e) =>
+                  setEditing((p) => ({ ...p, fullName: e.target.value }))
+                }
+                placeholder="Ms. Example Name"
+                data-ocid="accounts.fullName.input"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Email</Label>
+              <Input
+                type="email"
+                value={editing.email}
+                onChange={(e) =>
+                  setEditing((p) => ({ ...p, email: e.target.value }))
+                }
+                placeholder="name@maharaschools.com"
+                data-ocid="accounts.email.input"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Username (for login)</Label>
+              <Input
+                value={editing.username}
+                onChange={(e) =>
+                  setEditing((p) => ({ ...p, username: e.target.value }))
+                }
+                placeholder="e.g. teacher4"
+                data-ocid="accounts.username.input"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Password</Label>
+              <Input
+                type="text"
+                value={editing.password}
+                onChange={(e) =>
+                  setEditing((p) => ({ ...p, password: e.target.value }))
+                }
+                placeholder="Set a password"
+                data-ocid="accounts.password.input"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Role</Label>
+              <Select
+                value={editing.role}
+                onValueChange={(v) => setEditing((p) => ({ ...p, role: v }))}
+              >
+                <SelectTrigger data-ocid="accounts.role.select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLE_OPTIONS.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              data-ocid="accounts.cancel_button"
+            >
+              Cancel
+            </Button>
+            <Button
+              style={{ background: "#4F8F92" }}
+              onClick={handleSave}
+              disabled={saving}
+              data-ocid="accounts.save_button"
+            >
+              {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
+              {isNew ? "Create" : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Account?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This will remove the login permanently.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteId && handleDelete(deleteId)}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
 // ---- Branches ----
 function BranchesTab() {
@@ -85,13 +991,11 @@ function BranchesTab() {
     setIsNew(true);
     setOpen(true);
   }
-
   function openEdit(b: Branch) {
     setEditing({ ...b });
     setIsNew(false);
     setOpen(true);
   }
-
   async function handleSave() {
     if (!actor) return;
     setSaving(true);
@@ -103,8 +1007,7 @@ function BranchesTab() {
         await actor.updateBranch(editing);
         toast.success("Branch updated");
       }
-      const updated = await actor.getBranches();
-      setBranches(updated as Branch[]);
+      setBranches((await actor.getBranches()) as Branch[]);
       setOpen(false);
     } catch {
       toast.error("Failed to save branch");
@@ -112,12 +1015,11 @@ function BranchesTab() {
       setSaving(false);
     }
   }
-
   async function handleDelete(id: string) {
     if (!actor) return;
     try {
       await actor.deleteBranch(id);
-      setBranches((prev) => prev.filter((b) => b.id !== id));
+      setBranches((p) => p.filter((b) => b.id !== id));
       setDeleteId(null);
       toast.success("Branch deleted");
     } catch {
@@ -125,15 +1027,14 @@ function BranchesTab() {
     }
   }
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="space-y-2" data-ocid="branches.loading_state">
+      <div className="space-y-2">
         {[1, 2].map((i) => (
           <Skeleton key={i} className="h-16 rounded-xl" />
         ))}
       </div>
     );
-  }
 
   return (
     <div className="space-y-3">
@@ -149,10 +1050,7 @@ function BranchesTab() {
       </div>
       {branches.length === 0 && (
         <Card>
-          <CardContent
-            className="py-10 text-center text-sm text-muted-foreground"
-            data-ocid="branches.empty_state"
-          >
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
             No branches yet.
           </CardContent>
         </Card>
@@ -196,9 +1094,8 @@ function BranchesTab() {
           </Card>
         ))}
       </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm" data-ocid="branches.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>{isNew ? "Add Branch" : "Edit Branch"}</DialogTitle>
           </DialogHeader>
@@ -210,7 +1107,6 @@ function BranchesTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, name: e.target.value }))
                 }
-                data-ocid="branches.name.input"
               />
             </div>
             <div className="space-y-1.5">
@@ -220,23 +1116,17 @@ function BranchesTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, location: e.target.value }))
                 }
-                data-ocid="branches.location.input"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              data-ocid="branches.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
               style={{ background: "#4F8F92" }}
               onClick={handleSave}
               disabled={saving}
-              data-ocid="branches.save_button"
             >
               {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
               Save
@@ -244,9 +1134,8 @@ function BranchesTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm" data-ocid="branches.delete.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete Branch?</DialogTitle>
           </DialogHeader>
@@ -254,17 +1143,12 @@ function BranchesTab() {
             This action cannot be undone.
           </p>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteId(null)}
-              data-ocid="branches.delete.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => deleteId && handleDelete(deleteId)}
-              data-ocid="branches.delete.confirm_button"
             >
               Delete
             </Button>
@@ -305,7 +1189,6 @@ function LeadSourcesTab() {
     setIsNew(false);
     setOpen(true);
   }
-
   async function handleSave() {
     if (!actor) return;
     setSaving(true);
@@ -317,8 +1200,7 @@ function LeadSourcesTab() {
         await actor.updateLeadSource(editing);
         toast.success("Source updated");
       }
-      const updated = await actor.getLeadSources();
-      setSources(updated as LeadSource[]);
+      setSources((await actor.getLeadSources()) as LeadSource[]);
       setOpen(false);
     } catch {
       toast.error("Failed to save source");
@@ -326,12 +1208,11 @@ function LeadSourcesTab() {
       setSaving(false);
     }
   }
-
   async function handleDelete(id: string) {
     if (!actor) return;
     try {
       await actor.deleteLeadSource(id);
-      setSources((prev) => prev.filter((s) => s.id !== id));
+      setSources((p) => p.filter((s) => s.id !== id));
       setDeleteId(null);
       toast.success("Source deleted");
     } catch {
@@ -339,15 +1220,14 @@ function LeadSourcesTab() {
     }
   }
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="space-y-2" data-ocid="sources.loading_state">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-14 rounded-xl" />
         ))}
       </div>
     );
-  }
 
   return (
     <div className="space-y-3">
@@ -363,10 +1243,7 @@ function LeadSourcesTab() {
       </div>
       {sources.length === 0 && (
         <Card>
-          <CardContent
-            className="py-10 text-center text-sm text-muted-foreground"
-            data-ocid="sources.empty_state"
-          >
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
             No sources yet.
           </CardContent>
         </Card>
@@ -390,7 +1267,6 @@ function LeadSourcesTab() {
                   type="button"
                   onClick={() => openEdit(s)}
                   className="p-1.5 rounded hover:bg-muted"
-                  data-ocid={`sources.edit_button.${i + 1}`}
                 >
                   <Pencil size={13} className="text-muted-foreground" />
                 </button>
@@ -398,7 +1274,6 @@ function LeadSourcesTab() {
                   type="button"
                   onClick={() => setDeleteId(s.id)}
                   className="p-1.5 rounded hover:bg-destructive/10"
-                  data-ocid={`sources.delete_button.${i + 1}`}
                 >
                   <Trash2 size={13} className="text-destructive" />
                 </button>
@@ -407,9 +1282,8 @@ function LeadSourcesTab() {
           </Card>
         ))}
       </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm" data-ocid="sources.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
               {isNew ? "Add Lead Source" : "Edit Lead Source"}
@@ -422,22 +1296,16 @@ function LeadSourcesTab() {
               onChange={(e) =>
                 setEditing((p) => ({ ...p, name: e.target.value }))
               }
-              data-ocid="sources.name.input"
             />
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              data-ocid="sources.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
               style={{ background: "#4F8F92" }}
               onClick={handleSave}
               disabled={saving}
-              data-ocid="sources.save_button"
             >
               {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
               Save
@@ -445,9 +1313,8 @@ function LeadSourcesTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm" data-ocid="sources.delete.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete Source?</DialogTitle>
           </DialogHeader>
@@ -455,17 +1322,12 @@ function LeadSourcesTab() {
             This action cannot be undone.
           </p>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteId(null)}
-              data-ocid="sources.delete.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => deleteId && handleDelete(deleteId)}
-              data-ocid="sources.delete.confirm_button"
             >
               Delete
             </Button>
@@ -497,6 +1359,21 @@ function TeamMembersTab() {
     "Manager",
     "Support Staff",
   ];
+  const COLORS = ["#4F8F92", "#7B9E87", "#9B7BAE", "#C67B5C", "#5B7FAE"];
+  function avatarColor(name: string) {
+    let h = 0;
+    for (let i = 0; i < name.length; i++)
+      h = name.charCodeAt(i) + ((h << 5) - h);
+    return COLORS[Math.abs(h) % COLORS.length];
+  }
+  function initials(name: string) {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }
 
   useEffect(() => {
     if (!actor) return;
@@ -522,7 +1399,6 @@ function TeamMembersTab() {
     setIsNew(false);
     setOpen(true);
   }
-
   async function handleSave() {
     if (!actor) return;
     setSaving(true);
@@ -534,8 +1410,7 @@ function TeamMembersTab() {
         await actor.updateTeamMember(editing);
         toast.success("Team member updated");
       }
-      const updated = await actor.getTeamMembers();
-      setMembers(updated as TeamMember[]);
+      setMembers((await actor.getTeamMembers()) as TeamMember[]);
       setOpen(false);
     } catch {
       toast.error("Failed to save team member");
@@ -543,12 +1418,11 @@ function TeamMembersTab() {
       setSaving(false);
     }
   }
-
   async function handleDelete(id: string) {
     if (!actor) return;
     try {
       await actor.deleteTeamMember(id);
-      setMembers((prev) => prev.filter((m) => m.id !== id));
+      setMembers((p) => p.filter((m) => m.id !== id));
       setDeleteId(null);
       toast.success("Team member removed");
     } catch {
@@ -556,31 +1430,14 @@ function TeamMembersTab() {
     }
   }
 
-  const COLORS = ["#4F8F92", "#7B9E87", "#9B7BAE", "#C67B5C", "#5B7FAE"];
-  function avatarColor(name: string) {
-    let h = 0;
-    for (let i = 0; i < name.length; i++)
-      h = name.charCodeAt(i) + ((h << 5) - h);
-    return COLORS[Math.abs(h) % COLORS.length];
-  }
-  function initials(name: string) {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  }
-
-  if (loading) {
+  if (loading)
     return (
-      <div className="space-y-2" data-ocid="team.loading_state">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-16 rounded-xl" />
         ))}
       </div>
     );
-  }
 
   return (
     <div className="space-y-3">
@@ -596,10 +1453,7 @@ function TeamMembersTab() {
       </div>
       {members.length === 0 && (
         <Card>
-          <CardContent
-            className="py-10 text-center text-sm text-muted-foreground"
-            data-ocid="team.empty_state"
-          >
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
             No team members yet.
           </CardContent>
         </Card>
@@ -644,9 +1498,8 @@ function TeamMembersTab() {
           </Card>
         ))}
       </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm" data-ocid="team.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
               {isNew ? "Add Team Member" : "Edit Team Member"}
@@ -660,7 +1513,6 @@ function TeamMembersTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, name: e.target.value }))
                 }
-                data-ocid="team.name.input"
               />
             </div>
             <div className="space-y-1.5">
@@ -669,7 +1521,7 @@ function TeamMembersTab() {
                 value={editing.role}
                 onValueChange={(v) => setEditing((p) => ({ ...p, role: v }))}
               >
-                <SelectTrigger data-ocid="team.role.select">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -683,18 +1535,13 @@ function TeamMembersTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              data-ocid="team.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
               style={{ background: "#4F8F92" }}
               onClick={handleSave}
               disabled={saving}
-              data-ocid="team.save_button"
             >
               {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
               Save
@@ -702,9 +1549,8 @@ function TeamMembersTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm" data-ocid="team.delete.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Remove Member?</DialogTitle>
           </DialogHeader>
@@ -712,17 +1558,12 @@ function TeamMembersTab() {
             This action cannot be undone.
           </p>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteId(null)}
-              data-ocid="team.delete.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => deleteId && handleDelete(deleteId)}
-              data-ocid="team.delete.confirm_button"
             >
               Remove
             </Button>
@@ -733,10 +1574,10 @@ function TeamMembersTab() {
   );
 }
 
-// ---- Teachers ----
+// ---- Teachers Tab ----
 function TeachersTab() {
-  const { actor: _actorRaw4 } = useActor();
-  const actor = _actorRaw4 as any;
+  const { actor: rawActor } = useActor();
+  const actor = rawActor as any;
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -756,14 +1597,17 @@ function TeachersTab() {
   useEffect(() => {
     if (!actor) return;
     Promise.all([actor.getAllTeachers(), actor.getBranches()])
-      .then(([ts, bs]) => {
-        setTeachers(ts as Teacher[]);
-        setBranches(bs as Branch[]);
+      .then(([ts, bs]: [Teacher[], Branch[]]) => {
+        setTeachers(ts);
+        setBranches(bs);
       })
       .catch(() => toast.error("Failed to load teachers"))
       .finally(() => setLoading(false));
   }, [actor]);
 
+  function branchName(id: string) {
+    return branches.find((b) => b.id === id)?.name ?? id;
+  }
   function openNew() {
     setEditing({
       id: `tc${Date.now()}`,
@@ -781,11 +1625,6 @@ function TeachersTab() {
     setIsNew(false);
     setOpen(true);
   }
-
-  function branchName(id: string) {
-    return branches.find((b) => b.id === id)?.name ?? id;
-  }
-
   async function handleSave() {
     if (!actor) return;
     setSaving(true);
@@ -797,8 +1636,7 @@ function TeachersTab() {
         await actor.updateTeacher(editing);
         toast.success("Teacher updated");
       }
-      const updated = await actor.getAllTeachers();
-      setTeachers(updated as Teacher[]);
+      setTeachers(await actor.getAllTeachers());
       setOpen(false);
     } catch {
       toast.error("Failed to save teacher");
@@ -806,7 +1644,6 @@ function TeachersTab() {
       setSaving(false);
     }
   }
-
   async function handleDelete(id: string) {
     if (!actor) return;
     try {
@@ -819,15 +1656,14 @@ function TeachersTab() {
     }
   }
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="space-y-2" data-ocid="teachers.loading_state">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-16 rounded-xl" />
         ))}
       </div>
     );
-  }
 
   return (
     <div className="space-y-3">
@@ -843,10 +1679,7 @@ function TeachersTab() {
       </div>
       {teachers.length === 0 && (
         <Card>
-          <CardContent
-            className="py-10 text-center text-sm text-muted-foreground"
-            data-ocid="teachers.empty_state"
-          >
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
             No teachers yet.
           </CardContent>
         </Card>
@@ -865,7 +1698,7 @@ function TeachersTab() {
               >
                 {t.name
                   .split(" ")
-                  .map((n) => n[0])
+                  .map((n: string) => n[0])
                   .join("")
                   .toUpperCase()
                   .slice(0, 2)}
@@ -906,9 +1739,8 @@ function TeachersTab() {
           </Card>
         ))}
       </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm" data-ocid="teachers.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>{isNew ? "Add Teacher" : "Edit Teacher"}</DialogTitle>
           </DialogHeader>
@@ -920,7 +1752,6 @@ function TeachersTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, name: e.target.value }))
                 }
-                data-ocid="teachers.name.input"
               />
             </div>
             <div className="space-y-1.5">
@@ -930,7 +1761,6 @@ function TeachersTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, username: e.target.value }))
                 }
-                data-ocid="teachers.username.input"
               />
             </div>
             <div className="space-y-1.5">
@@ -941,7 +1771,7 @@ function TeachersTab() {
                   setEditing((p) => ({ ...p, branchId: v }))
                 }
               >
-                <SelectTrigger data-ocid="teachers.branch.select">
+                <SelectTrigger>
                   <SelectValue placeholder="Select branch" />
                 </SelectTrigger>
                 <SelectContent>
@@ -959,7 +1789,7 @@ function TeachersTab() {
                 value={editing.grade}
                 onValueChange={(v) => setEditing((p) => ({ ...p, grade: v }))}
               >
-                <SelectTrigger data-ocid="teachers.grade.select">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -979,23 +1809,17 @@ function TeachersTab() {
                 onChange={(e) =>
                   setEditing((p) => ({ ...p, subjects: e.target.value }))
                 }
-                data-ocid="teachers.subjects.input"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              data-ocid="teachers.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
               style={{ background: "#4F8F92" }}
               onClick={handleSave}
               disabled={saving}
-              data-ocid="teachers.save_button"
             >
               {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
               Save
@@ -1003,9 +1827,8 @@ function TeachersTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm" data-ocid="teachers.delete.dialog">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Remove Teacher?</DialogTitle>
           </DialogHeader>
@@ -1013,17 +1836,12 @@ function TeachersTab() {
             This action cannot be undone.
           </p>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteId(null)}
-              data-ocid="teachers.delete.cancel_button"
-            >
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => deleteId && handleDelete(deleteId)}
-              data-ocid="teachers.delete.confirm_button"
             >
               Remove
             </Button>
@@ -1034,168 +1852,14 @@ function TeachersTab() {
   );
 }
 
-// ---- Staff Hierarchy ----
-function StaffHierarchyTab() {
-  const { actor: _actorRaw5 } = useActor();
-  const actor = _actorRaw5 as any;
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!actor) return;
-    Promise.all([actor.getAllTeachers(), actor.getBranches()])
-      .then(([ts, bs]) => {
-        setTeachers(ts as Teacher[]);
-        setBranches(bs as Branch[]);
-      })
-      .catch(() => toast.error("Failed to load hierarchy"))
-      .finally(() => setLoading(false));
-  }, [actor]);
-
-  if (loading)
-    return (
-      <div className="space-y-2" data-ocid="hierarchy.loading_state">
-        {[1, 2].map((i) => (
-          <Skeleton key={i} className="h-24 rounded-xl" />
-        ))}
-      </div>
-    );
-
-  return (
-    <div className="space-y-4" data-ocid="hierarchy.panel">
-      {/* Founder */}
-      <div
-        className="flex items-center gap-3 p-4 rounded-xl border-2"
-        style={{ borderColor: "#4F8F92", background: "#F0F7F7" }}
-      >
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ background: "#4F8F92" }}
-        >
-          <Crown size={18} className="text-white" />
-        </div>
-        <div>
-          <p className="font-bold text-sm">Dr. Anita Sharma</p>
-          <p className="text-xs text-muted-foreground">
-            Founder & Digital Marketing
-          </p>
-        </div>
-        <Badge
-          className="ml-auto text-[10px]"
-          style={{ background: "#4F8F92" }}
-        >
-          Founder
-        </Badge>
-      </div>
-
-      {/* Centre Heads per branch */}
-      <div className="ml-6 space-y-3">
-        {branches.map((branch, bi) => {
-          const branchTeachers = teachers.filter(
-            (t) => t.branchId === branch.id,
-          );
-          const centreHeadNames: Record<string, string> = {
-            b1: "Mr. Rajan Pillai",
-            b2: "Ms. Hana Al-Blooshi",
-          };
-          const centreHead =
-            centreHeadNames[branch.id] ?? `Centre Head — ${branch.name}`;
-
-          return (
-            <div
-              key={branch.id}
-              className="space-y-2"
-              data-ocid={`hierarchy.branch.item.${bi + 1}`}
-            >
-              {/* Branch header with connector */}
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-px bg-border" />
-                <ChevronRight size={12} className="text-muted-foreground" />
-                <div className="flex items-center gap-3 flex-1 p-3 rounded-lg border bg-card shadow-xs">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: "#6EA9AA" }}
-                  >
-                    <Building2 size={14} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold">{centreHead}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Centre Head — {branch.name}, {branch.location}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="text-[10px]">
-                    Centre Head
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Teachers under this branch */}
-              {branchTeachers.length > 0 && (
-                <div className="ml-8 space-y-1.5">
-                  {branchTeachers.map((t, ti) => (
-                    <div
-                      key={t.id}
-                      className="flex items-center gap-2"
-                      data-ocid={`hierarchy.teachers.item.${ti + 1}`}
-                    >
-                      <div className="w-4 h-px bg-border" />
-                      <ChevronRight
-                        size={12}
-                        className="text-muted-foreground"
-                      />
-                      <div className="flex items-center gap-3 flex-1 p-2.5 rounded-lg border bg-muted/30">
-                        <div
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
-                          style={{ background: "#7B9E87" }}
-                        >
-                          {t.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()
-                            .slice(0, 2)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium">{t.name}</p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {t.grade} · {t.subjects}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="text-[10px]">
-                          Teacher
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {branchTeachers.length === 0 && (
-                <div className="ml-8">
-                  <p className="text-xs text-muted-foreground pl-6">
-                    No teachers assigned to this branch.
-                  </p>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {branches.length === 0 && (
-        <p
-          className="text-sm text-muted-foreground text-center py-4"
-          data-ocid="hierarchy.empty_state"
-        >
-          No branches configured.
-        </p>
-      )}
-    </div>
-  );
+// ---- Main Page ----
+interface Props {
+  user: AuthUser;
 }
 
-export default function ManagementPage() {
+export default function ManagementPage({ user }: Props) {
+  const isAdmin = user.role === "Founder" || user.role === "Admin";
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="hierarchy" data-ocid="management.tab">
@@ -1205,17 +1869,24 @@ export default function ManagementPage() {
             className="text-sm"
             data-ocid="management.hierarchy.tab"
           >
-            <Users size={13} className="mr-1" />
-            Staff Hierarchy
+            <Users size={13} className="mr-1" /> Staff Hierarchy
           </TabsTrigger>
           <TabsTrigger
             value="teachers"
             className="text-sm"
             data-ocid="management.teachers.tab"
           >
-            <GraduationCap size={13} className="mr-1" />
-            Teachers
+            <GraduationCap size={13} className="mr-1" /> Teachers
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger
+              value="accounts"
+              className="text-sm"
+              data-ocid="management.accounts.tab"
+            >
+              <KeyRound size={13} className="mr-1" /> User Accounts
+            </TabsTrigger>
+          )}
           <TabsTrigger
             value="branches"
             className="text-sm"
@@ -1244,6 +1915,11 @@ export default function ManagementPage() {
         <TabsContent value="teachers" className="mt-4">
           <TeachersTab />
         </TabsContent>
+        {isAdmin && (
+          <TabsContent value="accounts" className="mt-4">
+            <UserAccountsTab />
+          </TabsContent>
+        )}
         <TabsContent value="branches" className="mt-4">
           <BranchesTab />
         </TabsContent>
@@ -1255,7 +1931,6 @@ export default function ManagementPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Footer */}
       <footer className="pt-8 pb-2 text-center">
         <p className="text-[11px] text-muted-foreground">
           © {new Date().getFullYear()}. Built with ❤️ using{" "}

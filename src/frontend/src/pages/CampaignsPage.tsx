@@ -35,6 +35,7 @@ import {
   Image,
   Loader2,
   Megaphone,
+  MessageCircle,
   Pencil,
   Play,
   Plus,
@@ -203,7 +204,7 @@ export default function CampaignsPage() {
   const { actor } = useActor();
   // Cast to any to access campaign template/send methods not in the protected backend.ts interface
   const actorAny = actor as any;
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Data
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -240,23 +241,31 @@ export default function CampaignsPage() {
   const [sendProgress, setSendProgress] = useState({ done: 0, total: 0 });
   const [leadSearch, setLeadSearch] = useState("");
 
+  // WhatsApp integration config
+  const [whatsappToken, setWhatsappToken] = useState("");
+  const [sendingWhatsApp, setSendingWhatsApp] = useState<string | null>(null);
+
   // History filter
   const [filterSendCampaign, setFilterSendCampaign] = useState("all");
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: actorAny is derived from actor
   useEffect(() => {
     if (!actor) return;
+    setLoading(true);
     Promise.all([
       actor.getCampaigns(),
+      actorAny.getIntegrationConfig(),
       actorAny.getCampaignTemplates(),
       actor.getLeads(),
       actorAny.getCampaignSends(),
     ])
-      .then(([cs, ts, ls, ss]) => {
+      .then(([cs, ts, ls, ss, integCfg]) => {
         setCampaigns(cs.map(campaignFromBackend));
         setTemplates(ts.map(campaignTemplateFromBackend));
         setLeads(ls.map(leadFromBackend));
         setSends(ss.map(campaignSendFromBackend));
+        if (integCfg?.whatsappAccessToken)
+          setWhatsappToken(integCfg.whatsappAccessToken);
         const authUser = getAuthUser();
         setSendBy(authUser?.name || "");
       })
@@ -373,6 +382,40 @@ export default function CampaignsPage() {
     setSendNote("");
     setLeadSearch("");
     setSendDialogOpen(true);
+  }
+
+  async function handleSendViaWhatsApp(leadId: string) {
+    if (!actor) return;
+    if (!whatsappToken) {
+      toast.error("Configure WhatsApp in Integrations → WhatsApp first.");
+      return;
+    }
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead?.phone) {
+      toast.error("This lead has no phone number.");
+      return;
+    }
+    const template = templates.find((t) => t.id === sendTemplateId);
+    if (!template) {
+      toast.error("Please select a template first.");
+      return;
+    }
+    setSendingWhatsApp(leadId);
+    try {
+      const result = await actorAny.sendWhatsAppMessage(
+        lead.phone,
+        template.messageText,
+      );
+      if (result.success) {
+        toast.success(`WhatsApp message sent to ${lead.name}!`);
+      } else {
+        toast.error(`WhatsApp failed: ${result.message}`);
+      }
+    } catch {
+      toast.error("Failed to send via WhatsApp");
+    } finally {
+      setSendingWhatsApp(null);
+    }
   }
 
   async function handleSendCampaign() {
@@ -1216,6 +1259,32 @@ export default function CampaignsPage() {
                   data-ocid="campaigns.send.cancel_button"
                 >
                   Cancel
+                </Button>
+                <Button
+                  style={{ background: "#25D366" }}
+                  onClick={() => {
+                    if (sendLeadIds.length === 1) {
+                      handleSendViaWhatsApp(sendLeadIds[0]);
+                    } else {
+                      toast.error(
+                        "Select exactly one lead to send via WhatsApp.",
+                      );
+                    }
+                  }}
+                  disabled={
+                    !sendCampaignId ||
+                    !sendTemplateId ||
+                    sendLeadIds.length !== 1 ||
+                    !!sendingWhatsApp
+                  }
+                  data-ocid="campaigns.send.secondary_button"
+                >
+                  {sendingWhatsApp ? (
+                    <Loader2 size={13} className="mr-1.5 animate-spin" />
+                  ) : (
+                    <MessageCircle size={13} className="mr-1.5" />
+                  )}
+                  Send via WhatsApp
                 </Button>
                 <Button
                   style={{ background: "#4F8F92" }}

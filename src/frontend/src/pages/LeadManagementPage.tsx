@@ -42,7 +42,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 import LeadDetailDrawer from "../components/LeadDetailDrawer";
 import { useActor } from "../hooks/useActor";
 import type { Lead, LeadStatus } from "../types";
@@ -146,7 +145,7 @@ function autoMapColumns(headers: string[]): Record<string, string> {
 }
 
 function downloadTemplate() {
-  const ws = XLSX.utils.aoa_to_sheet([
+  const rows = [
     ["Name", "Email", "Phone", "Grade", "Source", "Agent", "Notes"],
     [
       "Aarav Sharma",
@@ -166,10 +165,17 @@ function downloadTemplate() {
       "Rajan Kumar",
       "Parent called, wants campus tour",
     ],
-  ]);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Leads");
-  XLSX.writeFile(wb, "mahara_leads_template.xlsx");
+  ];
+  const csv = rows
+    .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mahara_leads_template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function LeadManagementPage() {
@@ -274,17 +280,36 @@ export default function LeadManagementPage() {
 
   async function handleFileUpload(file: File) {
     try {
-      const data = await file.arrayBuffer();
-      const wb = XLSX.read(data, { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<any[]>(ws, {
-        header: 1,
-      }) as any[][];
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let cur = "";
+        let inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"' && !inQuote) {
+            inQuote = true;
+          } else if (line[i] === '"' && inQuote && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else if (line[i] === '"' && inQuote) {
+            inQuote = false;
+          } else if (line[i] === "," && !inQuote) {
+            result.push(cur);
+            cur = "";
+          } else {
+            cur += line[i];
+          }
+        }
+        result.push(cur);
+        return result;
+      };
+      const rows = lines.map(parseCSVLine);
       if (rows.length < 2) {
         toast.error("File is empty or has no data rows");
         return;
       }
-      const headers = (rows[0] as string[]).map((h) => String(h || "").trim());
+      const headers = rows[0].map((h) => String(h || "").trim());
       const dataRows = rows
         .slice(1)
         .filter((r) => r.some((c) => c !== undefined && c !== ""));
@@ -293,9 +318,7 @@ export default function LeadManagementPage() {
       setImportFieldMap(autoMapColumns(headers));
       setImportStep("map");
     } catch {
-      toast.error(
-        "Failed to parse file. Please use a valid .xlsx or .csv file.",
-      );
+      toast.error("Failed to parse file. Please use a valid .csv file.");
     }
   }
 
@@ -802,12 +825,12 @@ export default function LeadManagementPage() {
                   Drop your file here or click to browse
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Supports .xlsx, .xls, .csv files
+                  Supports .csv files
                 </p>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".xlsx,.xls,.csv"
+                  accept=".csv"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];

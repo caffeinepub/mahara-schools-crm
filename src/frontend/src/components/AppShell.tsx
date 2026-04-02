@@ -4,6 +4,7 @@ import AIReplyPage from "../pages/AIReplyPage";
 import AcademicsPage from "../pages/AcademicsPage";
 import CampaignsPage from "../pages/CampaignsPage";
 import DashboardPage from "../pages/DashboardPage";
+import IntegrationsPage from "../pages/IntegrationsPage";
 import LeadManagementPage from "../pages/LeadManagementPage";
 import ManagementPage from "../pages/ManagementPage";
 import ReportsPage from "../pages/ReportsPage";
@@ -31,6 +32,7 @@ export default function AppShell({ user, page, setPage, onLogout }: Props) {
     academics: "Academics",
     reports: "Reports & Analytics",
     tasks: "Tasks",
+    integrations: "Integrations",
   };
 
   return (
@@ -76,11 +78,12 @@ export default function AppShell({ user, page, setPage, onLogout }: Props) {
           {page === "dashboard" && <DashboardPage user={user} />}
           {page === "leads" && <LeadManagementPage />}
           {page === "campaigns" && <CampaignsPage />}
-          {page === "management" && <ManagementPage />}
+          {page === "management" && <ManagementPage user={user} />}
           {page === "ai-reply" && <AIReplyPage />}
           {page === "academics" && <AcademicsPage />}
           {page === "reports" && <ReportsPage />}
           {page === "tasks" && <TasksPage />}
+          {page === "integrations" && <IntegrationsPage />}
         </main>
       </div>
     </div>

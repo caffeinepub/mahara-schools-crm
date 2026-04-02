@@ -12,7 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const LOGO =
-  "/assets/mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png";
+  "/assets/mahara_common_logo_png-019d4d86-52fa-7582-a628-0e0c9b0a7c23.png";
 
 interface Props {
   onLogin: (username: string, password: string) => Promise<boolean>;

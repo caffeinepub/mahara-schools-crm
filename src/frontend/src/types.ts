@@ -152,3 +152,24 @@ export interface CalendarEvent {
   category: string;
   color: string;
 }
+
+export interface StaffProfile {
+  id: string;
+  name: string;
+  designation: string;
+  contactNumber: string;
+  branchId: string;
+  role: string;
+  dailyActivities: string;
+  notes: string;
+  email: string;
+}
+
+export interface UserAccount {
+  id: string;
+  username: string;
+  password: string;
+  role: string;
+  fullName: string;
+  email: string;
+}

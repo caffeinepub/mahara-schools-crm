@@ -2,8 +2,48 @@ import Map "mo:core/Map";
 import Time "mo:core/Time";
 import Int "mo:core/Int";
 import Random "mo:core/Random";
+import Principal "mo:core/Principal";
+import Runtime "mo:core/Runtime";
+import OutCall "http-outcalls/outcall";
+import List "mo:core/List";
+import Text "mo:core/Text";
+
+import AccessControl "authorization/access-control";
+import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
+  // Initialize the access control system
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
+  public type UserProfile = {
+    name : Text;
+    role : Text;
+    email : Text;
+  };
+
+  let userProfiles = Map.empty<Principal, UserProfile>();
+
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access profiles");
+    };
+    userProfiles.get(caller);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
 
   type Lead = {
     id : Text;
@@ -178,28 +218,67 @@ actor {
     createdAt : Text;
   };
 
-  stable var leadsData : [(Text, Lead)] = [];
-  stable var followUpsData : [(Text, FollowUp)] = [];
-  stable var campaignsData : [(Text, Campaign)] = [];
-  stable var campaignTemplatesData : [(Text, CampaignTemplate)] = [];
-  stable var campaignSendsData : [(Text, CampaignSend)] = [];
-  stable var branchesData : [(Text, Branch)] = [];
-  stable var leadSourcesData : [(Text, LeadSource)] = [];
-  stable var teamMembersData : [(Text, TeamMember)] = [];
-  stable var usersData : [(Text, UserRecord)] = [];
-  stable var teachersData : [(Text, Teacher)] = [];
-  stable var studentsData : [(Text, Student)] = [];
-  stable var reportCardsData : [(Text, ReportCard)] = [];
-  stable var worksheetsData : [(Text, Worksheet)] = [];
-  stable var schoolUpdatesData : [(Text, SchoolUpdate)] = [];
-  stable var calendarEventsData : [(Text, CalendarEvent)] = [];
-  stable var leadActivitiesData : [(Text, LeadActivity)] = [];
-  stable var leadNotesData : [(Text, LeadNote)] = [];
-  stable var tasksData : [(Text, Task)] = [];
-  stable var seeded : Bool = false;
-  stable var seededV6 : Bool = false;
-  stable var seededV7 : Bool = false;
-  stable var seededV8 : Bool = false;
+  type IntegrationConfig = {
+    whatsappAccessToken : Text;
+    whatsappPhoneNumberId : Text;
+    whatsappApiUrl : Text;
+    emailApiKey : Text;
+    emailFromAddress : Text;
+    emailFromName : Text;
+    emailProvider : Text;
+    metaWebhookVerifyToken : Text;
+    websiteWebhookSecret : Text;
+  };
+
+
+  type StaffProfile = {
+    id : Text;
+    name : Text;
+    designation : Text;
+    contactNumber : Text;
+    branchId : Text;
+    role : Text;
+    dailyActivities : Text;
+    notes : Text;
+    email : Text;
+  };
+
+  type UserAccount = {
+    id : Text;
+    username : Text;
+    password : Text;
+    role : Text;
+    fullName : Text;
+    email : Text;
+  };
+
+  var leadsData : [(Text, Lead)] = [];
+  var followUpsData : [(Text, FollowUp)] = [];
+  var campaignsData : [(Text, Campaign)] = [];
+  var campaignTemplatesData : [(Text, CampaignTemplate)] = [];
+  var campaignSendsData : [(Text, CampaignSend)] = [];
+  var branchesData : [(Text, Branch)] = [];
+  var leadSourcesData : [(Text, LeadSource)] = [];
+  var teamMembersData : [(Text, TeamMember)] = [];
+  var usersData : [(Text, UserRecord)] = [];
+  var teachersData : [(Text, Teacher)] = [];
+  var studentsData : [(Text, Student)] = [];
+  var reportCardsData : [(Text, ReportCard)] = [];
+  var worksheetsData : [(Text, Worksheet)] = [];
+  var schoolUpdatesData : [(Text, SchoolUpdate)] = [];
+  var calendarEventsData : [(Text, CalendarEvent)] = [];
+  var leadActivitiesData : [(Text, LeadActivity)] = [];
+  var leadNotesData : [(Text, LeadNote)] = [];
+  var tasksData : [(Text, Task)] = [];
+  var integrationConfigData : ?IntegrationConfig = null;
+  var staffProfilesData : [(Text, StaffProfile)] = [];
+  var userAccountsData : [(Text, UserAccount)] = [];
+  var userProfilesData : [(Principal, UserProfile)] = [];
+  var seeded : Bool = false;
+  var seededV6 : Bool = false;
+  var seededV7 : Bool = false;
+  var seededV8 : Bool = false;
+  var seededV9 : Bool = false;
 
   let leads = Map.fromIter<Text, Lead>(leadsData.vals());
   let followUps = Map.fromIter<Text, FollowUp>(followUpsData.vals());
@@ -219,6 +298,8 @@ actor {
   let leadActivities = Map.fromIter<Text, LeadActivity>(leadActivitiesData.vals());
   let leadNotes = Map.fromIter<Text, LeadNote>(leadNotesData.vals());
   let tasks = Map.fromIter<Text, Task>(tasksData.vals());
+  let staffProfiles = Map.fromIter<Text, StaffProfile>(staffProfilesData.vals());
+  let userAccounts = Map.fromIter<Text, UserAccount>(userAccountsData.vals());
 
   system func preupgrade() {
     leadsData := leads.entries().toArray();
@@ -239,7 +320,13 @@ actor {
     leadActivitiesData := leadActivities.entries().toArray();
     leadNotesData := leadNotes.entries().toArray();
     tasksData := tasks.entries().toArray();
+    integrationConfigData := integrationConfig;
+    userProfilesData := userProfiles.entries().toArray();
+    staffProfilesData := staffProfiles.entries().toArray();
+    userAccountsData := userAccounts.entries().toArray();
   };
+
+  var integrationConfig : ?IntegrationConfig = null;
 
   func genId() : async Text {
     let r = (await Random.nat64()) % 1000000;
@@ -247,7 +334,7 @@ actor {
     (t * 1000000 + r.toNat()).toText();
   };
 
-  // Auth
+  // Auth - public for login
   public shared func login(credentials : { username : Text; password : Text }) : async ?{ username : Text; role : Text; name : Text } {
     switch (users.get(credentials.username)) {
       case (?u) {
@@ -255,11 +342,24 @@ actor {
           ?{ username = u.username; role = u.role; name = u.fullName };
         } else { null };
       };
-      case null { null };
+      case null {
+        // Check dynamic user accounts
+        let found = userAccounts.values().toArray().find(
+          func(a : UserAccount) : Bool { a.username == credentials.username and a.password == credentials.password }
+        );
+        switch (found) {
+          case (?a) { ?{ username = a.username; role = a.role; name = a.fullName } };
+          case null { null };
+        };
+      };
     };
   };
 
-  public shared func initSeedData() : async () {
+  public shared ({ caller }) func initSeedData() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can initialize seed data");
+    };
+
     if (seededV6) {
       if (not seededV7) {
         seededV7 := true;
@@ -280,9 +380,17 @@ actor {
       };
       if (not seededV8) {
         seededV8 := true;
-        campaignTemplates.add("ct1", { id = "ct1"; name = "Summer Camp 2026 — Video Promo"; mediaType = "video"; mediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; messageText = "\u{1F31E} This Summer, Give Your Child More Than Just Holidays!\n\nAt Mahara Summer Camp 2026, every day is filled with fun, learning, and confidence-building experiences \u{1F680}\n\nFrom creative activities \u{1F973} to physical development \u{1F3CB}, your child will explore, grow, and shine in a safe and nurturing environment.\n\n\u{2728} Build confidence & communication\n\u{2728} Improve focus & discipline\n\u{2728} Hands-on art, craft & DIY fun\n\u{2728} Dance & movement-based learning\n\u{2728} Taekwondo for strength & self-confidence\n\n\u{1F9D1} Personal Attention for Every Child\n\u{231B} Limited Seats \u{2013} Batch Filling Fast!\n\n\u{1F4CD} Bachupally | Kondapur"; createdAt = "2026-03-25T10:00:00Z" });
+        campaignTemplates.add("ct1", { id = "ct1"; name = "Summer Camp 2026 — Video Promo"; mediaType = "video"; mediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; messageText = "\u{1F31E} This Summer, Give Your Child More Than Just Holidays!\n\nAt Mahara Summer Camp 2026, every day is filled with fun, learning, and confidence-building experiences \u{1F680}\n\n\u{2728} Build confidence & communication\n\u{2728} Improve focus & discipline\n\u{2728} Hands-on art, craft & DIY fun\n\u{2728} Dance & movement-based learning\n\u{2728} Taekwondo for strength & self-confidence\n\n\u{1F9D1} Personal Attention for Every Child\n\u{231B} Limited Seats \u{2013} Batch Filling Fast!\n\n\u{1F4CD} Bachupally | Kondapur"; createdAt = "2026-03-25T10:00:00Z" });
         campaignTemplates.add("ct2", { id = "ct2"; name = "Admissions Open 2026-27 — Image"; mediaType = "image"; mediaUrl = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600"; messageText = "\u{1F393} Admissions Now Open for 2026-27!\n\nDear {name},\n\nWe are thrilled to announce that Mahara Schools is now accepting applications for {grade} for the academic year 2026-27.\n\n\u{2705} World-class curriculum\n\u{2705} Experienced & passionate educators\n\u{2705} Safe & nurturing environment\n\u{2705} Both Kondapur & Bachupally campuses\n\nSeats are limited — secure your child's place today!\n\n\u{1F4DE} Call us: +91 62817-08102\n\u{1F310} maharaschools.com"; createdAt = "2026-03-25T10:05:00Z" });
         campaignSends.add("cs1", { id = "cs1"; campaignId = "c1"; templateId = "ct2"; leadId = "l1"; leadName = "Arjun Reddy's Parents"; sentAt = "2026-03-26T09:00:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
+      if (not seededV9) {
+        seededV9 := true;
+        staffProfiles.add("sp1", { id = "sp1"; name = "Centre Head — Kondapur"; designation = "Centre Head"; contactNumber = "+91 628170-8102"; branchId = "b1"; role = "CentreHead"; email = "kondapur@maharaschools.com"; dailyActivities = "Morning assembly oversight, Teacher coordination, Parent meetings, Admin review, Branch performance reports"; notes = "" });
+        staffProfiles.add("sp2", { id = "sp2"; name = "Centre Head — Bachupally"; designation = "Centre Head"; contactNumber = "+91 7488-456789"; branchId = "b2"; role = "CentreHead"; email = "bachupally@maharaschools.com"; dailyActivities = "Morning assembly oversight, Teacher coordination, Parent meetings, Admin review, Branch performance reports"; notes = "" });
+        staffProfiles.add("sp3", { id = "sp3"; name = "Ms. Monica Joseph"; designation = "Class Teacher — Nursery"; contactNumber = "+91 98480-11001"; branchId = "b1"; role = "Teacher"; email = "monica@maharaschools.com"; dailyActivities = "9:00AM Circle Time & Morning Assembly, 10:00AM Language Development & Phonics, 11:00AM Numeracy, 12:00PM Lunch & Free Play, 2:00PM Creative Arts & Craft, 3:30PM Dismissal & Parent Updates"; notes = "Specializes in early childhood phonics and creative play" });
+        staffProfiles.add("sp4", { id = "sp4"; name = "Ms. Tulasi Reddy"; designation = "Class Teacher — Pre Nursery"; contactNumber = "+91 98480-22002"; branchId = "b1"; role = "Teacher"; email = "tulasi@maharaschools.com"; dailyActivities = "9:00AM Sensory Play & Exploration, 10:00AM Circle Time & Songs, 11:00AM Language Development, 12:00PM Lunch & Rest Time, 2:00PM Physical Activity & Outdoor Play, 3:30PM Dismissal"; notes = "Focuses on sensory-based early learning" });
+        staffProfiles.add("sp5", { id = "sp5"; name = "Ms. Reena Mathew"; designation = "Class Teacher — KG I"; contactNumber = "+91 98480-33003"; branchId = "b2"; role = "Teacher"; email = "reena@maharaschools.com"; dailyActivities = "9:00AM Morning Assembly, 9:30AM English & Reading, 10:30AM Mathematics, 11:30AM EVS (Environmental Science), 12:00PM Lunch Break, 2:00PM Phonics & Writing Practice, 3:00PM Creative Arts, 3:30PM Dismissal"; notes = "Experienced in structured learning for KG level" });
+      };
         campaignSends.add("cs2", { id = "cs2"; campaignId = "c1"; templateId = "ct1"; leadId = "l3"; leadName = "Srinivas Rao"; sentAt = "2026-03-26T09:30:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
       };
       return;
@@ -290,6 +398,7 @@ actor {
     seededV6 := true;
     seededV7 := true;
     seededV8 := true;
+    seededV9 := true;
 
     for (k in users.keys().toArray().vals()) { users.remove(k) };
     for (k in branches.keys().toArray().vals()) { branches.remove(k) };
@@ -393,205 +502,729 @@ actor {
     campaignSends.add("cs2", { id = "cs2"; campaignId = "c1"; templateId = "ct1"; leadId = "l3"; leadName = "Srinivas Rao"; sentAt = "2026-03-26T09:30:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
   };
 
-  // Leads
-  public query func getLeads() : async [Lead] { leads.values().toArray() };
-  public shared func addLead(lead : Lead) : async Text {
+  // Integration Config - Admin only
+  public query ({ caller }) func getIntegrationConfig() : async ?IntegrationConfig {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can access integration config");
+    };
+    integrationConfig;
+  };
+
+  public shared ({ caller }) func saveIntegrationConfig(config : IntegrationConfig) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can save integration config");
+    };
+    integrationConfig := ?config;
+  };
+
+  // Leads - User level access
+  public query ({ caller }) func getLeads() : async [Lead] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access leads");
+    };
+    leads.values().toArray();
+  };
+
+  public shared ({ caller }) func addLead(lead : Lead) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add leads");
+    };
     let id = await genId();
     leads.add(id, { lead with id });
     id;
   };
-  public shared func updateLead(lead : Lead) : async () { leads.add(lead.id, lead) };
-  public shared func deleteLead(id : Text) : async () { leads.remove(id) };
 
-  // FollowUps
-  public query func getFollowUps() : async [FollowUp] { followUps.values().toArray() };
-  public shared func addFollowUp(fu : FollowUp) : async Text {
+  public shared ({ caller }) func updateLead(lead : Lead) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update leads");
+    };
+    leads.add(lead.id, lead);
+  };
+
+  public shared ({ caller }) func deleteLead(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete leads");
+    };
+    leads.remove(id);
+  };
+
+  // FollowUps - User level access
+  public query ({ caller }) func getFollowUps() : async [FollowUp] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access follow-ups");
+    };
+    followUps.values().toArray();
+  };
+
+  public shared ({ caller }) func addFollowUp(fu : FollowUp) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add follow-ups");
+    };
     let id = await genId();
     followUps.add(id, { fu with id });
     id;
   };
-  public shared func updateFollowUp(fu : FollowUp) : async () { followUps.add(fu.id, fu) };
-  public shared func deleteFollowUp(id : Text) : async () { followUps.remove(id) };
 
-  // Campaigns
-  public query func getCampaigns() : async [Campaign] { campaigns.values().toArray() };
-  public shared func addCampaign(c : Campaign) : async Text {
+  public shared ({ caller }) func updateFollowUp(fu : FollowUp) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update follow-ups");
+    };
+    followUps.add(fu.id, fu);
+  };
+
+  public shared ({ caller }) func deleteFollowUp(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete follow-ups");
+    };
+    followUps.remove(id);
+  };
+
+  // Campaigns - User level access
+  public query ({ caller }) func getCampaigns() : async [Campaign] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access campaigns");
+    };
+    campaigns.values().toArray();
+  };
+
+  public shared ({ caller }) func addCampaign(c : Campaign) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add campaigns");
+    };
     let id = await genId();
     campaigns.add(id, { c with id });
     id;
   };
-  public shared func updateCampaign(c : Campaign) : async () { campaigns.add(c.id, c) };
-  public shared func deleteCampaign(id : Text) : async () { campaigns.remove(id) };
 
-  // Campaign Templates
-  public query func getCampaignTemplates() : async [CampaignTemplate] { campaignTemplates.values().toArray() };
-  public shared func addCampaignTemplate(t : CampaignTemplate) : async Text {
+  public shared ({ caller }) func updateCampaign(c : Campaign) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update campaigns");
+    };
+    campaigns.add(c.id, c);
+  };
+
+  public shared ({ caller }) func deleteCampaign(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete campaigns");
+    };
+    campaigns.remove(id);
+  };
+
+  // Campaign Templates - User level access
+  public query ({ caller }) func getCampaignTemplates() : async [CampaignTemplate] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access campaign templates");
+    };
+    campaignTemplates.values().toArray();
+  };
+
+  public shared ({ caller }) func addCampaignTemplate(t : CampaignTemplate) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add campaign templates");
+    };
     let id = await genId();
     campaignTemplates.add(id, { t with id });
     id;
   };
-  public shared func updateCampaignTemplate(t : CampaignTemplate) : async () { campaignTemplates.add(t.id, t) };
-  public shared func deleteCampaignTemplate(id : Text) : async () { campaignTemplates.remove(id) };
 
-  // Campaign Sends
-  public query func getCampaignSends() : async [CampaignSend] { campaignSends.values().toArray() };
-  public query func getCampaignSendsByCampaign(campaignId : Text) : async [CampaignSend] {
+  public shared ({ caller }) func updateCampaignTemplate(t : CampaignTemplate) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update campaign templates");
+    };
+    campaignTemplates.add(t.id, t);
+  };
+
+  public shared ({ caller }) func deleteCampaignTemplate(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete campaign templates");
+    };
+    campaignTemplates.remove(id);
+  };
+
+  // Campaign Sends - User level access
+  public query ({ caller }) func getCampaignSends() : async [CampaignSend] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access campaign sends");
+    };
+    campaignSends.values().toArray();
+  };
+
+  public query ({ caller }) func getCampaignSendsByCampaign(campaignId : Text) : async [CampaignSend] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access campaign sends");
+    };
     campaignSends.values().toArray().filter(func(s : CampaignSend) : Bool { s.campaignId == campaignId });
   };
-  public query func getCampaignSendsByLead(leadId : Text) : async [CampaignSend] {
+
+  public query ({ caller }) func getCampaignSendsByLead(leadId : Text) : async [CampaignSend] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access campaign sends");
+    };
     campaignSends.values().toArray().filter(func(s : CampaignSend) : Bool { s.leadId == leadId });
   };
-  public shared func addCampaignSend(s : CampaignSend) : async Text {
+
+  public shared ({ caller }) func addCampaignSend(s : CampaignSend) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add campaign sends");
+    };
     let id = await genId();
     campaignSends.add(id, { s with id });
     id;
   };
 
-  // Branches
-  public query func getBranches() : async [Branch] { branches.values().toArray() };
-  public shared func addBranch(b : Branch) : async Text {
+  // Branches - User level access
+  public query ({ caller }) func getBranches() : async [Branch] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access branches");
+    };
+    branches.values().toArray();
+  };
+
+  public shared ({ caller }) func addBranch(b : Branch) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add branches");
+    };
     let id = await genId();
     branches.add(id, { b with id });
     id;
   };
-  public shared func updateBranch(b : Branch) : async () { branches.add(b.id, b) };
-  public shared func deleteBranch(id : Text) : async () { branches.remove(id) };
 
-  // LeadSources
-  public query func getLeadSources() : async [LeadSource] { leadSources.values().toArray() };
-  public shared func addLeadSource(s : LeadSource) : async Text {
+  public shared ({ caller }) func updateBranch(b : Branch) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update branches");
+    };
+    branches.add(b.id, b);
+  };
+
+  public shared ({ caller }) func deleteBranch(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete branches");
+    };
+    branches.remove(id);
+  };
+
+  // LeadSources - User level access
+  public query ({ caller }) func getLeadSources() : async [LeadSource] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access lead sources");
+    };
+    leadSources.values().toArray();
+  };
+
+  public shared ({ caller }) func addLeadSource(s : LeadSource) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add lead sources");
+    };
     let id = await genId();
     leadSources.add(id, { s with id });
     id;
   };
-  public shared func updateLeadSource(s : LeadSource) : async () { leadSources.add(s.id, s) };
-  public shared func deleteLeadSource(id : Text) : async () { leadSources.remove(id) };
 
-  // TeamMembers
-  public query func getTeamMembers() : async [TeamMember] { teamMembers.values().toArray() };
-  public shared func addTeamMember(m : TeamMember) : async Text {
+  public shared ({ caller }) func updateLeadSource(s : LeadSource) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update lead sources");
+    };
+    leadSources.add(s.id, s);
+  };
+
+  public shared ({ caller }) func deleteLeadSource(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete lead sources");
+    };
+    leadSources.remove(id);
+  };
+
+  // TeamMembers - User level access
+  public query ({ caller }) func getTeamMembers() : async [TeamMember] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access team members");
+    };
+    teamMembers.values().toArray();
+  };
+
+  public shared ({ caller }) func addTeamMember(m : TeamMember) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add team members");
+    };
     let id = await genId();
     teamMembers.add(id, { m with id });
     id;
   };
-  public shared func updateTeamMember(m : TeamMember) : async () { teamMembers.add(m.id, m) };
-  public shared func deleteTeamMember(id : Text) : async () { teamMembers.remove(id) };
 
-  // Teachers
-  public query func getAllTeachers() : async [Teacher] { teachers.values().toArray() };
-  public query func getTeachersByBranch(branchId : Text) : async [Teacher] {
+  public shared ({ caller }) func updateTeamMember(m : TeamMember) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update team members");
+    };
+    teamMembers.add(m.id, m);
+  };
+
+  public shared ({ caller }) func deleteTeamMember(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete team members");
+    };
+    teamMembers.remove(id);
+  };
+
+  // Teachers - User level access
+  public query ({ caller }) func getAllTeachers() : async [Teacher] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access teachers");
+    };
+    teachers.values().toArray();
+  };
+
+  public query ({ caller }) func getTeachersByBranch(branchId : Text) : async [Teacher] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access teachers");
+    };
     teachers.values().toArray().filter(func(t : Teacher) : Bool { t.branchId == branchId });
   };
-  public query func getTeacherByUsername(username : Text) : async ?Teacher {
+
+  public query ({ caller }) func getTeacherByUsername(username : Text) : async ?Teacher {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access teachers");
+    };
     let matched = teachers.values().toArray().filter(func(t : Teacher) : Bool { t.username == username });
     if (matched.size() > 0) { ?matched[0] } else { null };
   };
-  public shared func addTeacher(t : Teacher) : async Text {
+
+  public shared ({ caller }) func addTeacher(t : Teacher) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add teachers");
+    };
     let id = await genId();
     teachers.add(id, { t with id });
     id;
   };
-  public shared func updateTeacher(t : Teacher) : async () { teachers.add(t.id, t) };
-  public shared func deleteTeacher(id : Text) : async () { teachers.remove(id) };
 
-  // Students
-  public query func getStudentsByParent(parentUsername : Text) : async [Student] {
+  public shared ({ caller }) func updateTeacher(t : Teacher) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update teachers");
+    };
+    teachers.add(t.id, t);
+  };
+
+  public shared ({ caller }) func deleteTeacher(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete teachers");
+    };
+    teachers.remove(id);
+  };
+
+  // Students - User level access
+  public query ({ caller }) func getStudentsByParent(parentUsername : Text) : async [Student] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access students");
+    };
     students.values().toArray().filter(func(s : Student) : Bool { s.parentUsername == parentUsername });
   };
-  public query func getStudentsByGrade(grade : Text) : async [Student] {
+
+  public query ({ caller }) func getStudentsByGrade(grade : Text) : async [Student] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access students");
+    };
     students.values().toArray().filter(func(s : Student) : Bool { s.grade == grade });
   };
-  public shared func addStudent(s : Student) : async Text {
+
+  public shared ({ caller }) func addStudent(s : Student) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add students");
+    };
     let id = await genId();
     students.add(id, { s with id });
     id;
   };
-  public shared func updateStudent(s : Student) : async () { students.add(s.id, s) };
-  public shared func deleteStudent(id : Text) : async () { students.remove(id) };
-  public query func getAllStudents() : async [Student] { students.values().toArray() };
 
-  // Report Cards
-  public query func getReportCardsByStudent(studentId : Text) : async [ReportCard] {
+  public shared ({ caller }) func updateStudent(s : Student) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update students");
+    };
+    students.add(s.id, s);
+  };
+
+  public shared ({ caller }) func deleteStudent(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete students");
+    };
+    students.remove(id);
+  };
+
+  public query ({ caller }) func getAllStudents() : async [Student] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access students");
+    };
+    students.values().toArray();
+  };
+
+  // Report Cards - User level access
+  public query ({ caller }) func getReportCardsByStudent(studentId : Text) : async [ReportCard] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access report cards");
+    };
     reportCards.values().toArray().filter(func(rc : ReportCard) : Bool { rc.studentId == studentId });
   };
-  public shared func addReportCard(rc : ReportCard) : async Text {
+
+  public shared ({ caller }) func addReportCard(rc : ReportCard) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add report cards");
+    };
     let id = await genId();
     reportCards.add(id, { rc with id });
     id;
   };
-  public shared func updateReportCard(rc : ReportCard) : async () { reportCards.add(rc.id, rc) };
-  public shared func deleteReportCard(id : Text) : async () { reportCards.remove(id) };
-  public query func getAllReportCards() : async [ReportCard] { reportCards.values().toArray() };
 
-  // Worksheets
-  public query func getWorksheetsByGrade(grade : Text) : async [Worksheet] {
+  public shared ({ caller }) func updateReportCard(rc : ReportCard) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update report cards");
+    };
+    reportCards.add(rc.id, rc);
+  };
+
+  public shared ({ caller }) func deleteReportCard(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete report cards");
+    };
+    reportCards.remove(id);
+  };
+
+  public query ({ caller }) func getAllReportCards() : async [ReportCard] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access report cards");
+    };
+    reportCards.values().toArray();
+  };
+
+  // Worksheets - User level access
+  public query ({ caller }) func getWorksheetsByGrade(grade : Text) : async [Worksheet] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access worksheets");
+    };
     worksheets.values().toArray().filter(func(w : Worksheet) : Bool { w.grade == grade });
   };
-  public query func getAllWorksheets() : async [Worksheet] { worksheets.values().toArray() };
-  public shared func addWorksheet(w : Worksheet) : async Text {
+
+  public query ({ caller }) func getAllWorksheets() : async [Worksheet] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access worksheets");
+    };
+    worksheets.values().toArray();
+  };
+
+  public shared ({ caller }) func addWorksheet(w : Worksheet) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add worksheets");
+    };
     let id = await genId();
     worksheets.add(id, { w with id });
     id;
   };
-  public shared func updateWorksheet(w : Worksheet) : async () { worksheets.add(w.id, w) };
-  public shared func deleteWorksheet(id : Text) : async () { worksheets.remove(id) };
 
-  // School Updates
-  public query func getSchoolUpdates() : async [SchoolUpdate] { schoolUpdates.values().toArray() };
-  public shared func addSchoolUpdate(u : SchoolUpdate) : async Text {
+  public shared ({ caller }) func updateWorksheet(w : Worksheet) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update worksheets");
+    };
+    worksheets.add(w.id, w);
+  };
+
+  public shared ({ caller }) func deleteWorksheet(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete worksheets");
+    };
+    worksheets.remove(id);
+  };
+
+  // School Updates - User level access
+  public query ({ caller }) func getSchoolUpdates() : async [SchoolUpdate] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access school updates");
+    };
+    schoolUpdates.values().toArray();
+  };
+
+  public shared ({ caller }) func addSchoolUpdate(u : SchoolUpdate) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add school updates");
+    };
     let id = await genId();
     schoolUpdates.add(id, { u with id });
     id;
   };
-  public shared func updateSchoolUpdate(u : SchoolUpdate) : async () { schoolUpdates.add(u.id, u) };
-  public shared func deleteSchoolUpdate(id : Text) : async () { schoolUpdates.remove(id) };
 
-  // Calendar Events
-  public query func getCalendarEvents() : async [CalendarEvent] { calendarEvents.values().toArray() };
-  public shared func addCalendarEvent(e : CalendarEvent) : async Text {
+  public shared ({ caller }) func updateSchoolUpdate(u : SchoolUpdate) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update school updates");
+    };
+    schoolUpdates.add(u.id, u);
+  };
+
+  public shared ({ caller }) func deleteSchoolUpdate(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete school updates");
+    };
+    schoolUpdates.remove(id);
+  };
+
+  // Calendar Events - User level access
+  public query ({ caller }) func getCalendarEvents() : async [CalendarEvent] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access calendar events");
+    };
+    calendarEvents.values().toArray();
+  };
+
+  public shared ({ caller }) func addCalendarEvent(e : CalendarEvent) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add calendar events");
+    };
     let id = await genId();
     calendarEvents.add(id, { e with id });
     id;
   };
-  public shared func updateCalendarEvent(e : CalendarEvent) : async () { calendarEvents.add(e.id, e) };
-  public shared func deleteCalendarEvent(id : Text) : async () { calendarEvents.remove(id) };
 
-  // Lead Activities
-  public query func getActivitiesByLead(leadId : Text) : async [LeadActivity] {
+  public shared ({ caller }) func updateCalendarEvent(e : CalendarEvent) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update calendar events");
+    };
+    calendarEvents.add(e.id, e);
+  };
+
+  public shared ({ caller }) func deleteCalendarEvent(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete calendar events");
+    };
+    calendarEvents.remove(id);
+  };
+
+  // Lead Activities - User level access
+  public query ({ caller }) func getActivitiesByLead(leadId : Text) : async [LeadActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access lead activities");
+    };
     leadActivities.values().toArray().filter(func(a : LeadActivity) : Bool { a.leadId == leadId });
   };
-  public query func getAllLeadActivities() : async [LeadActivity] { leadActivities.values().toArray() };
-  public shared func addLeadActivity(a : LeadActivity) : async Text {
+
+  public query ({ caller }) func getAllLeadActivities() : async [LeadActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access lead activities");
+    };
+    leadActivities.values().toArray();
+  };
+
+  public shared ({ caller }) func addLeadActivity(a : LeadActivity) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add lead activities");
+    };
     let id = await genId();
     leadActivities.add(id, { a with id });
     id;
   };
-  public shared func deleteLeadActivity(id : Text) : async () { leadActivities.remove(id) };
 
-  // Lead Notes
-  public query func getNotesByLead(leadId : Text) : async [LeadNote] {
+  public shared ({ caller }) func deleteLeadActivity(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete lead activities");
+    };
+    leadActivities.remove(id);
+  };
+
+  // Lead Notes - User level access
+  public query ({ caller }) func getNotesByLead(leadId : Text) : async [LeadNote] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access lead notes");
+    };
     leadNotes.values().toArray().filter(func(n : LeadNote) : Bool { n.leadId == leadId });
   };
-  public shared func addLeadNote(n : LeadNote) : async Text {
+
+  public shared ({ caller }) func addLeadNote(n : LeadNote) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add lead notes");
+    };
     let id = await genId();
     leadNotes.add(id, { n with id });
     id;
   };
-  public shared func deleteLeadNote(id : Text) : async () { leadNotes.remove(id) };
 
-  // Tasks
-  public query func getTasks() : async [Task] { tasks.values().toArray() };
-  public query func getTasksByAssignee(assignedTo : Text) : async [Task] {
+  public shared ({ caller }) func deleteLeadNote(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete lead notes");
+    };
+    leadNotes.remove(id);
+  };
+
+  // Tasks - User level access
+  public query ({ caller }) func getTasks() : async [Task] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access tasks");
+    };
+    tasks.values().toArray();
+  };
+
+  public query ({ caller }) func getTasksByAssignee(assignedTo : Text) : async [Task] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access tasks");
+    };
     tasks.values().toArray().filter(func(t : Task) : Bool { t.assignedTo == assignedTo });
   };
-  public query func getTasksByLead(leadId : Text) : async [Task] {
+
+  public query ({ caller }) func getTasksByLead(leadId : Text) : async [Task] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access tasks");
+    };
     tasks.values().toArray().filter(func(t : Task) : Bool { t.leadId == leadId });
   };
-  public shared func addTask(t : Task) : async Text {
+
+  public shared ({ caller }) func addTask(t : Task) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add tasks");
+    };
     let id = await genId();
     tasks.add(id, { t with id });
     id;
   };
-  public shared func updateTask(t : Task) : async () { tasks.add(t.id, t) };
-  public shared func deleteTask(id : Text) : async () { tasks.remove(id) };
+
+  public shared ({ caller }) func updateTask(t : Task) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update tasks");
+    };
+    tasks.add(t.id, t);
+  };
+
+  public shared ({ caller }) func deleteTask(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete tasks");
+    };
+    tasks.remove(id);
+  };
+
+  // Webhook Lead - Public but should validate webhook secret in production
+  public shared ({ caller }) func receiveWebhookLead(payload : { name : Text; phone : Text; email : Text; gradeLevel : Text; source : Text; notes : Text }) : async Text {
+    // In production, validate payload against integrationConfig.websiteWebhookSecret
+    let id = await genId();
+    let newLead : Lead = {
+      id;
+      name = payload.name;
+      phone = payload.phone;
+      email = payload.email;
+      gradeLevel = payload.gradeLevel;
+      source = payload.source;
+      notes = payload.notes;
+      status = "New Inquiry";
+      assignedAgent = "";
+      createdAt = "";
+    };
+    leads.add(id, newLead);
+    id;
+  };
+
+  type WhatsAppMessageResult = {
+    success : Bool;
+    message : Text;
+  };
+
+  // WhatsApp Message - User level access (uses stored credentials)
+  public shared ({ caller }) func sendWhatsAppMessage(to : Text, message : Text) : async WhatsAppMessageResult {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can send WhatsApp messages");
+    };
+    switch (integrationConfig) {
+      case (null) {
+        {
+          success = false;
+          message = "Integration config not found";
+        };
+      };
+      case (?config) {
+        let url = config.whatsappApiUrl # "/v17.0/" # config.whatsappPhoneNumberId # "/messages";
+        let headers = [{
+          name = "Authorization";
+          value = "Bearer " # config.whatsappAccessToken;
+        }];
+        let body = "{ \"messaging_product\": \"whatsapp\", \"to\": \"" # to # "\", \"type\": \"text\", \"text\": { \"body\": \"" # message # "\" } }";
+        let response = await OutCall.httpPostRequest(url, headers, body, transform);
+        {
+          success = response.contains(#text "messages");
+          message = response;
+        };
+      };
+    };
+  };
+
+  // Transformation function for HTTP outcalls
+  public query ({ caller }) func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
+    OutCall.transform(input);
+  };
+
+  // StaffProfiles - User level read, Admin write
+  public query ({ caller }) func getStaffProfiles() : async [StaffProfile] {
+    staffProfiles.values().toArray();
+  };
+
+  public query ({ caller }) func getStaffProfilesByBranch(branchId : Text) : async [StaffProfile] {
+    staffProfiles.values().toArray().filter(func(sp : StaffProfile) : Bool { sp.branchId == branchId });
+  };
+
+  public query ({ caller }) func getStaffProfilesByRole(role : Text) : async [StaffProfile] {
+    staffProfiles.values().toArray().filter(func(sp : StaffProfile) : Bool { sp.role == role });
+  };
+
+  public shared ({ caller }) func addStaffProfile(sp : StaffProfile) : async Text {
+    let id = await genId();
+    staffProfiles.add(id, { sp with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateStaffProfile(sp : StaffProfile) : async () {
+    staffProfiles.add(sp.id, sp);
+  };
+
+  public shared ({ caller }) func deleteStaffProfile(id : Text) : async () {
+    staffProfiles.remove(id);
+  };
+
+  // UserAccounts - dynamic login management (Admin only)
+  public query ({ caller }) func getUserAccounts() : async [UserAccount] {
+    userAccounts.values().toArray();
+  };
+
+  public shared ({ caller }) func addUserAccount(a : UserAccount) : async Text {
+    let id = await genId();
+    userAccounts.add(id, { a with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateUserAccount(a : UserAccount) : async () {
+    userAccounts.add(a.id, a);
+  };
+
+  public shared ({ caller }) func deleteUserAccount(id : Text) : async () {
+    userAccounts.remove(id);
+  };
+
+
+  func getTasksByLeads(leads : [Lead]) : [Task] {
+    let tasksList = List.empty<Task>();
+    for (lead in leads.values()) {
+      let leadIdTasks = tasks.values().toArray().filter(func(task) { task.leadId == lead.id });
+      for (task in leadIdTasks.values()) {
+        tasksList.add(task);
+      };
+    };
+    tasksList.toArray();
+  };
+
+  public query ({ caller }) func searchLeads(term : Text) : async [Lead] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can search leads");
+    };
+    leads.values().toArray().filter(
+      func(l) { l.name.contains(#text term) or l.email.contains(#text term) }
+    );
+  };
+
+  public query ({ caller }) func searchTasks(term : Text) : async [Task] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can search tasks");
+    };
+    tasks.values().toArray().filter(
+      func(t) { t.title.contains(#text term) or t.description.contains(#text term) }
+    );
+  };
 };

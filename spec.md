@@ -1,36 +1,42 @@
-# Mahara Schools CRM — Version 11
+# Mahara Schools CRM — Version 15
 
 ## Current State
-A full-stack CRM on ICP for Mahara Schools (Kondapur + Bachupally). Version 10 includes: persistent backend with leads, follow-ups, campaigns, tasks, activities, notes, users, teachers, students, academics, calendar, reports/analytics. Frontend has role-based dashboards (Founder/Admin/CentreHead/Teacher/Parent), AI reply page with static templates, Campaigns CRUD, Reports with pie/bar/line charts, Lead Detail Drawer, Tasks, and basic security (right-click/keyboard shortcuts blocked).
+- Full CRM with role-based login (Founder, Admin, CentreHead, Teacher, Parent)
+- ManagementPage has 5 tabs: Staff Hierarchy, Teachers, Branches, Lead Sources, Team Members
+- Staff Hierarchy tab shows a static org chart (hardcoded founder name "Dr. Anita Sharma" and hardcoded centre head names)
+- Teachers tab allows CRUD (name, username, branch, grade, subjects) but no contact number, designation, or daily activities
+- No custom login creation UI — all logins are hardcoded in backend seed data
+- Logo path uses old asset: `mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png` — this file shows blank/white square on login and sidebar
+- New logo file is available at: `/assets/mahara_common_logo_png-019d4d86-52fa-7582-a628-0e0c9b0a7c23.png`
 
 ## Requested Changes (Diff)
 
 ### Add
-- **CampaignTemplate** backend type: id, name, mediaType (image/video/gif/pdf/none), mediaUrl, messageText, createdAt
-- **CampaignSend** backend type: id, campaignId, templateId, leadId, leadName, sentAt, sentBy, note
-- Backend CRUD: getCampaignTemplates, addCampaignTemplate, updateCampaignTemplate, deleteCampaignTemplate, getCampaignSends, getCampaignSendsByCampaign, getCampaignSendsByLead, addCampaignSend
-- CSV/Excel lead import UI in LeadManagementPage (file upload → parse → preview → bulk addLead calls)
-- Chat-style AI suggestion engine in AIReplyPage (no external API; keyword + lead context based response engine with typing animation)
-- Campaigns page: new "Templates" tab (create template with media URL + formatted text + WhatsApp-style preview) and "Send History" tab (track which leads received which campaign)
-- DevTools detection: monitor window size change; if devtools detected, overlay warning. CSS user-select: none. Disable drag and text selection events globally.
+- **StaffProfile** backend type: id, name, designation, contactNumber, branchId, role (CentreHead/Teacher), dailyActivities, notes, email
+- Backend functions: addStaffProfile, getStaffProfiles, updateStaffProfile, deleteStaffProfile
+- **UserAccount** backend type: username, password, role, fullName, email — allowing dynamic user creation
+- Backend functions: addUserAccount, getUserAccounts, updateUserAccount, deleteUserAccount (Founder/Admin only)
+- **Staff Hierarchy tab**: Visual tree — Founder (Ms. Manaswini Bandi, hardcoded at top) → Centre Heads per branch (fetched from StaffProfiles, role=CentreHead) → Teachers per branch (fetched from StaffProfiles, role=Teacher). Clicking any staff member opens a detail panel/sheet showing their full profile, contact, designation, and daily activities log.
+- **User Accounts tab** in ManagementPage (Founder & Admin only): Create/edit/delete login accounts (username, password, role, full name, email). Visual list of all accounts. 
+- Teacher detail panel with daily activities: each teacher entry has a list of daily activities (tasks/schedule they update)
 
 ### Modify
-- **ReportsPage.tsx**: Remove `<Legend />` from PieChart (labels already render on slices) to fix overlap in 220px height container
-- **AIReplyPage.tsx**: Replace static template cycling with a ChatGPT-style chat panel. User types context (e.g. "parent is worried about fees") and system generates a tailored message using lead's name/grade/stage/source. Keep custom template section at bottom.
-- **CampaignsPage.tsx**: Add tabs — Campaigns | Templates | Send History. Templates tab: builder + WhatsApp preview. Send History tab: table of all sends.
-- **main.tsx**: Add DevTools detector (window outer/inner dimension delta monitoring), CSS user-select none, drag disabled
-- **seededV8**: Add seed flag; on first V8 seed add 2 example campaign templates
+- Fix logo path in `LoginPage.tsx` and `Sidebar.tsx`: change from `mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png` to `mahara_common_logo_png-019d4d86-52fa-7582-a628-0e0c9b0a7c23.png`
+- Update Staff Hierarchy tab to pull real data from StaffProfiles instead of hardcoded names
+- Update founder name in hierarchy from "Dr. Anita Sharma" to "Ms. Manaswini Bandi"
+- Enhance Teacher records to include contactNumber, designation, dailyActivities fields
+- ManagementPage: add "User Accounts" tab, visible only to Founder and Admin roles
 
 ### Remove
-- `<Legend />` from the PieChart in ReportsPage (fixes overlap bug)
+- Hardcoded centre head names ("Mr. Rajan Pillai", "Ms. Hana Al-Blooshi") from StaffHierarchyTab — replace with dynamic data from StaffProfiles
 
 ## Implementation Plan
-1. Update `src/backend/main.mo`: add CampaignTemplate + CampaignSend types, stable vars, Maps, preupgrade entries, CRUD functions, seededV8 seed block with 2 sample templates
-2. Update `src/frontend/src/backend.d.ts`: add CampaignTemplate + CampaignSend interfaces and all new function signatures
-3. Update `src/frontend/src/types.ts`: add CampaignTemplate + CampaignSend types
-4. Update `src/frontend/src/utils/backendAdapters.ts`: add adapters for new types
-5. Fix `ReportsPage.tsx`: remove `<Legend />` from PieChart
-6. Upgrade `AIReplyPage.tsx`: chat-style interface with smart keyword engine
-7. Upgrade `CampaignsPage.tsx`: add Templates and Send History tabs
-8. Add CSV/Excel import modal to `LeadManagementPage.tsx` (install xlsx)
-9. Update `main.tsx` with advanced security (DevTools detection, CSS protections)
+1. Add `StaffProfile` and `UserAccount` types to backend (main.mo)
+2. Add backend CRUD functions for StaffProfile and UserAccount
+3. Seed initial staff profiles for centre heads and teachers (Kondapur + Bachupally)
+4. Update login function to also check dynamically created user accounts
+5. Fix logo path in LoginPage.tsx and Sidebar.tsx to use new asset file
+6. Rewrite StaffHierarchyTab in ManagementPage to fetch StaffProfiles and render tree
+7. Add clickable staff member detail sheet (profile, contact, designation, daily activities)
+8. Add User Accounts tab in ManagementPage for Founder/Admin to create/manage logins
+9. Validate and build

@@ -8,13 +8,14 @@ import {
   LayoutDashboard,
   LogOut,
   Megaphone,
+  Plug,
   Users,
 } from "lucide-react";
 import type { Page } from "../App";
 import type { AuthUser } from "../types";
 
 const LOGO =
-  "/assets/mahara_common_logo_png-019d3e56-ac03-771c-a137-577f15f3bff3.png";
+  "/assets/mahara_common_logo_png-019d4d86-52fa-7582-a628-0e0c9b0a7c23.png";
 
 interface Props {
   user: AuthUser;
@@ -71,6 +72,12 @@ const allNavItems: {
     label: "Academics",
     icon: BookOpen,
     roles: ["Founder", "Admin", "CentreHead"],
+  },
+  {
+    id: "integrations",
+    label: "Integrations",
+    icon: Plug,
+    roles: ["Founder", "Admin"],
   },
   {
     id: "management",

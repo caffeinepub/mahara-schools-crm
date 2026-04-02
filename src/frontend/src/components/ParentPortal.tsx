@@ -6,15 +6,17 @@ import {
   FileText,
   GraduationCap,
   LogOut,
+  Newspaper,
 } from "lucide-react";
 import { useState } from "react";
+import ParentArticles from "../pages/parent/ParentArticles";
 import ParentCalendar from "../pages/parent/ParentCalendar";
 import ParentReportCards from "../pages/parent/ParentReportCards";
 import ParentUpdates from "../pages/parent/ParentUpdates";
 import ParentWorksheets from "../pages/parent/ParentWorksheets";
 import type { AuthUser } from "../types";
 
-type Tab = "report-cards" | "worksheets" | "updates" | "calendar";
+type Tab = "report-cards" | "worksheets" | "updates" | "calendar" | "articles";
 
 interface Props {
   user: AuthUser;
@@ -41,6 +43,11 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     id: "calendar",
     label: "School Calendar",
     icon: <Calendar className="w-4 h-4" />,
+  },
+  {
+    id: "articles",
+    label: "Learning Hub",
+    icon: <Newspaper className="w-4 h-4" />,
   },
 ];
 
@@ -117,6 +124,7 @@ export default function ParentPortal({ user, onLogout }: Props) {
         {activeTab === "worksheets" && <ParentWorksheets user={user} />}
         {activeTab === "updates" && <ParentUpdates user={user} />}
         {activeTab === "calendar" && <ParentCalendar user={user} />}
+        {activeTab === "articles" && <ParentArticles user={user} />}
       </main>
 
       <footer className="text-center py-6 text-xs text-muted-foreground">

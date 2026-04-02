@@ -17,7 +17,8 @@ export type Page =
   | "ai-reply"
   | "academics"
   | "reports"
-  | "tasks";
+  | "tasks"
+  | "integrations";
 
 export default function App() {
   const { actor } = useActor();
