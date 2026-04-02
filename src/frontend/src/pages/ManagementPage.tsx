@@ -102,8 +102,8 @@ function StaffHierarchyTab() {
     if (!actor) return;
     Promise.all([actor.getStaffProfiles(), actor.getBranches()])
       .then(([profiles, bs]: [StaffProfile[], Branch[]]) => {
-        setStaffProfiles(profiles);
-        setBranches(bs);
+        setStaffProfiles(profiles ?? []);
+        setBranches(bs ?? []);
       })
       .catch(() => toast.error("Failed to load staff profiles"))
       .finally(() => setLoading(false));
@@ -450,14 +450,17 @@ function StaffHierarchyTab() {
                     </p>
                     <div className="mt-1 space-y-1">
                       {selected.dailyActivities ? (
-                        selected.dailyActivities.split(",").map((act) => (
-                          <p
-                            key={act.trim().slice(0, 30)}
-                            className="text-sm leading-relaxed"
-                          >
-                            • {act.trim()}
-                          </p>
-                        ))
+                        (selected.dailyActivities ?? "")
+                          .split(",")
+                          .filter(Boolean)
+                          .map((act) => (
+                            <p
+                              key={act.trim().slice(0, 30)}
+                              className="text-sm leading-relaxed"
+                            >
+                              • {act.trim()}
+                            </p>
+                          ))
                       ) : (
                         <p className="text-sm text-muted-foreground">
                           No activities listed
@@ -687,7 +690,7 @@ function UserAccountsTab() {
     if (!actor) return;
     actor
       .getUserAccounts()
-      .then((accs: UserAccount[]) => setAccounts(accs))
+      .then((accs: UserAccount[]) => setAccounts(accs ?? []))
       .catch(() => toast.error("Failed to load user accounts"))
       .finally(() => setLoading(false));
   }, [actor]);
@@ -1598,8 +1601,8 @@ function TeachersTab() {
     if (!actor) return;
     Promise.all([actor.getAllTeachers(), actor.getBranches()])
       .then(([ts, bs]: [Teacher[], Branch[]]) => {
-        setTeachers(ts);
-        setBranches(bs);
+        setTeachers(ts ?? []);
+        setBranches(bs ?? []);
       })
       .catch(() => toast.error("Failed to load teachers"))
       .finally(() => setLoading(false));

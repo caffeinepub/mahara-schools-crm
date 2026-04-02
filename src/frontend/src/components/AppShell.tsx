@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import type { Page } from "../App";
 import AIReplyPage from "../pages/AIReplyPage";
 import AcademicsPage from "../pages/AcademicsPage";
@@ -12,6 +12,46 @@ import TasksPage from "../pages/TasksPage";
 import type { AuthUser } from "../types";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: {
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
+  }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error) {
+    console.error("Page error:", error);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback ?? (
+          <div className="flex flex-col items-center justify-center h-64 gap-3">
+            <p className="text-sm text-muted-foreground">
+              Something went wrong loading this page.
+            </p>
+            <button
+              type="button"
+              className="text-xs text-teal-600 underline"
+              onClick={() => this.setState({ hasError: false, error: null })}
+            >
+              Try again
+            </button>
+          </div>
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
 
 interface Props {
   user: AuthUser;
@@ -78,7 +118,11 @@ export default function AppShell({ user, page, setPage, onLogout }: Props) {
           {page === "dashboard" && <DashboardPage user={user} />}
           {page === "leads" && <LeadManagementPage />}
           {page === "campaigns" && <CampaignsPage />}
-          {page === "management" && <ManagementPage user={user} />}
+          {page === "management" && (
+            <ErrorBoundary>
+              <ManagementPage user={user} />
+            </ErrorBoundary>
+          )}
           {page === "ai-reply" && <AIReplyPage />}
           {page === "academics" && <AcademicsPage />}
           {page === "reports" && <ReportsPage />}
