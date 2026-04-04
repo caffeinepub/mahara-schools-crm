@@ -18,7 +18,13 @@ export type Page =
   | "academics"
   | "reports"
   | "tasks"
-  | "integrations";
+  | "integrations"
+  | "whatsapp-history"
+  | "attendance"
+  | "teacher-performance"
+  | "activities"
+  | "forms"
+  | "blog";
 
 export default function App() {
   const { actor } = useActor();

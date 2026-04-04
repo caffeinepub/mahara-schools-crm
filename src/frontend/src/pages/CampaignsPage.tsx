@@ -408,6 +408,23 @@ export default function CampaignsPage() {
       );
       if (result.success) {
         toast.success(`WhatsApp message sent to ${lead.name}!`);
+        // Log to WhatsApp History
+        try {
+          await actorAny.addWhatsAppMessage({
+            id: `wa-${Date.now()}-${leadId}`,
+            leadId,
+            leadName: lead.name,
+            leadPhone: lead.phone,
+            direction: "outbound",
+            messageText: template.messageText,
+            status: "sent",
+            timestamp: new Date().toISOString(),
+            messageId: "",
+            campaignId: sendCampaignId || "",
+          });
+        } catch {
+          /* non-critical */
+        }
       } else {
         toast.error(`WhatsApp failed: ${result.message}`);
       }
@@ -443,6 +460,26 @@ export default function CampaignsPage() {
       };
       try {
         await actorAny.addCampaignSend(send);
+        // Log to WhatsApp History
+        const tmpl = templates.find((t) => t.id === sendTemplateId);
+        if (tmpl) {
+          try {
+            await actorAny.addWhatsAppMessage({
+              id: `wa-${Date.now()}-${leadId}`,
+              leadId,
+              leadName: lead?.name || leadId,
+              leadPhone: lead?.phone || "",
+              direction: "outbound",
+              messageText: tmpl.messageText,
+              status: "sent",
+              timestamp: new Date().toISOString(),
+              messageId: "",
+              campaignId: sendCampaignId,
+            });
+          } catch {
+            /* non-critical */
+          }
+        }
         done++;
       } catch {
         // continue

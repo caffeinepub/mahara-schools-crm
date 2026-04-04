@@ -6,7 +6,8 @@ export type UserRole =
   | "CentreHead"
   | "Teacher"
   | "Agent"
-  | "Parent";
+  | "Parent"
+  | "Counselor";
 
 export function getAuthUser(): {
   username: string;

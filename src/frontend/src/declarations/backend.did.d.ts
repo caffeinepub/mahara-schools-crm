@@ -201,6 +201,122 @@ export interface http_request_result {
   'body' : Uint8Array,
   'headers' : Array<http_header>,
 }
+
+export interface WhatsAppMessage {
+  'id' : string,
+  'leadId' : string,
+  'leadName' : string,
+  'leadPhone' : string,
+  'direction' : string,
+  'messageText' : string,
+  'status' : string,
+  'timestamp' : string,
+  'messageId' : string,
+  'campaignId' : string,
+}
+export interface StaffAttendance {
+  'id' : string,
+  'staffId' : string,
+  'staffName' : string,
+  'branchId' : string,
+  'date' : string,
+  'status' : string,
+  'markedBy' : string,
+  'timestamp' : string,
+}
+export interface TeacherPerformanceRecord {
+  'id' : string,
+  'teacherId' : string,
+  'teacherName' : string,
+  'branchId' : string,
+  'month' : string,
+  'year' : string,
+  'activitiesUploaded' : bigint,
+  'worksheetsSubmitted' : bigint,
+  'ptmAttended' : bigint,
+  'completionPercent' : bigint,
+}
+export interface ParentFeedback {
+  'id' : string,
+  'teacherId' : string,
+  'teacherName' : string,
+  'parentUsername' : string,
+  'studentName' : string,
+  'rating' : bigint,
+  'comment' : string,
+  'submittedAt' : string,
+}
+export interface PTMRecord {
+  'id' : string,
+  'teacherId' : string,
+  'date' : string,
+  'title' : string,
+  'attendees' : string,
+  'notes' : string,
+}
+export interface ClassActivity {
+  'id' : string,
+  'classGrade' : string,
+  'teacherId' : string,
+  'teacherName' : string,
+  'branchId' : string,
+  'date' : string,
+  'title' : string,
+  'description' : string,
+  'mediaUrls' : Array<string>,
+  'createdAt' : string,
+}
+export interface FormQuestion {
+  'id' : string,
+  'questionText' : string,
+  'questionType' : string,
+  'options' : Array<string>,
+  'required' : boolean,
+}
+export interface FormAnswer {
+  'questionId' : string,
+  'questionText' : string,
+  'answer' : string,
+}
+export interface SchoolForm {
+  'id' : string,
+  'title' : string,
+  'description' : string,
+  'questions' : Array<FormQuestion>,
+  'publishedAt' : string,
+  'isDraft' : boolean,
+  'createdBy' : string,
+  'responseCount' : bigint,
+}
+export interface FormResponse {
+  'id' : string,
+  'formId' : string,
+  'parentUsername' : string,
+  'studentName' : string,
+  'answers' : Array<FormAnswer>,
+  'submittedAt' : string,
+}
+export interface BlogPost {
+  'id' : string,
+  'title' : string,
+  'content' : string,
+  'category' : string,
+  'authorName' : string,
+  'publishedAt' : string,
+  'isDraft' : boolean,
+  'tags' : string,
+}
+export interface ParentNotification {
+  'id' : string,
+  'parentUsername' : string,
+  'title' : string,
+  'message' : string,
+  'notifType' : string,
+  'isRead' : boolean,
+  'createdAt' : string,
+  'linkId' : string,
+}
+
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addBranch' : ActorMethod<[Branch], string>,

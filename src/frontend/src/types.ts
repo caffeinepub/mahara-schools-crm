@@ -90,7 +90,14 @@ export interface Teacher {
 
 export interface AuthUser {
   username: string;
-  role: "Founder" | "Admin" | "CentreHead" | "Teacher" | "Agent" | "Parent";
+  role:
+    | "Founder"
+    | "Admin"
+    | "CentreHead"
+    | "Teacher"
+    | "Agent"
+    | "Parent"
+    | "Counselor";
   name: string;
 }
 

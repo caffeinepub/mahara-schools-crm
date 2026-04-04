@@ -265,6 +265,135 @@ actor {
     fullName : Text;
     email : Text;
   };
+  // ===== NEW TYPES: Version 20 =====
+
+  type WhatsAppMessage = {
+    id : Text;
+    leadId : Text;
+    leadName : Text;
+    leadPhone : Text;
+    direction : Text;
+    messageText : Text;
+    status : Text;
+    timestamp : Text;
+    messageId : Text;
+    campaignId : Text;
+  };
+
+  type StaffAttendance = {
+    id : Text;
+    staffId : Text;
+    staffName : Text;
+    branchId : Text;
+    date : Text;
+    status : Text;
+    markedBy : Text;
+    timestamp : Text;
+  };
+
+  type TeacherPerformanceRecord = {
+    id : Text;
+    teacherId : Text;
+    teacherName : Text;
+    branchId : Text;
+    month : Text;
+    year : Text;
+    activitiesUploaded : Nat;
+    worksheetsSubmitted : Nat;
+    ptmAttended : Nat;
+    completionPercent : Nat;
+  };
+
+  type ParentFeedback = {
+    id : Text;
+    teacherId : Text;
+    teacherName : Text;
+    parentUsername : Text;
+    studentName : Text;
+    rating : Nat;
+    comment : Text;
+    submittedAt : Text;
+  };
+
+  type PTMRecord = {
+    id : Text;
+    teacherId : Text;
+    date : Text;
+    title : Text;
+    attendees : Text;
+    notes : Text;
+  };
+
+  type ClassActivity = {
+    id : Text;
+    classGrade : Text;
+    teacherId : Text;
+    teacherName : Text;
+    branchId : Text;
+    date : Text;
+    title : Text;
+    description : Text;
+    mediaUrls : [Text];
+    createdAt : Text;
+  };
+
+  type FormQuestion = {
+    id : Text;
+    questionText : Text;
+    questionType : Text;
+    options : [Text];
+    required : Bool;
+  };
+
+  type FormAnswer = {
+    questionId : Text;
+    questionText : Text;
+    answer : Text;
+  };
+
+  type SchoolForm = {
+    id : Text;
+    title : Text;
+    description : Text;
+    questions : [FormQuestion];
+    publishedAt : Text;
+    isDraft : Bool;
+    createdBy : Text;
+    responseCount : Nat;
+  };
+
+  type FormResponse = {
+    id : Text;
+    formId : Text;
+    parentUsername : Text;
+    studentName : Text;
+    answers : [FormAnswer];
+    submittedAt : Text;
+  };
+
+  type BlogPost = {
+    id : Text;
+    title : Text;
+    content : Text;
+    category : Text;
+    authorName : Text;
+    publishedAt : Text;
+    isDraft : Bool;
+    tags : Text;
+  };
+
+  type ParentNotification = {
+    id : Text;
+    parentUsername : Text;
+    title : Text;
+    message : Text;
+    notifType : Text;
+    isRead : Bool;
+    createdAt : Text;
+    linkId : Text;
+  };
+
+
 
   var leadsData : [(Text, Lead)] = [];
   var followUpsData : [(Text, FollowUp)] = [];
@@ -294,6 +423,17 @@ actor {
   var seededV7 : Bool = false;
   var seededV8 : Bool = false;
   var seededV9 : Bool = false;
+  var seededV20 : Bool = false;
+  var whatsAppMessagesData : [(Text, WhatsAppMessage)] = [];
+  var staffAttendanceData : [(Text, StaffAttendance)] = [];
+  var teacherPerformanceData : [(Text, TeacherPerformanceRecord)] = [];
+  var parentFeedbackData : [(Text, ParentFeedback)] = [];
+  var ptmRecordsData : [(Text, PTMRecord)] = [];
+  var classActivitiesData : [(Text, ClassActivity)] = [];
+  var schoolFormsData : [(Text, SchoolForm)] = [];
+  var formResponsesData : [(Text, FormResponse)] = [];
+  var blogPostsData : [(Text, BlogPost)] = [];
+  var parentNotificationsData : [(Text, ParentNotification)] = [];
 
   let leads = Map.fromIter<Text, Lead>(leadsData.vals());
   let followUps = Map.fromIter<Text, FollowUp>(followUpsData.vals());
@@ -316,6 +456,16 @@ actor {
   let staffProfiles = Map.fromIter<Text, StaffProfile>(staffProfilesData.vals());
   let userAccounts = Map.fromIter<Text, UserAccount>(userAccountsData.vals());
   let studentRecords = Map.fromIter<Text, StudentRecord>(studentRecordsData.vals());
+  let whatsAppMessages = Map.fromIter<Text, WhatsAppMessage>(whatsAppMessagesData.vals());
+  let staffAttendance = Map.fromIter<Text, StaffAttendance>(staffAttendanceData.vals());
+  let teacherPerformance = Map.fromIter<Text, TeacherPerformanceRecord>(teacherPerformanceData.vals());
+  let parentFeedback = Map.fromIter<Text, ParentFeedback>(parentFeedbackData.vals());
+  let ptmRecords = Map.fromIter<Text, PTMRecord>(ptmRecordsData.vals());
+  let classActivities = Map.fromIter<Text, ClassActivity>(classActivitiesData.vals());
+  let schoolForms = Map.fromIter<Text, SchoolForm>(schoolFormsData.vals());
+  let formResponses = Map.fromIter<Text, FormResponse>(formResponsesData.vals());
+  let blogPosts = Map.fromIter<Text, BlogPost>(blogPostsData.vals());
+  let parentNotifications = Map.fromIter<Text, ParentNotification>(parentNotificationsData.vals());
 
   system func preupgrade() {
     leadsData := leads.entries().toArray();
@@ -341,6 +491,16 @@ actor {
     staffProfilesData := staffProfiles.entries().toArray();
     userAccountsData := userAccounts.entries().toArray();
     studentRecordsData := studentRecords.entries().toArray();
+    whatsAppMessagesData := whatsAppMessages.entries().toArray();
+    staffAttendanceData := staffAttendance.entries().toArray();
+    teacherPerformanceData := teacherPerformance.entries().toArray();
+    parentFeedbackData := parentFeedback.entries().toArray();
+    ptmRecordsData := ptmRecords.entries().toArray();
+    classActivitiesData := classActivities.entries().toArray();
+    schoolFormsData := schoolForms.entries().toArray();
+    formResponsesData := formResponses.entries().toArray();
+    blogPostsData := blogPosts.entries().toArray();
+    parentNotificationsData := parentNotifications.entries().toArray();
   };
 
   var integrationConfig : ?IntegrationConfig = null;
@@ -416,6 +576,7 @@ actor {
     seededV7 := true;
     seededV8 := true;
     seededV9 := true;
+    seededV20 := true;
 
     for (k in users.keys().toArray().vals()) { users.remove(k) };
     for (k in branches.keys().toArray().vals()) { branches.remove(k) };
@@ -443,6 +604,7 @@ actor {
     users.add("teacher3", { username = "teacher3"; password = "teacher789"; role = "Teacher"; fullName = "Ms. Reena Mathew" });
     users.add("parent1", { username = "parent1"; password = "parent123"; role = "Parent"; fullName = "Mr. Naveen Kumar" });
     users.add("parent2", { username = "parent2"; password = "parent456"; role = "Parent"; fullName = "Ms. Priya Srinivas" });
+    users.add("counselor", { username = "counselor"; password = "counselor123"; role = "Counselor"; fullName = "Admissions Counselor" });
 
     branches.add("b1", { id = "b1"; name = "Mahara — Kondapur"; location = "Plot No 1539, Raja Rajeshwara Nagar, Kondapur, Hyderabad, Telangana 500084" });
     branches.add("b2", { id = "b2"; name = "Mahara — Bachupally"; location = "Block Diamond Enclave, Plot No 09, Bachupally, Hyderabad, Telangana 500090" });
@@ -1300,6 +1462,393 @@ actor {
       Runtime.trap("Unauthorized: Only users can delete student records");
     };
     studentRecords.remove(id);
+  };
+
+
+
+    // V20 seed data
+    blogPosts.add("bp1", { id = "bp1"; title = "Why Early Childhood Education Shapes Your Child Future"; content = "Research shows the first five years are critical for brain development. At Mahara Schools, we design every activity to stimulate cognitive, emotional, and social growth.\n\nOur curriculum has four pillars: Play-based Learning, Language Development, Creative Expression, and Structured Exploration. Children in quality early childhood programmes show stronger literacy, social skills, and confidence.\n\nThe Mahara Difference: Our teachers observe each child individually, adapt activities to their learning style, and celebrate every milestone.\n\nTip for Parents: Spend 20 minutes daily reading with your child. Even picture books build vocabulary and strengthen the parent-child bond."; category = "Education"; authorName = "Ms. Manaswini Bandi"; publishedAt = "2026-03-15T09:00:00Z"; isDraft = false; tags = "early childhood, brain development, parenting" });
+    blogPosts.add("bp2", { id = "bp2"; title = "5 Ways to Build a Morning Routine Your Child Will Love"; content = "Mornings can be chaotic with young children. But a consistent routine builds executive function, reduces anxiety, and sets the tone for a focused, happy day.\n\n1. Wake Up With Music: Start the day with an upbeat song. Music activates the brain and shifts mood instantly.\n\n2. Visual Schedule: Create a picture chart: Wake Up, Brush Teeth, Get Dressed, Breakfast, School.\n\n3. Prep the Night Before: Lay out uniforms and pack bags the evening before.\n\n4. Breakfast Together: Ask one question at breakfast: What are you looking forward to today?\n\n5. Goodbye Ritual: A consistent goodbye signals safety and reduces separation anxiety.\n\nAt Mahara Schools, our teachers partner with parents on routines."; category = "Parenting"; authorName = "Teaching Team, Mahara Schools"; publishedAt = "2026-03-22T10:00:00Z"; isDraft = false; tags = "morning routine, parenting tips, school readiness" });
+
+    classActivities.add("ca1", { id = "ca1"; classGrade = "Nursery"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; title = "Colour Mixing Magic"; description = "Children explored primary colours using paint and water. They discovered how red and yellow make orange, blue and yellow make green. Every child created their own colour chart to take home!"; mediaUrls = []; createdAt = "2026-04-03T14:00:00Z" });
+    classActivities.add("ca2", { id = "ca2"; classGrade = "Pre Nursery"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; title = "Sensory Sand Play"; description = "Today we used kinetic sand to build shapes and letters. Children practised fine motor skills while building the letter A and their own name. Fantastic concentration from all!"; mediaUrls = []; createdAt = "2026-04-03T13:30:00Z" });
+    classActivities.add("ca3", { id = "ca3"; classGrade = "KG I"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; date = "2026-04-03"; title = "Number Patterns Workshop"; description = "KG I practised skip counting by 2s using colourful beads and a number line. Children worked in pairs and finished with a fun number relay race!"; mediaUrls = []; createdAt = "2026-04-03T14:30:00Z" });
+
+    schoolForms.add("sf1", { id = "sf1"; title = "Parent Satisfaction Survey - Term 2 2026"; description = "We value your feedback! Please take 3 minutes to help us improve our programmes."; questions = [{ id = "q1"; questionText = "How satisfied are you with your child progress this term?"; questionType = "rating"; options = []; required = true }, { id = "q2"; questionText = "How would you rate communication from the school?"; questionType = "multiple_choice"; options = ["Excellent", "Good", "Needs Improvement", "Poor"]; required = true }, { id = "q3"; questionText = "What would you like to see more of at Mahara Schools?"; questionType = "paragraph"; options = []; required = false }]; publishedAt = "2026-04-01T09:00:00Z"; isDraft = false; createdBy = "admin"; responseCount = 0 });
+
+    staffAttendance.add("att1", { id = "att1"; staffId = "sp1"; staffName = "Centre Head Kondapur"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:30:00Z" });
+    staffAttendance.add("att2", { id = "att2"; staffId = "sp3"; staffName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:32:00Z" });
+    staffAttendance.add("att3", { id = "att3"; staffId = "sp4"; staffName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; status = "late"; markedBy = "admin"; timestamp = "2026-04-03T09:15:00Z" });
+
+    teacherPerformance.add("tp1", { id = "tp1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 18; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 90 });
+    teacherPerformance.add("tp2", { id = "tp2"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 14; worksheetsSubmitted = 3; ptmAttended = 1; completionPercent = 75 });
+    teacherPerformance.add("tp3", { id = "tp3"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; month = "March"; year = "2026"; activitiesUploaded = 20; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 95 });
+
+    parentFeedback.add("pf1", { id = "pf1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; parentUsername = "parent1"; studentName = "Arjun Kumar"; rating = 5; comment = "Ms. Monica is wonderful! Arjun loves going to school. She communicates progress weekly and is so patient."; submittedAt = "2026-03-28T10:00:00Z" });
+    parentFeedback.add("pf2", { id = "pf2"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; parentUsername = "parent2"; studentName = "Aanya Srinivas"; rating = 4; comment = "Very dedicated teacher. Would love more updates on daily activities."; submittedAt = "2026-03-29T11:00:00Z" });
+
+    parentNotifications.add("pn1", { id = "pn1"; parentUsername = "parent1"; title = "New Blog Post"; message = "Check out: Why Early Childhood Education Shapes Your Child Future"; notifType = "blog"; isRead = false; createdAt = "2026-03-15T09:05:00Z"; linkId = "bp1" });
+    parentNotifications.add("pn2", { id = "pn2"; parentUsername = "parent1"; title = "New Survey Available"; message = "Parent Satisfaction Survey - Term 2 2026 is now open."; notifType = "form"; isRead = false; createdAt = "2026-04-01T09:05:00Z"; linkId = "sf1" });
+    parentNotifications.add("pn3", { id = "pn3"; parentUsername = "parent2"; title = "PTM Reminder"; message = "Parent-Teacher Meeting scheduled for April 10, 2026 at 10:00 AM."; notifType = "ptm"; isRead = false; createdAt = "2026-04-03T08:00:00Z"; linkId = "" });
+
+  // ===== WhatsApp Messages =====
+  public query ({ caller }) func getWhatsAppMessages() : async [WhatsAppMessage] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    whatsAppMessages.values().toArray();
+  };
+
+  public query ({ caller }) func getWhatsAppMessagesByLead(leadId : Text) : async [WhatsAppMessage] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    whatsAppMessages.values().toArray().filter(func(m : WhatsAppMessage) : Bool { m.leadId == leadId });
+  };
+
+  public shared ({ caller }) func addWhatsAppMessage(msg : WhatsAppMessage) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    whatsAppMessages.add(id, { msg with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateWhatsAppMessageStatus(id : Text, status : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    switch (whatsAppMessages.get(id)) {
+      case (?msg) { whatsAppMessages.add(id, { msg with status }) };
+      case null {};
+    };
+  };
+
+  public shared func receiveWhatsAppWebhook(payload : Text) : async Text {
+    let id = await genId();
+    if (payload.contains(#text "statuses")) {
+      "status_update_received";
+    } else if (payload.contains(#text "messages")) {
+      let newMsg : WhatsAppMessage = {
+        id;
+        leadId = "";
+        leadName = "Unknown";
+        leadPhone = "Unknown";
+        direction = "received";
+        messageText = payload;
+        status = "received";
+        timestamp = Int.abs(Time.now()).toText();
+        messageId = id;
+        campaignId = "";
+      };
+      whatsAppMessages.add(id, newMsg);
+      id;
+    } else {
+      "unknown_payload";
+    };
+  };
+
+  // ===== Staff Attendance =====
+  public query ({ caller }) func getStaffAttendance() : async [StaffAttendance] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    staffAttendance.values().toArray();
+  };
+
+  public query ({ caller }) func getStaffAttendanceByDate(date : Text) : async [StaffAttendance] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    staffAttendance.values().toArray().filter(func(a : StaffAttendance) : Bool { a.date == date });
+  };
+
+  public query ({ caller }) func getStaffAttendanceByStaff(staffId : Text) : async [StaffAttendance] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    staffAttendance.values().toArray().filter(func(a : StaffAttendance) : Bool { a.staffId == staffId });
+  };
+
+  public shared ({ caller }) func markAttendance(a : StaffAttendance) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    staffAttendance.add(id, { a with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateAttendance(a : StaffAttendance) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    staffAttendance.add(a.id, a);
+  };
+
+  // ===== Teacher Performance =====
+  public query ({ caller }) func getTeacherPerformanceRecords() : async [TeacherPerformanceRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    teacherPerformance.values().toArray();
+  };
+
+  public query ({ caller }) func getTeacherPerformanceByTeacher(teacherId : Text) : async [TeacherPerformanceRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    teacherPerformance.values().toArray().filter(func(r : TeacherPerformanceRecord) : Bool { r.teacherId == teacherId });
+  };
+
+  public shared ({ caller }) func upsertTeacherPerformance(record : TeacherPerformanceRecord) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = if (record.id == "") { await genId() } else { record.id };
+    teacherPerformance.add(id, { record with id });
+    id;
+  };
+
+  // ===== Parent Feedback =====
+  public query ({ caller }) func getParentFeedback() : async [ParentFeedback] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    parentFeedback.values().toArray();
+  };
+
+  public query ({ caller }) func getParentFeedbackByTeacher(teacherId : Text) : async [ParentFeedback] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    parentFeedback.values().toArray().filter(func(f : ParentFeedback) : Bool { f.teacherId == teacherId });
+  };
+
+  public shared ({ caller }) func submitParentFeedback(feedback : ParentFeedback) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    parentFeedback.add(id, { feedback with id });
+    id;
+  };
+
+  // ===== PTM Records =====
+  public query ({ caller }) func getPTMRecords() : async [PTMRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    ptmRecords.values().toArray();
+  };
+
+  public query ({ caller }) func getPTMRecordsByTeacher(teacherId : Text) : async [PTMRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    ptmRecords.values().toArray().filter(func(r : PTMRecord) : Bool { r.teacherId == teacherId });
+  };
+
+  public shared ({ caller }) func addPTMRecord(record : PTMRecord) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    ptmRecords.add(id, { record with id });
+    id;
+  };
+
+  // ===== Class Activities =====
+  public query ({ caller }) func getAllClassActivities() : async [ClassActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.values().toArray();
+  };
+
+  public query ({ caller }) func getClassActivitiesByGrade(grade : Text) : async [ClassActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.values().toArray().filter(func(a : ClassActivity) : Bool { a.classGrade == grade });
+  };
+
+  public query ({ caller }) func getClassActivitiesByTeacher(teacherId : Text) : async [ClassActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.values().toArray().filter(func(a : ClassActivity) : Bool { a.teacherId == teacherId });
+  };
+
+  public query ({ caller }) func getClassActivitiesByBranch(branchId : Text) : async [ClassActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.values().toArray().filter(func(a : ClassActivity) : Bool { a.branchId == branchId });
+  };
+
+  public shared ({ caller }) func addClassActivity(a : ClassActivity) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    classActivities.add(id, { a with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateClassActivity(a : ClassActivity) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.add(a.id, a);
+  };
+
+  public shared ({ caller }) func deleteClassActivity(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    classActivities.remove(id);
+  };
+
+  // ===== School Forms =====
+  public query ({ caller }) func getAllForms() : async [SchoolForm] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    schoolForms.values().toArray();
+  };
+
+  public query ({ caller }) func getPublishedForms() : async [SchoolForm] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    schoolForms.values().toArray().filter(func(f : SchoolForm) : Bool { not f.isDraft });
+  };
+
+  public query ({ caller }) func getFormById(id : Text) : async ?SchoolForm {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    schoolForms.get(id);
+  };
+
+  public shared ({ caller }) func addForm(form : SchoolForm) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can create forms");
+    };
+    let id = await genId();
+    schoolForms.add(id, { form with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateForm(form : SchoolForm) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update forms");
+    };
+    schoolForms.add(form.id, form);
+  };
+
+  public shared ({ caller }) func deleteForm(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete forms");
+    };
+    schoolForms.remove(id);
+  };
+
+  // ===== Form Responses =====
+  public query ({ caller }) func getFormResponses(formId : Text) : async [FormResponse] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    formResponses.values().toArray().filter(func(r : FormResponse) : Bool { r.formId == formId });
+  };
+
+  public query ({ caller }) func getMyFormResponses(parentUsername : Text) : async [FormResponse] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    formResponses.values().toArray().filter(func(r : FormResponse) : Bool { r.parentUsername == parentUsername });
+  };
+
+  public shared ({ caller }) func submitFormResponse(response : FormResponse) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let id = await genId();
+    formResponses.add(id, { response with id });
+    switch (schoolForms.get(response.formId)) {
+      case (?form) {
+        schoolForms.add(form.id, { form with responseCount = form.responseCount + 1 });
+      };
+      case null {};
+    };
+    id;
+  };
+
+  // ===== Blog Posts =====
+  public query ({ caller }) func getAllBlogPosts() : async [BlogPost] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    blogPosts.values().toArray();
+  };
+
+  public query ({ caller }) func getPublishedBlogPosts() : async [BlogPost] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    blogPosts.values().toArray().filter(func(p : BlogPost) : Bool { not p.isDraft });
+  };
+
+  public shared ({ caller }) func addBlogPost(post : BlogPost) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add blog posts");
+    };
+    let id = await genId();
+    blogPosts.add(id, { post with id });
+    id;
+  };
+
+  public shared ({ caller }) func updateBlogPost(post : BlogPost) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update blog posts");
+    };
+    blogPosts.add(post.id, post);
+  };
+
+  public shared ({ caller }) func deleteBlogPost(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete blog posts");
+    };
+    blogPosts.remove(id);
+  };
+
+  // ===== Parent Notifications =====
+  public query ({ caller }) func getNotificationsForParent(parentUsername : Text) : async [ParentNotification] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    parentNotifications.values().toArray().filter(func(n : ParentNotification) : Bool { n.parentUsername == parentUsername });
+  };
+
+  public shared ({ caller }) func markNotificationRead(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    switch (parentNotifications.get(id)) {
+      case (?n) { parentNotifications.add(id, { n with isRead = true }) };
+      case null {};
+    };
+  };
+
+  public shared ({ caller }) func addNotification(notification : ParentNotification) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add notifications");
+    };
+    let id = await genId();
+    parentNotifications.add(id, { notification with id });
+    id;
   };
 
 

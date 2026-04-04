@@ -572,6 +572,122 @@ export const idlFactory = ({ IDL }) => {
     'headers' : IDL.Vec(http_header),
   });
   
+
+  const WhatsAppMessage = IDL.Record({
+    'id' : IDL.Text,
+    'leadId' : IDL.Text,
+    'leadName' : IDL.Text,
+    'leadPhone' : IDL.Text,
+    'direction' : IDL.Text,
+    'messageText' : IDL.Text,
+    'status' : IDL.Text,
+    'timestamp' : IDL.Text,
+    'messageId' : IDL.Text,
+    'campaignId' : IDL.Text,
+  });
+  const StaffAttendance = IDL.Record({
+    'id' : IDL.Text,
+    'staffId' : IDL.Text,
+    'staffName' : IDL.Text,
+    'branchId' : IDL.Text,
+    'date' : IDL.Text,
+    'status' : IDL.Text,
+    'markedBy' : IDL.Text,
+    'timestamp' : IDL.Text,
+  });
+  const TeacherPerformanceRecord = IDL.Record({
+    'id' : IDL.Text,
+    'teacherId' : IDL.Text,
+    'teacherName' : IDL.Text,
+    'branchId' : IDL.Text,
+    'month' : IDL.Text,
+    'year' : IDL.Text,
+    'activitiesUploaded' : IDL.Nat,
+    'worksheetsSubmitted' : IDL.Nat,
+    'ptmAttended' : IDL.Nat,
+    'completionPercent' : IDL.Nat,
+  });
+  const ParentFeedback = IDL.Record({
+    'id' : IDL.Text,
+    'teacherId' : IDL.Text,
+    'teacherName' : IDL.Text,
+    'parentUsername' : IDL.Text,
+    'studentName' : IDL.Text,
+    'rating' : IDL.Nat,
+    'comment' : IDL.Text,
+    'submittedAt' : IDL.Text,
+  });
+  const PTMRecord = IDL.Record({
+    'id' : IDL.Text,
+    'teacherId' : IDL.Text,
+    'date' : IDL.Text,
+    'title' : IDL.Text,
+    'attendees' : IDL.Text,
+    'notes' : IDL.Text,
+  });
+  const ClassActivity = IDL.Record({
+    'id' : IDL.Text,
+    'classGrade' : IDL.Text,
+    'teacherId' : IDL.Text,
+    'teacherName' : IDL.Text,
+    'branchId' : IDL.Text,
+    'date' : IDL.Text,
+    'title' : IDL.Text,
+    'description' : IDL.Text,
+    'mediaUrls' : IDL.Vec(IDL.Text),
+    'createdAt' : IDL.Text,
+  });
+  const FormQuestion = IDL.Record({
+    'id' : IDL.Text,
+    'questionText' : IDL.Text,
+    'questionType' : IDL.Text,
+    'options' : IDL.Vec(IDL.Text),
+    'required' : IDL.Bool,
+  });
+  const FormAnswer = IDL.Record({
+    'questionId' : IDL.Text,
+    'questionText' : IDL.Text,
+    'answer' : IDL.Text,
+  });
+  const SchoolForm = IDL.Record({
+    'id' : IDL.Text,
+    'title' : IDL.Text,
+    'description' : IDL.Text,
+    'questions' : IDL.Vec(FormQuestion),
+    'publishedAt' : IDL.Text,
+    'isDraft' : IDL.Bool,
+    'createdBy' : IDL.Text,
+    'responseCount' : IDL.Nat,
+  });
+  const FormResponse = IDL.Record({
+    'id' : IDL.Text,
+    'formId' : IDL.Text,
+    'parentUsername' : IDL.Text,
+    'studentName' : IDL.Text,
+    'answers' : IDL.Vec(FormAnswer),
+    'submittedAt' : IDL.Text,
+  });
+  const BlogPost = IDL.Record({
+    'id' : IDL.Text,
+    'title' : IDL.Text,
+    'content' : IDL.Text,
+    'category' : IDL.Text,
+    'authorName' : IDL.Text,
+    'publishedAt' : IDL.Text,
+    'isDraft' : IDL.Bool,
+    'tags' : IDL.Text,
+  });
+  const ParentNotification = IDL.Record({
+    'id' : IDL.Text,
+    'parentUsername' : IDL.Text,
+    'title' : IDL.Text,
+    'message' : IDL.Text,
+    'notifType' : IDL.Text,
+    'isRead' : IDL.Bool,
+    'createdAt' : IDL.Text,
+    'linkId' : IDL.Text,
+  });
+
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addBranch' : IDL.Func([Branch], [IDL.Text], []),
