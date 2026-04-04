@@ -102,6 +102,20 @@ export interface Student {
   admissionNumber: string;
 }
 
+export interface StudentRecord {
+  id: string;
+  rollNumber: string;
+  name: string;
+  grade: string;
+  branchId: string;
+  parentName: string;
+  parentContact: string;
+  parentEmail: string;
+  dateOfBirth: string;
+  address: string;
+  admissionNumber: string;
+}
+
 export interface SubjectGrade {
   subject: string;
   grade: string;

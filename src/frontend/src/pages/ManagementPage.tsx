@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import StudentsTab from "../components/StudentsTab";
 import { useActor } from "../hooks/useActor";
 import type {
   AuthUser,
@@ -1911,6 +1912,13 @@ export default function ManagementPage({ user }: Props) {
           >
             Team Members
           </TabsTrigger>
+          <TabsTrigger
+            value="students"
+            className="text-sm"
+            data-ocid="management.students.tab"
+          >
+            <BookOpen size={13} className="mr-1" /> Students
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="hierarchy" className="mt-4">
           <StaffHierarchyTab />
@@ -1931,6 +1939,9 @@ export default function ManagementPage({ user }: Props) {
         </TabsContent>
         <TabsContent value="team" className="mt-4">
           <TeamMembersTab />
+        </TabsContent>
+        <TabsContent value="students" className="mt-4">
+          <StudentsTab user={user} />
         </TabsContent>
       </Tabs>
 

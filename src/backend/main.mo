@@ -138,6 +138,20 @@ actor {
     admissionNumber : Text;
   };
 
+  type StudentRecord = {
+    id : Text;
+    rollNumber : Text;
+    name : Text;
+    grade : Text;
+    branchId : Text;
+    parentName : Text;
+    parentContact : Text;
+    parentEmail : Text;
+    dateOfBirth : Text;
+    address : Text;
+    admissionNumber : Text;
+  };
+
   type SubjectGrade = {
     subject : Text;
     grade : Text;
@@ -273,6 +287,7 @@ actor {
   var integrationConfigData : ?IntegrationConfig = null;
   var staffProfilesData : [(Text, StaffProfile)] = [];
   var userAccountsData : [(Text, UserAccount)] = [];
+  var studentRecordsData : [(Text, StudentRecord)] = [];
   var userProfilesData : [(Principal, UserProfile)] = [];
   var seeded : Bool = false;
   var seededV6 : Bool = false;
@@ -300,6 +315,7 @@ actor {
   let tasks = Map.fromIter<Text, Task>(tasksData.vals());
   let staffProfiles = Map.fromIter<Text, StaffProfile>(staffProfilesData.vals());
   let userAccounts = Map.fromIter<Text, UserAccount>(userAccountsData.vals());
+  let studentRecords = Map.fromIter<Text, StudentRecord>(studentRecordsData.vals());
 
   system func preupgrade() {
     leadsData := leads.entries().toArray();
@@ -324,6 +340,7 @@ actor {
     userProfilesData := userProfiles.entries().toArray();
     staffProfilesData := staffProfiles.entries().toArray();
     userAccountsData := userAccounts.entries().toArray();
+    studentRecordsData := studentRecords.entries().toArray();
   };
 
   var integrationConfig : ?IntegrationConfig = null;
@@ -1227,4 +1244,63 @@ actor {
       func(t) { t.title.contains(#text term) or t.description.contains(#text term) }
     );
   };
+  // StudentRecords - full student database with extended fields
+  public query ({ caller }) func getAllStudentRecords() : async [StudentRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access student records");
+    };
+    studentRecords.values().toArray();
+  };
+
+  public query ({ caller }) func getStudentRecordsByGrade(grade : Text) : async [StudentRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access student records");
+    };
+    studentRecords.values().toArray().filter(func(s : StudentRecord) : Bool { s.grade == grade });
+  };
+
+  public query ({ caller }) func getStudentRecordsByBranch(branchId : Text) : async [StudentRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access student records");
+    };
+    studentRecords.values().toArray().filter(func(s : StudentRecord) : Bool { s.branchId == branchId });
+  };
+
+  public shared ({ caller }) func addStudentRecord(s : StudentRecord) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add student records");
+    };
+    let id = await genId();
+    studentRecords.add(id, { s with id });
+    id;
+  };
+
+  public shared ({ caller }) func addStudentRecordsBulk(records : [StudentRecord]) : async [Text] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add student records");
+    };
+    let ids = List.empty<Text>();
+    for (s in records.vals()) {
+      let id = await genId();
+      studentRecords.add(id, { s with id });
+      ids.add(id);
+    };
+    ids.toArray();
+  };
+
+  public shared ({ caller }) func updateStudentRecord(s : StudentRecord) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update student records");
+    };
+    studentRecords.add(s.id, s);
+  };
+
+  public shared ({ caller }) func deleteStudentRecord(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete student records");
+    };
+    studentRecords.remove(id);
+  };
+
+
 };

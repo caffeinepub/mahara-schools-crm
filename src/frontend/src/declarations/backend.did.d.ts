@@ -116,6 +116,19 @@ export interface Student {
   'grade' : string,
   'parentUsername' : string,
 }
+export interface StudentRecord {
+  'id' : string,
+  'rollNumber' : string,
+  'name' : string,
+  'grade' : string,
+  'branchId' : string,
+  'parentName' : string,
+  'parentContact' : string,
+  'parentEmail' : string,
+  'dateOfBirth' : string,
+  'address' : string,
+  'admissionNumber' : string,
+}
 export interface SubjectGrade {
   'marks' : string,
   'subject' : string,
@@ -295,6 +308,13 @@ export interface _SERVICE {
   'updateTeacher' : ActorMethod<[Teacher], undefined>,
   'updateTeamMember' : ActorMethod<[TeamMember], undefined>,
   'updateWorksheet' : ActorMethod<[Worksheet], undefined>,
+  'addStudentRecord' : ActorMethod<[StudentRecord], string>,
+  'addStudentRecordsBulk' : ActorMethod<[Array<StudentRecord>], Array<string>>,
+  'updateStudentRecord' : ActorMethod<[StudentRecord], undefined>,
+  'deleteStudentRecord' : ActorMethod<[string], undefined>,
+  'getAllStudentRecords' : ActorMethod<[], Array<StudentRecord>>,
+  'getStudentRecordsByGrade' : ActorMethod<[string], Array<StudentRecord>>,
+  'getStudentRecordsByBranch' : ActorMethod<[string], Array<StudentRecord>>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

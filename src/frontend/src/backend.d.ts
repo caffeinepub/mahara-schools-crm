@@ -192,6 +192,19 @@ export interface Student {
     grade: string;
     parentUsername: string;
 }
+export interface StudentRecord {
+    id: string;
+    rollNumber: string;
+    name: string;
+    grade: string;
+    branchId: string;
+    parentName: string;
+    parentContact: string;
+    parentEmail: string;
+    dateOfBirth: string;
+    address: string;
+    admissionNumber: string;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -240,6 +253,13 @@ export interface backendInterface {
     addReportCard(rc: ReportCard): Promise<string>;
     addSchoolUpdate(u: SchoolUpdate): Promise<string>;
     addStudent(s: Student): Promise<string>;
+    addStudentRecord(s: StudentRecord): Promise<string>;
+    addStudentRecordsBulk(records: Array<StudentRecord>): Promise<Array<string>>;
+    updateStudentRecord(s: StudentRecord): Promise<void>;
+    deleteStudentRecord(id: string): Promise<void>;
+    getAllStudentRecords(): Promise<Array<StudentRecord>>;
+    getStudentRecordsByGrade(grade: string): Promise<Array<StudentRecord>>;
+    getStudentRecordsByBranch(branchId: string): Promise<Array<StudentRecord>>;
     addTask(t: Task): Promise<string>;
     addTeacher(t: Teacher): Promise<string>;
     addTeamMember(m: TeamMember): Promise<string>;

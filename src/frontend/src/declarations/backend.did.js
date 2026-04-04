@@ -113,6 +113,19 @@ export const Student = IDL.Record({
   'grade' : IDL.Text,
   'parentUsername' : IDL.Text,
 });
+export const StudentRecord = IDL.Record({
+  'id' : IDL.Text,
+  'rollNumber' : IDL.Text,
+  'name' : IDL.Text,
+  'grade' : IDL.Text,
+  'branchId' : IDL.Text,
+  'parentName' : IDL.Text,
+  'parentContact' : IDL.Text,
+  'parentEmail' : IDL.Text,
+  'dateOfBirth' : IDL.Text,
+  'address' : IDL.Text,
+  'admissionNumber' : IDL.Text,
+});
 export const Task = IDL.Record({
   'id' : IDL.Text,
   'title' : IDL.Text,
@@ -349,6 +362,13 @@ export const idlService = IDL.Service({
   'updateTeacher' : IDL.Func([Teacher], [], []),
   'updateTeamMember' : IDL.Func([TeamMember], [], []),
   'updateWorksheet' : IDL.Func([Worksheet], [], []),
+  'addStudentRecord' : IDL.Func([StudentRecord], [IDL.Text], []),
+  'addStudentRecordsBulk' : IDL.Func([IDL.Vec(StudentRecord)], [IDL.Vec(IDL.Text)], []),
+  'updateStudentRecord' : IDL.Func([StudentRecord], [], []),
+  'deleteStudentRecord' : IDL.Func([IDL.Text], [], []),
+  'getAllStudentRecords' : IDL.Func([], [IDL.Vec(StudentRecord)], ['query']),
+  'getStudentRecordsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
+  'getStudentRecordsByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -458,6 +478,19 @@ export const idlFactory = ({ IDL }) => {
     'admissionNumber' : IDL.Text,
     'grade' : IDL.Text,
     'parentUsername' : IDL.Text,
+  });
+  const StudentRecord = IDL.Record({
+    'id' : IDL.Text,
+    'rollNumber' : IDL.Text,
+    'name' : IDL.Text,
+    'grade' : IDL.Text,
+    'branchId' : IDL.Text,
+    'parentName' : IDL.Text,
+    'parentContact' : IDL.Text,
+    'parentEmail' : IDL.Text,
+    'dateOfBirth' : IDL.Text,
+    'address' : IDL.Text,
+    'admissionNumber' : IDL.Text,
   });
   const Task = IDL.Record({
     'id' : IDL.Text,
@@ -700,6 +733,13 @@ export const idlFactory = ({ IDL }) => {
     'updateTeacher' : IDL.Func([Teacher], [], []),
     'updateTeamMember' : IDL.Func([TeamMember], [], []),
     'updateWorksheet' : IDL.Func([Worksheet], [], []),
+    'addStudentRecord' : IDL.Func([StudentRecord], [IDL.Text], []),
+    'addStudentRecordsBulk' : IDL.Func([IDL.Vec(StudentRecord)], [IDL.Vec(IDL.Text)], []),
+    'updateStudentRecord' : IDL.Func([StudentRecord], [], []),
+    'deleteStudentRecord' : IDL.Func([IDL.Text], [], []),
+    'getAllStudentRecords' : IDL.Func([], [IDL.Vec(StudentRecord)], ['query']),
+    'getStudentRecordsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
+    'getStudentRecordsByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
   });
 };
 
