@@ -13,7 +13,7 @@ interface Props {
 
 export default function TopBar({ title, user, onMenuClick }: Props) {
   return (
-    <header className="h-14 flex items-center gap-3 px-4 border-b border-border bg-white/80 backdrop-blur-sm flex-shrink-0">
+    <header className="h-14 flex items-center gap-3 px-4 border-b border-border bg-white/90 backdrop-blur-sm flex-shrink-0">
       {/* Mobile menu */}
       <Button
         variant="ghost"
@@ -30,16 +30,31 @@ export default function TopBar({ title, user, onMenuClick }: Props) {
         <img src={LOGO} alt="Mahara" className="w-7 h-7 object-contain" />
       </div>
 
-      <h1 className="text-sm font-semibold text-foreground flex-1">{title}</h1>
+      <h1
+        className="text-sm flex-1"
+        style={{
+          fontFamily: "'Fraunces', Georgia, serif",
+          fontStyle: "italic",
+          fontWeight: 700,
+          color: "oklch(0.22 0.015 250)",
+        }}
+      >
+        {title}
+      </h1>
 
       <div className="flex items-center gap-2">
         <div
           className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center text-[10px] font-bold text-white"
-          style={{ background: "linear-gradient(135deg, #78C8C8, #6BA3D6)" }}
+          style={{ background: "oklch(0.74 0.07 293)" }}
         >
           {user.name.charAt(0)}
         </div>
-        <span className="hidden sm:block text-xs text-muted-foreground max-w-[140px] truncate">
+        <span
+          className="hidden sm:block text-xs text-muted-foreground max-w-[140px] truncate"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
+        >
           {user.name}
         </span>
       </div>

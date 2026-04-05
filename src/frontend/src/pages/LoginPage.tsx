@@ -37,35 +37,86 @@ export default function LoginPage({ onLogin }: Props) {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
-      style={{
-        background:
-          "linear-gradient(135deg, #78C8C8 0%, #64A0A3 40%, #B8A7CC 100%)",
-      }}
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ background: "oklch(0.80 0.07 189)" }}
     >
-      <div className="w-full max-w-sm">
-        {/* Logo */}
+      {/* Radial gradient overlay for depth */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 20% 50%, oklch(0.82 0.09 356 / 0.45) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, oklch(0.74 0.07 293 / 0.4) 0%, transparent 55%), radial-gradient(ellipse at 60% 85%, oklch(0.68 0.13 243 / 0.35) 0%, transparent 50%)",
+        }}
+      />
+
+      {/* Decorative blobs */}
+      <div
+        className="absolute top-[-80px] left-[-80px] w-64 h-64 rounded-full opacity-30 pointer-events-none"
+        style={{ background: "oklch(0.93 0.19 105)" }}
+      />
+      <div
+        className="absolute bottom-[-60px] right-[-60px] w-48 h-48 rounded-full opacity-25 pointer-events-none"
+        style={{ background: "oklch(0.85 0.18 125)" }}
+      />
+
+      <div className="w-full max-w-sm relative z-10 px-4">
+        {/* Logo + brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white shadow-lg mb-4 p-2">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white shadow-xl mb-5 p-2">
             <img
               src={LOGO}
               alt="Mahara Schools"
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-white font-bold text-2xl tracking-tight drop-shadow">
+          <h1
+            className="text-white text-2xl tracking-tight drop-shadow-sm"
+            style={{
+              fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+              fontWeight: 800,
+            }}
+          >
             Mahara Schools
           </h1>
-          <p className="text-white/80 text-sm mt-1">
-            International Pre-School & Day Care
+          <p
+            className="text-white/85 text-sm mt-1.5"
+            style={{
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            }}
+          >
+            International Pre-School &amp; Day Care
           </p>
-          <p className="text-white/60 text-xs mt-0.5">CRM & Staff Portal</p>
+          <p
+            className="text-white/65 text-xs mt-0.5"
+            style={{
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            }}
+          >
+            CRM &amp; Staff Portal
+          </p>
         </div>
 
-        <Card className="shadow-xl border-0">
+        {/* Login card */}
+        <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-md">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Welcome back</CardTitle>
-            <CardDescription>Sign in to your account</CardDescription>
+            <CardTitle
+              className="text-lg"
+              style={{
+                fontFamily: "'Fraunces', Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 700,
+                color: "oklch(0.22 0.015 250)",
+              }}
+            >
+              Welcome back
+            </CardTitle>
+            <CardDescription
+              style={{
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              }}
+            >
+              Sign in to your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,6 +124,9 @@ export default function LoginPage({ onLogin }: Props) {
                 <Label
                   htmlFor="username"
                   className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                  }}
                 >
                   Username
                 </Label>
@@ -89,6 +143,9 @@ export default function LoginPage({ onLogin }: Props) {
                 <Label
                   htmlFor="password"
                   className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                  }}
                 >
                   Password
                 </Label>
@@ -104,10 +161,12 @@ export default function LoginPage({ onLogin }: Props) {
               </div>
               <Button
                 type="submit"
-                className="w-full font-semibold"
+                className="w-full font-semibold text-sm border-0"
                 style={{
-                  background:
-                    "linear-gradient(90deg, #78C8C8 0%, #64A0A3 100%)",
+                  background: "oklch(0.93 0.19 105)",
+                  color: "oklch(0.22 0.015 250)",
+                  fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                  fontWeight: 700,
                 }}
                 disabled={loading}
                 data-ocid="login.submit_button"
@@ -115,33 +174,49 @@ export default function LoginPage({ onLogin }: Props) {
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-            <div className="mt-4 rounded-lg bg-muted/60 px-3 py-2.5 text-[11px] text-muted-foreground space-y-1">
-              <p className="font-semibold text-foreground/70 mb-1">
+
+            {/* Demo credentials */}
+            <div
+              className="mt-4 rounded-lg px-3 py-2.5 text-[11px] space-y-1"
+              style={{
+                background: "oklch(0.95 0.02 240)",
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              }}
+            >
+              <p
+                className="font-semibold mb-1"
+                style={{ color: "oklch(0.22 0.015 250)" }}
+              >
                 Demo Credentials
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Founder: <strong>founder / founder123</strong>
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Admin: <strong>admin / admin123</strong>
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Centre Head (Kondapur): <strong>centrehead1 / ch123</strong>
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Centre Head (Bachupally): <strong>centrehead2 / ch456</strong>
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Teacher (Nursery): <strong>teacher1 / teacher123</strong>
               </p>
-              <p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Parent Portal: <strong>parent1 / parent123</strong>
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <p className="text-center text-white/50 text-[10px] mt-4">
+        <p
+          className="text-center text-white/55 text-[10px] mt-4"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
+        >
           Kondapur: +91 628170-8102 &nbsp;|&nbsp; Bachupally: +91 7488-456789
         </p>
       </div>

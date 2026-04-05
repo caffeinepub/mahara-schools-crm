@@ -193,10 +193,7 @@ export default function Sidebar({
   return (
     <aside
       className="w-[240px] flex-shrink-0 flex flex-col h-full"
-      style={{
-        background:
-          "linear-gradient(180deg, #3A8A8D 0%, #4FA3A6 50%, #5C8DB0 100%)",
-      }}
+      style={{ background: "oklch(var(--sidebar))" }}
     >
       {/* Logo */}
       <div className="px-4 py-4 border-b border-white/20">
@@ -209,10 +206,21 @@ export default function Sidebar({
             />
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">
+            <p
+              className="text-white text-sm leading-tight"
+              style={{
+                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                fontWeight: 800,
+              }}
+            >
               Mahara Schools
             </p>
-            <p className="text-white/60 text-[10px] uppercase tracking-wider">
+            <p
+              className="text-white/60 text-[10px] uppercase tracking-wider"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              }}
+            >
               CRM Portal
             </p>
           </div>
@@ -221,10 +229,21 @@ export default function Sidebar({
 
       {/* Role badge */}
       <div className="px-4 py-2.5 border-b border-white/10">
-        <p className="text-white/50 text-[9px] uppercase tracking-widest">
+        <p
+          className="text-white/50 text-[9px] uppercase tracking-widest"
+          style={{
+            fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+            fontWeight: 800,
+          }}
+        >
           {ROLE_LABELS[user.role] ?? user.role}
         </p>
-        <p className="text-white text-xs font-medium truncate mt-0.5">
+        <p
+          className="text-white text-xs font-medium truncate mt-0.5"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
+        >
           {user.name}
         </p>
       </div>
@@ -236,7 +255,13 @@ export default function Sidebar({
           if (!items || items.length === 0) return null;
           return (
             <div key={section} className="mb-3">
-              <p className="text-white/35 text-[8px] uppercase tracking-widest px-3 mb-1">
+              <p
+                className="text-white/40 text-[8px] uppercase tracking-widest px-3 mb-1"
+                style={{
+                  fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
                 {SECTION_LABELS[section]}
               </p>
               <div className="space-y-0.5">
@@ -249,14 +274,18 @@ export default function Sidebar({
                       key={item.id}
                       data-ocid={`nav.${item.id}.link`}
                       onClick={() => handleNav(item.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                         active
-                          ? "bg-white/20 text-white shadow-sm"
-                          : "text-white/75 hover:bg-white/10 hover:text-white"
+                          ? "bg-white/25 text-white shadow-sm"
+                          : "text-white/75 hover:bg-white/15 hover:text-white"
                       }`}
+                      style={{
+                        fontFamily:
+                          "'Plus Jakarta Sans', system-ui, sans-serif",
+                      }}
                     >
                       <Icon className="flex-shrink-0" size={17} />
-                      <span className="flex-1 text-left text-xs">
+                      <span className="flex-1 text-left text-xs font-medium">
                         {item.label}
                       </span>
                       {active && (
@@ -273,13 +302,29 @@ export default function Sidebar({
 
       {/* Branches quick info */}
       <div className="px-4 pb-3 border-t border-white/10 pt-3">
-        <p className="text-white/40 text-[9px] uppercase tracking-widest mb-1.5">
+        <p
+          className="text-white/40 text-[9px] uppercase tracking-widest mb-1.5"
+          style={{
+            fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+            fontWeight: 800,
+          }}
+        >
           Branches
         </p>
-        <p className="text-white/70 text-[10px] leading-relaxed">
+        <p
+          className="text-white/70 text-[10px] leading-relaxed"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
+        >
           📍 Kondapur, Hyderabad
         </p>
-        <p className="text-white/70 text-[10px] leading-relaxed">
+        <p
+          className="text-white/70 text-[10px] leading-relaxed"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
+        >
           📍 Bachupally, Hyderabad
         </p>
       </div>
@@ -290,7 +335,10 @@ export default function Sidebar({
           type="button"
           data-ocid="nav.logout.button"
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/75 hover:bg-white/10 hover:text-white transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/75 hover:bg-white/15 hover:text-white transition-all"
+          style={{
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          }}
         >
           <LogOut size={17} />
           <span>Logout</span>

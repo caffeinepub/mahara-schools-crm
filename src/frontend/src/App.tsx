@@ -32,14 +32,22 @@ export default function App() {
   const [page, setPage] = useState<Page>("dashboard");
   const [seeded, setSeeded] = useState(false);
 
-  // Security hardening: run once on mount
+  // Security hardening: run once on mount, wrapped in try/catch so it can never crash the app
   useEffect(() => {
-    setupSecurity();
+    try {
+      setupSecurity();
+    } catch {
+      // Security setup failing should never crash the app
+    }
   }, []);
 
   useEffect(() => {
-    const stored = getAuthUser();
-    if (stored) setUser(stored as AuthUser);
+    try {
+      const stored = getAuthUser();
+      if (stored) setUser(stored as AuthUser);
+    } catch {
+      // ignore storage errors
+    }
   }, []);
 
   useEffect(() => {
@@ -75,7 +83,11 @@ export default function App() {
   }
 
   function handleLogout() {
-    clearAuth();
+    try {
+      clearAuth();
+    } catch {
+      // ignore
+    }
     setUser(null);
   }
 

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Fraunces:ital,opsz,wght@1,9..144,300..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,45 +7,74 @@
 @layer base {
   :root {
     --radius: 0.625rem;
-    /* Background: #EEF2F3 cool-gray */
-    --background: 0.951 0.008 200;
-    --foreground: 0.22 0.02 200;
+
+    /* ── Mahara Brand Palette ──────────────────────────────────────────── */
+    /* Blue #65A0E3  → background only */
+    /* Teal #91D3CF  → primary (bg + fg) */
+    /* Pink #F2B0CB  → secondary (bg + fg) */
+    /* Purple #B2A8D1 → sidebar, versatile (bg + fg) */
+    /* Yellow #FFE600 → accent foreground only */
+    /* Lime #BCD800  → accent foreground only */
+    /* ─────────────────────────────────────────────────────────────────── */
+
+    /* Page background: Mahara Blue */
+    --background: 0.68 0.13 243;
+    --foreground: 0.22 0.015 250;
+
+    /* Cards stay white for readability */
     --card: 1 0 0;
-    --card-foreground: 0.22 0.02 200;
+    --card-foreground: 0.22 0.015 250;
+
     --popover: 1 0 0;
-    --popover-foreground: 0.22 0.02 200;
-    /* Primary: #64A0A3 teal */
-    --primary: 0.65 0.07 195;
-    --primary-foreground: 1 0 0;
-    --secondary: 0.94 0.012 200;
-    --secondary-foreground: 0.22 0.02 200;
-    --muted: 0.94 0.012 200;
-    --muted-foreground: 0.52 0.025 200;
-    --accent: 0.64 0.07 195;
-    --accent-foreground: 1 0 0;
+    --popover-foreground: 0.22 0.015 250;
+
+    /* Primary: Teal #91D3CF */
+    --primary: 0.8 0.07 189;
+    --primary-foreground: 0.22 0.015 250;
+
+    /* Secondary: Pink #F2B0CB */
+    --secondary: 0.82 0.09 356;
+    --secondary-foreground: 0.22 0.015 250;
+
+    /* Muted: very light blue */
+    --muted: 0.95 0.02 240;
+    --muted-foreground: 0.55 0.015 250;
+
+    /* Accent: Yellow #FFE600 */
+    --accent: 0.93 0.19 105;
+    --accent-foreground: 0.22 0.015 250;
+
     --destructive: 0.577 0.245 27.325;
     --destructive-foreground: 1 0 0;
-    --border: 0.9 0.01 200;
-    --input: 0.9 0.01 200;
-    --ring: 0.65 0.07 195;
-    --chart-1: 0.646 0.222 41.116;
-    --chart-2: 0.65 0.07 195;
-    --chart-3: 0.398 0.07 227.392;
-    --chart-4: 0.828 0.189 84.429;
-    --chart-5: 0.769 0.188 70.08;
-    /* Sidebar: teal gradient applied via CSS */
-    --sidebar: 0.58 0.075 195;
+
+    --border: 0.88 0.03 240;
+    --input: 0.88 0.03 240;
+    --ring: 0.8 0.07 189;
+
+    /* Charts */
+    --chart-1: 0.93 0.19 105;
+    --chart-2: 0.8 0.07 189;
+    --chart-3: 0.85 0.18 125;
+    --chart-4: 0.82 0.09 356;
+    --chart-5: 0.74 0.07 293;
+
+    /* Sidebar: Purple #B2A8D1 */
+    --sidebar: 0.74 0.07 293;
     --sidebar-foreground: 1 0 0;
-    --sidebar-primary: 0.68 0.065 195;
-    --sidebar-primary-foreground: 1 0 0;
-    --sidebar-accent: 0.52 0.08 195;
+    --sidebar-primary: 0.8 0.07 189;
+    --sidebar-primary-foreground: 0.22 0.015 250;
+    --sidebar-accent: 0.68 0.08 293;
     --sidebar-accent-foreground: 1 0 0;
-    --sidebar-border: 0.65 0.06 195;
-    --sidebar-ring: 0.7 0.065 195;
-    /* Custom */
-    --teal-dark: 0.58 0.075 195;
-    --teal-mid: 0.65 0.07 195;
-    --teal-light: 0.68 0.065 195;
+    --sidebar-border: 0.68 0.06 293;
+    --sidebar-ring: 0.8 0.07 189;
+
+    /* Mahara brand extras */
+    --mahara-blue: 0.68 0.13 243;
+    --mahara-teal: 0.8 0.07 189;
+    --mahara-pink: 0.82 0.09 356;
+    --mahara-purple: 0.74 0.07 293;
+    --mahara-yellow: 0.93 0.19 105;
+    --mahara-lime: 0.85 0.18 125;
     --success: 0.72 0.17 145;
     --success-bg: 0.95 0.05 145;
   }
@@ -73,6 +102,22 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  /* Typography helpers */
+  .font-display {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    font-weight: 800;
+  }
+
+  .font-heading {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .font-body {
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 }

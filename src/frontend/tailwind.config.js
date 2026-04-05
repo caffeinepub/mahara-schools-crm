@@ -1,6 +1,7 @@
 import typography from "@tailwindcss/typography";
 import containerQueries from "@tailwindcss/container-queries";
 import animate from "tailwindcss-animate";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -16,7 +17,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ["Plus Jakarta Sans", ...fontFamily.sans],
+        display: ["Bricolage Grotesque", ...fontFamily.sans],
+        heading: ["Fraunces", ...fontFamily.serif],
       },
       colors: {
         border: "oklch(var(--border))",
@@ -69,10 +72,13 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
-        teal: {
-          dark: "oklch(var(--teal-dark))",
-          mid: "oklch(var(--teal-mid))",
-          light: "oklch(var(--teal-light))",
+        mahara: {
+          blue: "oklch(var(--mahara-blue))",
+          teal: "oklch(var(--mahara-teal))",
+          pink: "oklch(var(--mahara-pink))",
+          purple: "oklch(var(--mahara-purple))",
+          yellow: "oklch(var(--mahara-yellow))",
+          lime: "oklch(var(--mahara-lime))",
         },
         success: {
           DEFAULT: "oklch(var(--success))",
