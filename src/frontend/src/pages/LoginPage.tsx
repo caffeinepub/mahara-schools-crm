@@ -12,7 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const LOGO =
-  "/assets/mahara_common_logo_png-019d4d86-52fa-7582-a628-0e0c9b0a7c23.png";
+  "/assets/mahara_common_logo_png-019d5f08-56b5-75e2-b21e-90232b0e5415.png";
 
 interface Props {
   onLogin: (username: string, password: string) => Promise<boolean>;
@@ -67,6 +67,19 @@ export default function LoginPage({ onLogin }: Props) {
               src={LOGO}
               alt="Mahara Schools"
               className="w-full h-full object-contain"
+              onError={(e) => {
+                const t = e.currentTarget;
+                t.style.display = "none";
+                const parent = t.parentElement;
+                if (parent && !parent.querySelector(".logo-fallback")) {
+                  const span = document.createElement("span");
+                  span.className = "logo-fallback";
+                  span.textContent = "M";
+                  span.style.cssText =
+                    "font-size:2rem;font-weight:800;color:#65A0E3;";
+                  parent.appendChild(span);
+                }
+              }}
             />
           </div>
           <h1
@@ -206,6 +219,9 @@ export default function LoginPage({ onLogin }: Props) {
               </p>
               <p style={{ color: "oklch(0.55 0.015 250)" }}>
                 Parent Portal: <strong>parent1 / parent123</strong>
+              </p>
+              <p style={{ color: "oklch(0.55 0.015 250)" }}>
+                Counselor: <strong>counselor / counselor123</strong>
               </p>
             </div>
           </CardContent>
