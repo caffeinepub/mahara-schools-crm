@@ -201,7 +201,25 @@ export interface http_request_result {
   'body' : Uint8Array,
   'headers' : Array<http_header>,
 }
-
+export interface StaffProfile {
+  'id' : string,
+  'name' : string,
+  'designation' : string,
+  'contactNumber' : string,
+  'branchId' : string,
+  'role' : string,
+  'dailyActivities' : string,
+  'notes' : string,
+  'email' : string,
+}
+export interface UserAccount {
+  'id' : string,
+  'username' : string,
+  'password' : string,
+  'role' : string,
+  'fullName' : string,
+  'email' : string,
+}
 export interface WhatsAppMessage {
   'id' : string,
   'leadId' : string,
@@ -319,6 +337,18 @@ export interface ParentNotification {
 
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  // Staff Profiles
+  'addStaffProfile' : ActorMethod<[StaffProfile], string>,
+  'addUserAccount' : ActorMethod<[UserAccount], string>,
+  'deleteStaffProfile' : ActorMethod<[string], undefined>,
+  'deleteUserAccount' : ActorMethod<[string], undefined>,
+  'getStaffProfiles' : ActorMethod<[], Array<StaffProfile>>,
+  'getStaffProfilesByBranch' : ActorMethod<[string], Array<StaffProfile>>,
+  'getStaffProfilesByRole' : ActorMethod<[string], Array<StaffProfile>>,
+  'getUserAccounts' : ActorMethod<[], Array<UserAccount>>,
+  'updateStaffProfile' : ActorMethod<[StaffProfile], undefined>,
+  'updateUserAccount' : ActorMethod<[UserAccount], undefined>,
+  // Core
   'addBranch' : ActorMethod<[Branch], string>,
   'addCalendarEvent' : ActorMethod<[CalendarEvent], string>,
   'addCampaign' : ActorMethod<[Campaign], string>,
@@ -424,6 +454,7 @@ export interface _SERVICE {
   'updateTeacher' : ActorMethod<[Teacher], undefined>,
   'updateTeamMember' : ActorMethod<[TeamMember], undefined>,
   'updateWorksheet' : ActorMethod<[Worksheet], undefined>,
+  // Student Records
   'addStudentRecord' : ActorMethod<[StudentRecord], string>,
   'addStudentRecordsBulk' : ActorMethod<[Array<StudentRecord>], Array<string>>,
   'updateStudentRecord' : ActorMethod<[StudentRecord], undefined>,
@@ -431,6 +462,54 @@ export interface _SERVICE {
   'getAllStudentRecords' : ActorMethod<[], Array<StudentRecord>>,
   'getStudentRecordsByGrade' : ActorMethod<[string], Array<StudentRecord>>,
   'getStudentRecordsByBranch' : ActorMethod<[string], Array<StudentRecord>>,
+  // WhatsApp History
+  'getWhatsAppMessages' : ActorMethod<[], Array<WhatsAppMessage>>,
+  'getWhatsAppMessagesByLead' : ActorMethod<[string], Array<WhatsAppMessage>>,
+  'addWhatsAppMessage' : ActorMethod<[WhatsAppMessage], string>,
+  'updateWhatsAppMessageStatus' : ActorMethod<[string, string], undefined>,
+  // Staff Attendance
+  'getStaffAttendance' : ActorMethod<[], Array<StaffAttendance>>,
+  'getStaffAttendanceByDate' : ActorMethod<[string], Array<StaffAttendance>>,
+  'getStaffAttendanceByStaff' : ActorMethod<[string], Array<StaffAttendance>>,
+  'markAttendance' : ActorMethod<[StaffAttendance], string>,
+  'updateAttendance' : ActorMethod<[StaffAttendance], undefined>,
+  // Teacher Performance
+  'getTeacherPerformanceRecords' : ActorMethod<[], Array<TeacherPerformanceRecord>>,
+  'getTeacherPerformanceByTeacher' : ActorMethod<[string], Array<TeacherPerformanceRecord>>,
+  'getParentFeedback' : ActorMethod<[], Array<ParentFeedback>>,
+  'getParentFeedbackByTeacher' : ActorMethod<[string], Array<ParentFeedback>>,
+  'submitParentFeedback' : ActorMethod<[ParentFeedback], string>,
+  'getPTMRecords' : ActorMethod<[], Array<PTMRecord>>,
+  'getPTMRecordsByTeacher' : ActorMethod<[string], Array<PTMRecord>>,
+  'addPTMRecord' : ActorMethod<[PTMRecord], string>,
+  // Classroom Activities
+  'getAllClassActivities' : ActorMethod<[], Array<ClassActivity>>,
+  'getClassActivitiesByGrade' : ActorMethod<[string], Array<ClassActivity>>,
+  'getClassActivitiesByTeacher' : ActorMethod<[string], Array<ClassActivity>>,
+  'getClassActivitiesByBranch' : ActorMethod<[string], Array<ClassActivity>>,
+  'addClassActivity' : ActorMethod<[ClassActivity], string>,
+  'updateClassActivity' : ActorMethod<[ClassActivity], undefined>,
+  'deleteClassActivity' : ActorMethod<[string], undefined>,
+  // Forms
+  'getAllForms' : ActorMethod<[], Array<SchoolForm>>,
+  'getPublishedForms' : ActorMethod<[], Array<SchoolForm>>,
+  'getFormById' : ActorMethod<[string], [] | [SchoolForm]>,
+  'addForm' : ActorMethod<[SchoolForm], string>,
+  'updateForm' : ActorMethod<[SchoolForm], undefined>,
+  'deleteForm' : ActorMethod<[string], undefined>,
+  'getFormResponses' : ActorMethod<[string], Array<FormResponse>>,
+  'getMyFormResponses' : ActorMethod<[string], Array<FormResponse>>,
+  'submitFormResponse' : ActorMethod<[FormResponse], string>,
+  // Blog
+  'getAllBlogPosts' : ActorMethod<[], Array<BlogPost>>,
+  'getPublishedBlogPosts' : ActorMethod<[], Array<BlogPost>>,
+  'addBlogPost' : ActorMethod<[BlogPost], string>,
+  'updateBlogPost' : ActorMethod<[BlogPost], undefined>,
+  'deleteBlogPost' : ActorMethod<[string], undefined>,
+  // Parent Notifications
+  'getParentNotifications' : ActorMethod<[string], Array<ParentNotification>>,
+  'addParentNotification' : ActorMethod<[ParentNotification], string>,
+  'markNotificationRead' : ActorMethod<[string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

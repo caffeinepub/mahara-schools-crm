@@ -229,7 +229,122 @@ export interface UserAccount {
     fullName: string;
     email: string;
 }
+export interface WhatsAppMessage {
+    id: string;
+    leadId: string;
+    leadName: string;
+    leadPhone: string;
+    direction: string;
+    messageText: string;
+    status: string;
+    timestamp: string;
+    messageId: string;
+    campaignId: string;
+}
+export interface StaffAttendance {
+    id: string;
+    staffId: string;
+    staffName: string;
+    branchId: string;
+    date: string;
+    status: string;
+    markedBy: string;
+    timestamp: string;
+}
+export interface TeacherPerformanceRecord {
+    id: string;
+    teacherId: string;
+    teacherName: string;
+    branchId: string;
+    month: string;
+    year: string;
+    activitiesUploaded: bigint;
+    worksheetsSubmitted: bigint;
+    ptmAttended: bigint;
+    completionPercent: bigint;
+}
+export interface ParentFeedback {
+    id: string;
+    teacherId: string;
+    teacherName: string;
+    parentUsername: string;
+    studentName: string;
+    rating: bigint;
+    comment: string;
+    submittedAt: string;
+}
+export interface PTMRecord {
+    id: string;
+    teacherId: string;
+    date: string;
+    title: string;
+    attendees: string;
+    notes: string;
+}
+export interface ClassActivity {
+    id: string;
+    classGrade: string;
+    teacherId: string;
+    teacherName: string;
+    branchId: string;
+    date: string;
+    title: string;
+    description: string;
+    mediaUrls: Array<string>;
+    createdAt: string;
+}
+export interface FormQuestion {
+    id: string;
+    questionText: string;
+    questionType: string;
+    options: Array<string>;
+    required: boolean;
+}
+export interface FormAnswer {
+    questionId: string;
+    questionText: string;
+    answer: string;
+}
+export interface SchoolForm {
+    id: string;
+    title: string;
+    description: string;
+    questions: Array<FormQuestion>;
+    publishedAt: string;
+    isDraft: boolean;
+    createdBy: string;
+    responseCount: bigint;
+}
+export interface FormResponse {
+    id: string;
+    formId: string;
+    parentUsername: string;
+    studentName: string;
+    answers: Array<FormAnswer>;
+    submittedAt: string;
+}
+export interface BlogPost {
+    id: string;
+    title: string;
+    content: string;
+    category: string;
+    authorName: string;
+    publishedAt: string;
+    isDraft: boolean;
+    tags: string;
+}
+export interface ParentNotification {
+    id: string;
+    parentUsername: string;
+    title: string;
+    message: string;
+    notifType: string;
+    isRead: boolean;
+    createdAt: string;
+    linkId: string;
+}
 export interface backendInterface {
+    // Staff Profiles
     addStaffProfile(sp: StaffProfile): Promise<string>;
     addUserAccount(a: UserAccount): Promise<string>;
     deleteStaffProfile(id: string): Promise<void>;
@@ -240,6 +355,7 @@ export interface backendInterface {
     getUserAccounts(): Promise<Array<UserAccount>>;
     updateStaffProfile(sp: StaffProfile): Promise<void>;
     updateUserAccount(a: UserAccount): Promise<void>;
+    // Core
     addBranch(b: Branch): Promise<string>;
     addCalendarEvent(e: CalendarEvent): Promise<string>;
     addCampaign(c: Campaign): Promise<string>;
@@ -351,4 +467,52 @@ export interface backendInterface {
     updateTeacher(t: Teacher): Promise<void>;
     updateTeamMember(m: TeamMember): Promise<void>;
     updateWorksheet(w: Worksheet): Promise<void>;
+    // WhatsApp History
+    getWhatsAppMessages(): Promise<Array<WhatsAppMessage>>;
+    getWhatsAppMessagesByLead(leadId: string): Promise<Array<WhatsAppMessage>>;
+    addWhatsAppMessage(msg: WhatsAppMessage): Promise<string>;
+    updateWhatsAppMessageStatus(id: string, status: string): Promise<void>;
+    // Staff Attendance
+    getStaffAttendance(): Promise<Array<StaffAttendance>>;
+    getStaffAttendanceByDate(date: string): Promise<Array<StaffAttendance>>;
+    getStaffAttendanceByStaff(staffId: string): Promise<Array<StaffAttendance>>;
+    markAttendance(a: StaffAttendance): Promise<string>;
+    updateAttendance(a: StaffAttendance): Promise<void>;
+    // Teacher Performance
+    getTeacherPerformanceRecords(): Promise<Array<TeacherPerformanceRecord>>;
+    getTeacherPerformanceByTeacher(teacherId: string): Promise<Array<TeacherPerformanceRecord>>;
+    getParentFeedback(): Promise<Array<ParentFeedback>>;
+    getParentFeedbackByTeacher(teacherId: string): Promise<Array<ParentFeedback>>;
+    submitParentFeedback(feedback: ParentFeedback): Promise<string>;
+    getPTMRecords(): Promise<Array<PTMRecord>>;
+    getPTMRecordsByTeacher(teacherId: string): Promise<Array<PTMRecord>>;
+    addPTMRecord(record: PTMRecord): Promise<string>;
+    // Classroom Activities
+    getAllClassActivities(): Promise<Array<ClassActivity>>;
+    getClassActivitiesByGrade(grade: string): Promise<Array<ClassActivity>>;
+    getClassActivitiesByTeacher(teacherId: string): Promise<Array<ClassActivity>>;
+    getClassActivitiesByBranch(branchId: string): Promise<Array<ClassActivity>>;
+    addClassActivity(a: ClassActivity): Promise<string>;
+    updateClassActivity(a: ClassActivity): Promise<void>;
+    deleteClassActivity(id: string): Promise<void>;
+    // Forms
+    getAllForms(): Promise<Array<SchoolForm>>;
+    getPublishedForms(): Promise<Array<SchoolForm>>;
+    getFormById(id: string): Promise<SchoolForm | null>;
+    addForm(form: SchoolForm): Promise<string>;
+    updateForm(form: SchoolForm): Promise<void>;
+    deleteForm(id: string): Promise<void>;
+    getFormResponses(formId: string): Promise<Array<FormResponse>>;
+    getMyFormResponses(parentUsername: string): Promise<Array<FormResponse>>;
+    submitFormResponse(response: FormResponse): Promise<string>;
+    // Blog
+    getAllBlogPosts(): Promise<Array<BlogPost>>;
+    getPublishedBlogPosts(): Promise<Array<BlogPost>>;
+    addBlogPost(post: BlogPost): Promise<string>;
+    updateBlogPost(post: BlogPost): Promise<void>;
+    deleteBlogPost(id: string): Promise<void>;
+    // Parent Notifications
+    getParentNotifications(parentUsername: string): Promise<Array<ParentNotification>>;
+    addParentNotification(n: ParentNotification): Promise<string>;
+    markNotificationRead(id: string): Promise<void>;
 }

@@ -208,9 +208,154 @@ export const TransformationOutput = IDL.Record({
   'body' : IDL.Vec(IDL.Nat8),
   'headers' : IDL.Vec(http_header),
 });
+export const StaffProfile = IDL.Record({
+  'id' : IDL.Text,
+  'name' : IDL.Text,
+  'designation' : IDL.Text,
+  'contactNumber' : IDL.Text,
+  'branchId' : IDL.Text,
+  'role' : IDL.Text,
+  'dailyActivities' : IDL.Text,
+  'notes' : IDL.Text,
+  'email' : IDL.Text,
+});
+export const UserAccount = IDL.Record({
+  'id' : IDL.Text,
+  'username' : IDL.Text,
+  'password' : IDL.Text,
+  'role' : IDL.Text,
+  'fullName' : IDL.Text,
+  'email' : IDL.Text,
+});
+export const WhatsAppMessage = IDL.Record({
+  'id' : IDL.Text,
+  'leadId' : IDL.Text,
+  'leadName' : IDL.Text,
+  'leadPhone' : IDL.Text,
+  'direction' : IDL.Text,
+  'messageText' : IDL.Text,
+  'status' : IDL.Text,
+  'timestamp' : IDL.Text,
+  'messageId' : IDL.Text,
+  'campaignId' : IDL.Text,
+});
+export const StaffAttendance = IDL.Record({
+  'id' : IDL.Text,
+  'staffId' : IDL.Text,
+  'staffName' : IDL.Text,
+  'branchId' : IDL.Text,
+  'date' : IDL.Text,
+  'status' : IDL.Text,
+  'markedBy' : IDL.Text,
+  'timestamp' : IDL.Text,
+});
+export const TeacherPerformanceRecord = IDL.Record({
+  'id' : IDL.Text,
+  'teacherId' : IDL.Text,
+  'teacherName' : IDL.Text,
+  'branchId' : IDL.Text,
+  'month' : IDL.Text,
+  'year' : IDL.Text,
+  'activitiesUploaded' : IDL.Nat,
+  'worksheetsSubmitted' : IDL.Nat,
+  'ptmAttended' : IDL.Nat,
+  'completionPercent' : IDL.Nat,
+});
+export const ParentFeedback = IDL.Record({
+  'id' : IDL.Text,
+  'teacherId' : IDL.Text,
+  'teacherName' : IDL.Text,
+  'parentUsername' : IDL.Text,
+  'studentName' : IDL.Text,
+  'rating' : IDL.Nat,
+  'comment' : IDL.Text,
+  'submittedAt' : IDL.Text,
+});
+export const PTMRecord = IDL.Record({
+  'id' : IDL.Text,
+  'teacherId' : IDL.Text,
+  'date' : IDL.Text,
+  'title' : IDL.Text,
+  'attendees' : IDL.Text,
+  'notes' : IDL.Text,
+});
+export const ClassActivity = IDL.Record({
+  'id' : IDL.Text,
+  'classGrade' : IDL.Text,
+  'teacherId' : IDL.Text,
+  'teacherName' : IDL.Text,
+  'branchId' : IDL.Text,
+  'date' : IDL.Text,
+  'title' : IDL.Text,
+  'description' : IDL.Text,
+  'mediaUrls' : IDL.Vec(IDL.Text),
+  'createdAt' : IDL.Text,
+});
+export const FormQuestion = IDL.Record({
+  'id' : IDL.Text,
+  'questionText' : IDL.Text,
+  'questionType' : IDL.Text,
+  'options' : IDL.Vec(IDL.Text),
+  'required' : IDL.Bool,
+});
+export const FormAnswer = IDL.Record({
+  'questionId' : IDL.Text,
+  'questionText' : IDL.Text,
+  'answer' : IDL.Text,
+});
+export const SchoolForm = IDL.Record({
+  'id' : IDL.Text,
+  'title' : IDL.Text,
+  'description' : IDL.Text,
+  'questions' : IDL.Vec(FormQuestion),
+  'publishedAt' : IDL.Text,
+  'isDraft' : IDL.Bool,
+  'createdBy' : IDL.Text,
+  'responseCount' : IDL.Nat,
+});
+export const FormResponse = IDL.Record({
+  'id' : IDL.Text,
+  'formId' : IDL.Text,
+  'parentUsername' : IDL.Text,
+  'studentName' : IDL.Text,
+  'answers' : IDL.Vec(FormAnswer),
+  'submittedAt' : IDL.Text,
+});
+export const BlogPost = IDL.Record({
+  'id' : IDL.Text,
+  'title' : IDL.Text,
+  'content' : IDL.Text,
+  'category' : IDL.Text,
+  'authorName' : IDL.Text,
+  'publishedAt' : IDL.Text,
+  'isDraft' : IDL.Bool,
+  'tags' : IDL.Text,
+});
+export const ParentNotification = IDL.Record({
+  'id' : IDL.Text,
+  'parentUsername' : IDL.Text,
+  'title' : IDL.Text,
+  'message' : IDL.Text,
+  'notifType' : IDL.Text,
+  'isRead' : IDL.Bool,
+  'createdAt' : IDL.Text,
+  'linkId' : IDL.Text,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  // Staff
+  'addStaffProfile' : IDL.Func([StaffProfile], [IDL.Text], []),
+  'addUserAccount' : IDL.Func([UserAccount], [IDL.Text], []),
+  'deleteStaffProfile' : IDL.Func([IDL.Text], [], []),
+  'deleteUserAccount' : IDL.Func([IDL.Text], [], []),
+  'getStaffProfiles' : IDL.Func([], [IDL.Vec(StaffProfile)], ['query']),
+  'getStaffProfilesByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StaffProfile)], ['query']),
+  'getStaffProfilesByRole' : IDL.Func([IDL.Text], [IDL.Vec(StaffProfile)], ['query']),
+  'getUserAccounts' : IDL.Func([], [IDL.Vec(UserAccount)], ['query']),
+  'updateStaffProfile' : IDL.Func([StaffProfile], [], []),
+  'updateUserAccount' : IDL.Func([UserAccount], [], []),
+  // Core
   'addBranch' : IDL.Func([Branch], [IDL.Text], []),
   'addCalendarEvent' : IDL.Func([CalendarEvent], [IDL.Text], []),
   'addCampaign' : IDL.Func([Campaign], [IDL.Text], []),
@@ -245,11 +390,7 @@ export const idlService = IDL.Service({
   'deleteTeacher' : IDL.Func([IDL.Text], [], []),
   'deleteTeamMember' : IDL.Func([IDL.Text], [], []),
   'deleteWorksheet' : IDL.Func([IDL.Text], [], []),
-  'getActivitiesByLead' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(LeadActivity)],
-      ['query'],
-    ),
+  'getActivitiesByLead' : IDL.Func([IDL.Text], [IDL.Vec(LeadActivity)], ['query']),
   'getAllLeadActivities' : IDL.Func([], [IDL.Vec(LeadActivity)], ['query']),
   'getAllReportCards' : IDL.Func([], [IDL.Vec(ReportCard)], ['query']),
   'getAllStudents' : IDL.Func([], [IDL.Vec(Student)], ['query']),
@@ -260,32 +401,16 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCampaignSends' : IDL.Func([], [IDL.Vec(CampaignSend)], ['query']),
-  'getCampaignSendsByCampaign' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(CampaignSend)],
-      ['query'],
-    ),
-  'getCampaignSendsByLead' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(CampaignSend)],
-      ['query'],
-    ),
+  'getCampaignSendsByCampaign' : IDL.Func([IDL.Text], [IDL.Vec(CampaignSend)], ['query']),
+  'getCampaignSendsByLead' : IDL.Func([IDL.Text], [IDL.Vec(CampaignSend)], ['query']),
   'getCampaignTemplates' : IDL.Func([], [IDL.Vec(CampaignTemplate)], ['query']),
   'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
   'getFollowUps' : IDL.Func([], [IDL.Vec(FollowUp)], ['query']),
-  'getIntegrationConfig' : IDL.Func(
-      [],
-      [IDL.Opt(IntegrationConfig)],
-      ['query'],
-    ),
+  'getIntegrationConfig' : IDL.Func([], [IDL.Opt(IntegrationConfig)], ['query']),
   'getLeadSources' : IDL.Func([], [IDL.Vec(LeadSource)], ['query']),
   'getLeads' : IDL.Func([], [IDL.Vec(Lead)], ['query']),
   'getNotesByLead' : IDL.Func([IDL.Text], [IDL.Vec(LeadNote)], ['query']),
-  'getReportCardsByStudent' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(ReportCard)],
-      ['query'],
-    ),
+  'getReportCardsByStudent' : IDL.Func([IDL.Text], [IDL.Vec(ReportCard)], ['query']),
   'getSchoolUpdates' : IDL.Func([], [IDL.Vec(SchoolUpdate)], ['query']),
   'getStudentsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(Student)], ['query']),
   'getStudentsByParent' : IDL.Func([IDL.Text], [IDL.Vec(Student)], ['query']),
@@ -295,42 +420,17 @@ export const idlService = IDL.Service({
   'getTeacherByUsername' : IDL.Func([IDL.Text], [IDL.Opt(Teacher)], ['query']),
   'getTeachersByBranch' : IDL.Func([IDL.Text], [IDL.Vec(Teacher)], ['query']),
   'getTeamMembers' : IDL.Func([], [IDL.Vec(TeamMember)], ['query']),
-  'getUserProfile' : IDL.Func(
-      [IDL.Principal],
-      [IDL.Opt(UserProfile)],
-      ['query'],
-    ),
-  'getWorksheetsByGrade' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(Worksheet)],
-      ['query'],
-    ),
+  'getUserProfile' : IDL.Func([IDL.Principal], [IDL.Opt(UserProfile)], ['query']),
+  'getWorksheetsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(Worksheet)], ['query']),
   'initSeedData' : IDL.Func([], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'login' : IDL.Func(
       [IDL.Record({ 'username' : IDL.Text, 'password' : IDL.Text })],
-      [
-        IDL.Opt(
-          IDL.Record({
-            'username' : IDL.Text,
-            'name' : IDL.Text,
-            'role' : IDL.Text,
-          })
-        ),
-      ],
+      [IDL.Opt(IDL.Record({ 'username' : IDL.Text, 'name' : IDL.Text, 'role' : IDL.Text }))],
       [],
     ),
   'receiveWebhookLead' : IDL.Func(
-      [
-        IDL.Record({
-          'source' : IDL.Text,
-          'name' : IDL.Text,
-          'email' : IDL.Text,
-          'gradeLevel' : IDL.Text,
-          'notes' : IDL.Text,
-          'phone' : IDL.Text,
-        }),
-      ],
+      [IDL.Record({ 'source' : IDL.Text, 'name' : IDL.Text, 'email' : IDL.Text, 'gradeLevel' : IDL.Text, 'notes' : IDL.Text, 'phone' : IDL.Text })],
       [IDL.Text],
       [],
     ),
@@ -338,16 +438,8 @@ export const idlService = IDL.Service({
   'saveIntegrationConfig' : IDL.Func([IntegrationConfig], [], []),
   'searchLeads' : IDL.Func([IDL.Text], [IDL.Vec(Lead)], ['query']),
   'searchTasks' : IDL.Func([IDL.Text], [IDL.Vec(Task)], ['query']),
-  'sendWhatsAppMessage' : IDL.Func(
-      [IDL.Text, IDL.Text],
-      [WhatsAppMessageResult],
-      [],
-    ),
-  'transform' : IDL.Func(
-      [TransformationInput],
-      [TransformationOutput],
-      ['query'],
-    ),
+  'sendWhatsAppMessage' : IDL.Func([IDL.Text, IDL.Text], [WhatsAppMessageResult], []),
+  'transform' : IDL.Func([TransformationInput], [TransformationOutput], ['query']),
   'updateBranch' : IDL.Func([Branch], [], []),
   'updateCalendarEvent' : IDL.Func([CalendarEvent], [], []),
   'updateCampaign' : IDL.Func([Campaign], [], []),
@@ -362,6 +454,7 @@ export const idlService = IDL.Service({
   'updateTeacher' : IDL.Func([Teacher], [], []),
   'updateTeamMember' : IDL.Func([TeamMember], [], []),
   'updateWorksheet' : IDL.Func([Worksheet], [], []),
+  // Student Records
   'addStudentRecord' : IDL.Func([StudentRecord], [IDL.Text], []),
   'addStudentRecordsBulk' : IDL.Func([IDL.Vec(StudentRecord)], [IDL.Vec(IDL.Text)], []),
   'updateStudentRecord' : IDL.Func([StudentRecord], [], []),
@@ -369,6 +462,54 @@ export const idlService = IDL.Service({
   'getAllStudentRecords' : IDL.Func([], [IDL.Vec(StudentRecord)], ['query']),
   'getStudentRecordsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
   'getStudentRecordsByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
+  // WhatsApp History
+  'getWhatsAppMessages' : IDL.Func([], [IDL.Vec(WhatsAppMessage)], ['query']),
+  'getWhatsAppMessagesByLead' : IDL.Func([IDL.Text], [IDL.Vec(WhatsAppMessage)], ['query']),
+  'addWhatsAppMessage' : IDL.Func([WhatsAppMessage], [IDL.Text], []),
+  'updateWhatsAppMessageStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  // Staff Attendance
+  'getStaffAttendance' : IDL.Func([], [IDL.Vec(StaffAttendance)], ['query']),
+  'getStaffAttendanceByDate' : IDL.Func([IDL.Text], [IDL.Vec(StaffAttendance)], ['query']),
+  'getStaffAttendanceByStaff' : IDL.Func([IDL.Text], [IDL.Vec(StaffAttendance)], ['query']),
+  'markAttendance' : IDL.Func([StaffAttendance], [IDL.Text], []),
+  'updateAttendance' : IDL.Func([StaffAttendance], [], []),
+  // Teacher Performance
+  'getTeacherPerformanceRecords' : IDL.Func([], [IDL.Vec(TeacherPerformanceRecord)], ['query']),
+  'getTeacherPerformanceByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(TeacherPerformanceRecord)], ['query']),
+  'getParentFeedback' : IDL.Func([], [IDL.Vec(ParentFeedback)], ['query']),
+  'getParentFeedbackByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(ParentFeedback)], ['query']),
+  'submitParentFeedback' : IDL.Func([ParentFeedback], [IDL.Text], []),
+  'getPTMRecords' : IDL.Func([], [IDL.Vec(PTMRecord)], ['query']),
+  'getPTMRecordsByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(PTMRecord)], ['query']),
+  'addPTMRecord' : IDL.Func([PTMRecord], [IDL.Text], []),
+  // Classroom Activities
+  'getAllClassActivities' : IDL.Func([], [IDL.Vec(ClassActivity)], ['query']),
+  'getClassActivitiesByGrade' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+  'getClassActivitiesByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+  'getClassActivitiesByBranch' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+  'addClassActivity' : IDL.Func([ClassActivity], [IDL.Text], []),
+  'updateClassActivity' : IDL.Func([ClassActivity], [], []),
+  'deleteClassActivity' : IDL.Func([IDL.Text], [], []),
+  // Forms
+  'getAllForms' : IDL.Func([], [IDL.Vec(SchoolForm)], ['query']),
+  'getPublishedForms' : IDL.Func([], [IDL.Vec(SchoolForm)], ['query']),
+  'getFormById' : IDL.Func([IDL.Text], [IDL.Opt(SchoolForm)], ['query']),
+  'addForm' : IDL.Func([SchoolForm], [IDL.Text], []),
+  'updateForm' : IDL.Func([SchoolForm], [], []),
+  'deleteForm' : IDL.Func([IDL.Text], [], []),
+  'getFormResponses' : IDL.Func([IDL.Text], [IDL.Vec(FormResponse)], ['query']),
+  'getMyFormResponses' : IDL.Func([IDL.Text], [IDL.Vec(FormResponse)], ['query']),
+  'submitFormResponse' : IDL.Func([FormResponse], [IDL.Text], []),
+  // Blog
+  'getAllBlogPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
+  'getPublishedBlogPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
+  'addBlogPost' : IDL.Func([BlogPost], [IDL.Text], []),
+  'updateBlogPost' : IDL.Func([BlogPost], [], []),
+  'deleteBlogPost' : IDL.Func([IDL.Text], [], []),
+  // Parent Notifications
+  'getParentNotifications' : IDL.Func([IDL.Text], [IDL.Vec(ParentNotification)], ['query']),
+  'addParentNotification' : IDL.Func([ParentNotification], [IDL.Text], []),
+  'markNotificationRead' : IDL.Func([IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
@@ -571,8 +712,25 @@ export const idlFactory = ({ IDL }) => {
     'body' : IDL.Vec(IDL.Nat8),
     'headers' : IDL.Vec(http_header),
   });
-  
-
+  const StaffProfile = IDL.Record({
+    'id' : IDL.Text,
+    'name' : IDL.Text,
+    'designation' : IDL.Text,
+    'contactNumber' : IDL.Text,
+    'branchId' : IDL.Text,
+    'role' : IDL.Text,
+    'dailyActivities' : IDL.Text,
+    'notes' : IDL.Text,
+    'email' : IDL.Text,
+  });
+  const UserAccount = IDL.Record({
+    'id' : IDL.Text,
+    'username' : IDL.Text,
+    'password' : IDL.Text,
+    'role' : IDL.Text,
+    'fullName' : IDL.Text,
+    'email' : IDL.Text,
+  });
   const WhatsAppMessage = IDL.Record({
     'id' : IDL.Text,
     'leadId' : IDL.Text,
@@ -690,6 +848,18 @@ export const idlFactory = ({ IDL }) => {
 
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    // Staff
+    'addStaffProfile' : IDL.Func([StaffProfile], [IDL.Text], []),
+    'addUserAccount' : IDL.Func([UserAccount], [IDL.Text], []),
+    'deleteStaffProfile' : IDL.Func([IDL.Text], [], []),
+    'deleteUserAccount' : IDL.Func([IDL.Text], [], []),
+    'getStaffProfiles' : IDL.Func([], [IDL.Vec(StaffProfile)], ['query']),
+    'getStaffProfilesByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StaffProfile)], ['query']),
+    'getStaffProfilesByRole' : IDL.Func([IDL.Text], [IDL.Vec(StaffProfile)], ['query']),
+    'getUserAccounts' : IDL.Func([], [IDL.Vec(UserAccount)], ['query']),
+    'updateStaffProfile' : IDL.Func([StaffProfile], [], []),
+    'updateUserAccount' : IDL.Func([UserAccount], [], []),
+    // Core
     'addBranch' : IDL.Func([Branch], [IDL.Text], []),
     'addCalendarEvent' : IDL.Func([CalendarEvent], [IDL.Text], []),
     'addCampaign' : IDL.Func([Campaign], [IDL.Text], []),
@@ -724,11 +894,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteTeacher' : IDL.Func([IDL.Text], [], []),
     'deleteTeamMember' : IDL.Func([IDL.Text], [], []),
     'deleteWorksheet' : IDL.Func([IDL.Text], [], []),
-    'getActivitiesByLead' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(LeadActivity)],
-        ['query'],
-      ),
+    'getActivitiesByLead' : IDL.Func([IDL.Text], [IDL.Vec(LeadActivity)], ['query']),
     'getAllLeadActivities' : IDL.Func([], [IDL.Vec(LeadActivity)], ['query']),
     'getAllReportCards' : IDL.Func([], [IDL.Vec(ReportCard)], ['query']),
     'getAllStudents' : IDL.Func([], [IDL.Vec(Student)], ['query']),
@@ -739,85 +905,36 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCampaignSends' : IDL.Func([], [IDL.Vec(CampaignSend)], ['query']),
-    'getCampaignSendsByCampaign' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(CampaignSend)],
-        ['query'],
-      ),
-    'getCampaignSendsByLead' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(CampaignSend)],
-        ['query'],
-      ),
-    'getCampaignTemplates' : IDL.Func(
-        [],
-        [IDL.Vec(CampaignTemplate)],
-        ['query'],
-      ),
+    'getCampaignSendsByCampaign' : IDL.Func([IDL.Text], [IDL.Vec(CampaignSend)], ['query']),
+    'getCampaignSendsByLead' : IDL.Func([IDL.Text], [IDL.Vec(CampaignSend)], ['query']),
+    'getCampaignTemplates' : IDL.Func([], [IDL.Vec(CampaignTemplate)], ['query']),
     'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
     'getFollowUps' : IDL.Func([], [IDL.Vec(FollowUp)], ['query']),
-    'getIntegrationConfig' : IDL.Func(
-        [],
-        [IDL.Opt(IntegrationConfig)],
-        ['query'],
-      ),
+    'getIntegrationConfig' : IDL.Func([], [IDL.Opt(IntegrationConfig)], ['query']),
     'getLeadSources' : IDL.Func([], [IDL.Vec(LeadSource)], ['query']),
     'getLeads' : IDL.Func([], [IDL.Vec(Lead)], ['query']),
     'getNotesByLead' : IDL.Func([IDL.Text], [IDL.Vec(LeadNote)], ['query']),
-    'getReportCardsByStudent' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(ReportCard)],
-        ['query'],
-      ),
+    'getReportCardsByStudent' : IDL.Func([IDL.Text], [IDL.Vec(ReportCard)], ['query']),
     'getSchoolUpdates' : IDL.Func([], [IDL.Vec(SchoolUpdate)], ['query']),
     'getStudentsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(Student)], ['query']),
     'getStudentsByParent' : IDL.Func([IDL.Text], [IDL.Vec(Student)], ['query']),
     'getTasks' : IDL.Func([], [IDL.Vec(Task)], ['query']),
     'getTasksByAssignee' : IDL.Func([IDL.Text], [IDL.Vec(Task)], ['query']),
     'getTasksByLead' : IDL.Func([IDL.Text], [IDL.Vec(Task)], ['query']),
-    'getTeacherByUsername' : IDL.Func(
-        [IDL.Text],
-        [IDL.Opt(Teacher)],
-        ['query'],
-      ),
+    'getTeacherByUsername' : IDL.Func([IDL.Text], [IDL.Opt(Teacher)], ['query']),
     'getTeachersByBranch' : IDL.Func([IDL.Text], [IDL.Vec(Teacher)], ['query']),
     'getTeamMembers' : IDL.Func([], [IDL.Vec(TeamMember)], ['query']),
-    'getUserProfile' : IDL.Func(
-        [IDL.Principal],
-        [IDL.Opt(UserProfile)],
-        ['query'],
-      ),
-    'getWorksheetsByGrade' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(Worksheet)],
-        ['query'],
-      ),
+    'getUserProfile' : IDL.Func([IDL.Principal], [IDL.Opt(UserProfile)], ['query']),
+    'getWorksheetsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(Worksheet)], ['query']),
     'initSeedData' : IDL.Func([], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'login' : IDL.Func(
         [IDL.Record({ 'username' : IDL.Text, 'password' : IDL.Text })],
-        [
-          IDL.Opt(
-            IDL.Record({
-              'username' : IDL.Text,
-              'name' : IDL.Text,
-              'role' : IDL.Text,
-            })
-          ),
-        ],
+        [IDL.Opt(IDL.Record({ 'username' : IDL.Text, 'name' : IDL.Text, 'role' : IDL.Text }))],
         [],
       ),
     'receiveWebhookLead' : IDL.Func(
-        [
-          IDL.Record({
-            'source' : IDL.Text,
-            'name' : IDL.Text,
-            'email' : IDL.Text,
-            'gradeLevel' : IDL.Text,
-            'notes' : IDL.Text,
-            'phone' : IDL.Text,
-          }),
-        ],
+        [IDL.Record({ 'source' : IDL.Text, 'name' : IDL.Text, 'email' : IDL.Text, 'gradeLevel' : IDL.Text, 'notes' : IDL.Text, 'phone' : IDL.Text })],
         [IDL.Text],
         [],
       ),
@@ -825,16 +942,8 @@ export const idlFactory = ({ IDL }) => {
     'saveIntegrationConfig' : IDL.Func([IntegrationConfig], [], []),
     'searchLeads' : IDL.Func([IDL.Text], [IDL.Vec(Lead)], ['query']),
     'searchTasks' : IDL.Func([IDL.Text], [IDL.Vec(Task)], ['query']),
-    'sendWhatsAppMessage' : IDL.Func(
-        [IDL.Text, IDL.Text],
-        [WhatsAppMessageResult],
-        [],
-      ),
-    'transform' : IDL.Func(
-        [TransformationInput],
-        [TransformationOutput],
-        ['query'],
-      ),
+    'sendWhatsAppMessage' : IDL.Func([IDL.Text, IDL.Text], [WhatsAppMessageResult], []),
+    'transform' : IDL.Func([TransformationInput], [TransformationOutput], ['query']),
     'updateBranch' : IDL.Func([Branch], [], []),
     'updateCalendarEvent' : IDL.Func([CalendarEvent], [], []),
     'updateCampaign' : IDL.Func([Campaign], [], []),
@@ -849,6 +958,7 @@ export const idlFactory = ({ IDL }) => {
     'updateTeacher' : IDL.Func([Teacher], [], []),
     'updateTeamMember' : IDL.Func([TeamMember], [], []),
     'updateWorksheet' : IDL.Func([Worksheet], [], []),
+    // Student Records
     'addStudentRecord' : IDL.Func([StudentRecord], [IDL.Text], []),
     'addStudentRecordsBulk' : IDL.Func([IDL.Vec(StudentRecord)], [IDL.Vec(IDL.Text)], []),
     'updateStudentRecord' : IDL.Func([StudentRecord], [], []),
@@ -856,6 +966,54 @@ export const idlFactory = ({ IDL }) => {
     'getAllStudentRecords' : IDL.Func([], [IDL.Vec(StudentRecord)], ['query']),
     'getStudentRecordsByGrade' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
     'getStudentRecordsByBranch' : IDL.Func([IDL.Text], [IDL.Vec(StudentRecord)], ['query']),
+    // WhatsApp History
+    'getWhatsAppMessages' : IDL.Func([], [IDL.Vec(WhatsAppMessage)], ['query']),
+    'getWhatsAppMessagesByLead' : IDL.Func([IDL.Text], [IDL.Vec(WhatsAppMessage)], ['query']),
+    'addWhatsAppMessage' : IDL.Func([WhatsAppMessage], [IDL.Text], []),
+    'updateWhatsAppMessageStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    // Staff Attendance
+    'getStaffAttendance' : IDL.Func([], [IDL.Vec(StaffAttendance)], ['query']),
+    'getStaffAttendanceByDate' : IDL.Func([IDL.Text], [IDL.Vec(StaffAttendance)], ['query']),
+    'getStaffAttendanceByStaff' : IDL.Func([IDL.Text], [IDL.Vec(StaffAttendance)], ['query']),
+    'markAttendance' : IDL.Func([StaffAttendance], [IDL.Text], []),
+    'updateAttendance' : IDL.Func([StaffAttendance], [], []),
+    // Teacher Performance
+    'getTeacherPerformanceRecords' : IDL.Func([], [IDL.Vec(TeacherPerformanceRecord)], ['query']),
+    'getTeacherPerformanceByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(TeacherPerformanceRecord)], ['query']),
+    'getParentFeedback' : IDL.Func([], [IDL.Vec(ParentFeedback)], ['query']),
+    'getParentFeedbackByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(ParentFeedback)], ['query']),
+    'submitParentFeedback' : IDL.Func([ParentFeedback], [IDL.Text], []),
+    'getPTMRecords' : IDL.Func([], [IDL.Vec(PTMRecord)], ['query']),
+    'getPTMRecordsByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(PTMRecord)], ['query']),
+    'addPTMRecord' : IDL.Func([PTMRecord], [IDL.Text], []),
+    // Classroom Activities
+    'getAllClassActivities' : IDL.Func([], [IDL.Vec(ClassActivity)], ['query']),
+    'getClassActivitiesByGrade' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+    'getClassActivitiesByTeacher' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+    'getClassActivitiesByBranch' : IDL.Func([IDL.Text], [IDL.Vec(ClassActivity)], ['query']),
+    'addClassActivity' : IDL.Func([ClassActivity], [IDL.Text], []),
+    'updateClassActivity' : IDL.Func([ClassActivity], [], []),
+    'deleteClassActivity' : IDL.Func([IDL.Text], [], []),
+    // Forms
+    'getAllForms' : IDL.Func([], [IDL.Vec(SchoolForm)], ['query']),
+    'getPublishedForms' : IDL.Func([], [IDL.Vec(SchoolForm)], ['query']),
+    'getFormById' : IDL.Func([IDL.Text], [IDL.Opt(SchoolForm)], ['query']),
+    'addForm' : IDL.Func([SchoolForm], [IDL.Text], []),
+    'updateForm' : IDL.Func([SchoolForm], [], []),
+    'deleteForm' : IDL.Func([IDL.Text], [], []),
+    'getFormResponses' : IDL.Func([IDL.Text], [IDL.Vec(FormResponse)], ['query']),
+    'getMyFormResponses' : IDL.Func([IDL.Text], [IDL.Vec(FormResponse)], ['query']),
+    'submitFormResponse' : IDL.Func([FormResponse], [IDL.Text], []),
+    // Blog
+    'getAllBlogPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
+    'getPublishedBlogPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
+    'addBlogPost' : IDL.Func([BlogPost], [IDL.Text], []),
+    'updateBlogPost' : IDL.Func([BlogPost], [], []),
+    'deleteBlogPost' : IDL.Func([IDL.Text], [], []),
+    // Parent Notifications
+    'getParentNotifications' : IDL.Func([IDL.Text], [IDL.Vec(ParentNotification)], ['query']),
+    'addParentNotification' : IDL.Func([ParentNotification], [IDL.Text], []),
+    'markNotificationRead' : IDL.Func([IDL.Text], [], []),
   });
 };
 
