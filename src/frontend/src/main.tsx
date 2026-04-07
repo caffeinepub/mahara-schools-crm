@@ -15,20 +15,22 @@ declare global {
   }
 }
 
+// Root-level error boundary to prevent the entire app from going white on crash
 class RootErrorBoundary extends React.Component<
   { children: React.ReactNode },
-  { hasError: boolean; errorMsg: string }
+  { hasError: boolean; error: Error | null }
 > {
   constructor(props: { children: React.ReactNode }) {
     super(props);
-    this.state = { hasError: false, errorMsg: "" };
+    this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: unknown) {
-    return {
-      hasError: true,
-      errorMsg: error instanceof Error ? error.message : String(error),
-    };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("[Mahara CRM] Root crash:", error, info);
   }
 
   render() {
@@ -38,68 +40,60 @@ class RootErrorBoundary extends React.Component<
           style={{
             minHeight: "100vh",
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            background: "oklch(0.80 0.07 189)",
-            padding: "2rem",
-            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            background: "#65A0E3",
+            fontFamily: "system-ui, sans-serif",
           }}
         >
           <div
             style={{
               background: "white",
-              borderRadius: "1rem",
-              padding: "2rem",
-              maxWidth: "400px",
-              width: "100%",
+              borderRadius: 16,
+              padding: "40px 32px",
+              maxWidth: 400,
+              width: "90%",
               textAlign: "center",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
             }}
           >
-            <img
-              src="/assets/mahara_common_logo_png-019d5f08-56b5-75e2-b21e-90232b0e5415.png"
-              alt="Mahara Schools"
-              style={{
-                width: 72,
-                height: 72,
-                objectFit: "contain",
-                margin: "0 auto 1rem",
-              }}
-            />
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🏫</div>
             <h2
               style={{
+                fontSize: 20,
                 fontWeight: 800,
-                fontSize: "1.25rem",
-                color: "#1a1a2e",
-                marginBottom: "0.5rem",
-                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                color: "#1a2237",
+                marginBottom: 8,
               }}
             >
-              Something went wrong
+              Mahara Schools CRM
             </h2>
             <p
               style={{
-                color: "#666",
-                fontSize: "0.875rem",
-                marginBottom: "1.5rem",
+                fontSize: 14,
+                color: "#555",
+                marginBottom: 24,
+                lineHeight: 1.6,
               }}
             >
-              The app encountered an unexpected error. Please reload the page.
+              Something went wrong loading the application. This is usually a
+              temporary issue.
             </p>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
               style={{
-                background: "oklch(0.93 0.19 105)",
-                color: "#1a1a2e",
+                background: "#FFE600",
+                color: "#1a2237",
                 border: "none",
-                borderRadius: "0.5rem",
-                padding: "0.75rem 2rem",
+                borderRadius: 8,
+                padding: "12px 28px",
                 fontWeight: 700,
-                fontSize: "0.875rem",
+                fontSize: 14,
                 cursor: "pointer",
-                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
               }}
             >
               Reload Page
@@ -116,7 +110,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: false,
+      retryDelay: 1000,
     },
   },
 });

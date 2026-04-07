@@ -26,14 +26,23 @@ export function useActor() {
       };
 
       const actor = await createActorWithConfig(actorOptions);
-      const adminToken = getSecretParameter("caffeineAdminToken") || "";
-      await actor._initializeAccessControlWithSecret(adminToken);
+      // Initialize access control — wrap in try/catch so a bad token never
+      // prevents the app from loading
+      try {
+        const adminToken = getSecretParameter("caffeineAdminToken") || "";
+        await actor._initializeAccessControlWithSecret(adminToken);
+      } catch {
+        // Non-fatal: continue with unauthenticated actor capabilities
+      }
       return actor;
     },
     // Only refetch when identity changes
     staleTime: Number.POSITIVE_INFINITY,
     // This will cause the actor to be recreated when the identity changes
     enabled: true,
+    // Don't throw errors to the component tree
+    retry: 2,
+    retryDelay: 1500,
   });
 
   // When the actor changes, invalidate dependent queries
@@ -55,5 +64,6 @@ export function useActor() {
   return {
     actor: actorQuery.data || null,
     isFetching: actorQuery.isFetching,
+    isError: actorQuery.isError,
   };
 }

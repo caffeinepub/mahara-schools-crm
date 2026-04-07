@@ -16,23 +16,33 @@ const LOGO =
 
 interface Props {
   onLogin: (username: string, password: string) => Promise<boolean>;
+  actorReady?: boolean;
 }
 
-export default function LoginPage({ onLogin }: Props) {
+export default function LoginPage({ onLogin, actorReady = true }: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    const ok = await onLogin(username, password);
-    if (!ok) {
-      toast.error(
-        "Invalid credentials. Please check your username and password.",
-      );
+    if (!actorReady) {
+      toast.error("Still connecting to the server. Please wait a moment.");
+      return;
     }
-    setLoading(false);
+    setLoading(true);
+    try {
+      const ok = await onLogin(username, password);
+      if (!ok) {
+        toast.error(
+          "Invalid credentials. Please check your username and password.",
+        );
+      }
+    } catch {
+      toast.error("Connection error. Please refresh and try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -62,11 +72,11 @@ export default function LoginPage({ onLogin }: Props) {
       <div className="w-full max-w-sm relative z-10 px-4">
         {/* Logo + brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white shadow-xl mb-5 p-2">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white shadow-xl mb-5 overflow-hidden">
             <img
               src={LOGO}
               alt="Mahara Schools"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain p-2"
               onError={(e) => {
                 const t = e.currentTarget;
                 t.style.display = "none";
@@ -76,7 +86,7 @@ export default function LoginPage({ onLogin }: Props) {
                   span.className = "logo-fallback";
                   span.textContent = "M";
                   span.style.cssText =
-                    "font-size:2rem;font-weight:800;color:#65A0E3;";
+                    "font-size:2.2rem;font-weight:800;color:#65A0E3;display:flex;align-items:center;justify-content:center;width:100%;height:100%;";
                   parent.appendChild(span);
                 }
               }}
@@ -181,10 +191,14 @@ export default function LoginPage({ onLogin }: Props) {
                   fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                   fontWeight: 700,
                 }}
-                disabled={loading}
+                disabled={loading || !actorReady}
                 data-ocid="login.submit_button"
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading
+                  ? "Signing in..."
+                  : !actorReady
+                    ? "Connecting..."
+                    : "Sign In"}
               </Button>
             </form>
 
