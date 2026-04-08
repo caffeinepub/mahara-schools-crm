@@ -1,0 +1,549 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
+type WorksheetSubject = 
+ record {
+   activities: text;
+   homework: text;
+   notes: text;
+   subject: text;
+ };
+type Worksheet = 
+ record {
+   date: text;
+   grade: text;
+   id: text;
+   subjects: vec WorksheetSubject;
+   teacherName: text;
+   title: text;
+ };
+type WhatsAppMessageResult = 
+ record {
+   message: text;
+   success: bool;
+ };
+type WhatsAppMessage = 
+ record {
+   campaignId: text;
+   direction: text;
+   id: text;
+   leadId: text;
+   leadName: text;
+   leadPhone: text;
+   messageId: text;
+   messageText: text;
+   status: text;
+   timestamp: text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = 
+ record {
+   email: text;
+   name: text;
+   role: text;
+ };
+type UserAccount = 
+ record {
+   email: text;
+   fullName: text;
+   id: text;
+   password: text;
+   role: text;
+   username: text;
+ };
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
+type TeamMember = 
+ record {
+   branchId: text;
+   id: text;
+   name: text;
+   role: text;
+ };
+type TeacherPerformanceRecord = 
+ record {
+   activitiesUploaded: nat;
+   branchId: text;
+   completionPercent: nat;
+   id: text;
+   month: text;
+   ptmAttended: nat;
+   teacherId: text;
+   teacherName: text;
+   worksheetsSubmitted: nat;
+   year: text;
+ };
+type Teacher = 
+ record {
+   branchId: text;
+   grade: text;
+   id: text;
+   name: text;
+   subjects: text;
+   username: text;
+ };
+type Task = 
+ record {
+   assignedTo: text;
+   completed: bool;
+   createdAt: text;
+   description: text;
+   dueDate: text;
+   id: text;
+   leadId: text;
+   priority: text;
+   title: text;
+ };
+type SubjectGrade = 
+ record {
+   grade: text;
+   marks: text;
+   remarks: text;
+   subject: text;
+ };
+type StudentRecord = 
+ record {
+   address: text;
+   admissionNumber: text;
+   branchId: text;
+   dateOfBirth: text;
+   grade: text;
+   id: text;
+   name: text;
+   parentContact: text;
+   parentEmail: text;
+   parentName: text;
+   rollNumber: text;
+ };
+type Student = 
+ record {
+   admissionNumber: text;
+   grade: text;
+   id: text;
+   name: text;
+   parentUsername: text;
+ };
+type StaffProfile = 
+ record {
+   branchId: text;
+   contactNumber: text;
+   dailyActivities: text;
+   designation: text;
+   email: text;
+   id: text;
+   name: text;
+   notes: text;
+   role: text;
+ };
+type StaffAttendance = 
+ record {
+   branchId: text;
+   date: text;
+   id: text;
+   markedBy: text;
+   staffId: text;
+   staffName: text;
+   status: text;
+   timestamp: text;
+ };
+type SchoolUpdate = 
+ record {
+   category: text;
+   content: text;
+   date: text;
+   id: text;
+   title: text;
+ };
+type SchoolForm = 
+ record {
+   createdBy: text;
+   description: text;
+   id: text;
+   isDraft: bool;
+   publishedAt: text;
+   questions: vec FormQuestion;
+   responseCount: nat;
+   title: text;
+ };
+type ReportCard = 
+ record {
+   academicYear: text;
+   attendance: text;
+   date: text;
+   id: text;
+   overallGrade: text;
+   studentId: text;
+   subjects: vec SubjectGrade;
+   teacherComment: text;
+   term: text;
+ };
+type ParentNotification = 
+ record {
+   createdAt: text;
+   id: text;
+   isRead: bool;
+   linkId: text;
+   message: text;
+   notifType: text;
+   parentUsername: text;
+   title: text;
+ };
+type ParentFeedback = 
+ record {
+   comment: text;
+   id: text;
+   parentUsername: text;
+   rating: nat;
+   studentName: text;
+   submittedAt: text;
+   teacherId: text;
+   teacherName: text;
+ };
+type PTMRecord = 
+ record {
+   attendees: text;
+   date: text;
+   id: text;
+   notes: text;
+   teacherId: text;
+   title: text;
+ };
+type LeadSource = 
+ record {
+   id: text;
+   name: text;
+ };
+type LeadNote = 
+ record {
+   content: text;
+   createdAt: text;
+   createdBy: text;
+   id: text;
+   leadId: text;
+ };
+type LeadActivity = 
+ record {
+   activityType: text;
+   description: text;
+   id: text;
+   leadId: text;
+   performedBy: text;
+   timestamp: text;
+ };
+type Lead = 
+ record {
+   assignedAgent: text;
+   createdAt: text;
+   email: text;
+   gradeLevel: text;
+   id: text;
+   name: text;
+   notes: text;
+   phone: text;
+   source: text;
+   status: text;
+ };
+type IntegrationConfig = 
+ record {
+   emailApiKey: text;
+   emailFromAddress: text;
+   emailFromName: text;
+   emailProvider: text;
+   metaWebhookVerifyToken: text;
+   websiteWebhookSecret: text;
+   whatsappAccessToken: text;
+   whatsappApiUrl: text;
+   whatsappPhoneNumberId: text;
+ };
+type FormResponse = 
+ record {
+   answers: vec FormAnswer;
+   formId: text;
+   id: text;
+   parentUsername: text;
+   studentName: text;
+   submittedAt: text;
+ };
+type FormQuestion = 
+ record {
+   id: text;
+   options: vec text;
+   questionText: text;
+   questionType: text;
+   required: bool;
+ };
+type FormAnswer = 
+ record {
+   answer: text;
+   questionId: text;
+   questionText: text;
+ };
+type FollowUp = 
+ record {
+   assignedTo: text;
+   completed: bool;
+   dueDate: text;
+   followUpType: text;
+   id: text;
+   leadId: text;
+   notes: text;
+ };
+type ClassActivity = 
+ record {
+   branchId: text;
+   classGrade: text;
+   createdAt: text;
+   date: text;
+   description: text;
+   id: text;
+   mediaUrls: vec text;
+   teacherId: text;
+   teacherName: text;
+   title: text;
+ };
+type CampaignTemplate = 
+ record {
+   createdAt: text;
+   id: text;
+   mediaType: text;
+   mediaUrl: text;
+   messageText: text;
+   name: text;
+ };
+type CampaignSend = 
+ record {
+   campaignId: text;
+   id: text;
+   leadId: text;
+   leadName: text;
+   note: text;
+   sentAt: text;
+   sentBy: text;
+   templateId: text;
+ };
+type Campaign = 
+ record {
+   createdAt: text;
+   description: text;
+   id: text;
+   name: text;
+   status: text;
+ };
+type CalendarEvent = 
+ record {
+   category: text;
+   color: text;
+   date: text;
+   id: text;
+   title: text;
+ };
+type Branch = 
+ record {
+   id: text;
+   location: text;
+   name: text;
+ };
+type BlogPost = 
+ record {
+   authorName: text;
+   category: text;
+   content: text;
+   id: text;
+   isDraft: bool;
+   publishedAt: text;
+   tags: text;
+   title: text;
+ };
+service : {
+  _initializeAccessControl: () -> ();
+  addBlogPost: (post: BlogPost) -> (text);
+  addBranch: (b: Branch) -> (text);
+  addCalendarEvent: (e: CalendarEvent) -> (text);
+  addCampaign: (c: Campaign) -> (text);
+  addCampaignSend: (s: CampaignSend) -> (text);
+  addCampaignTemplate: (t: CampaignTemplate) -> (text);
+  addClassActivity: (a: ClassActivity) -> (text);
+  addFollowUp: (fu: FollowUp) -> (text);
+  addForm: (form: SchoolForm) -> (text);
+  addLead: (lead: Lead) -> (text);
+  addLeadActivity: (a: LeadActivity) -> (text);
+  addLeadNote: (n: LeadNote) -> (text);
+  addLeadSource: (s: LeadSource) -> (text);
+  addNotification: (notification: ParentNotification) -> (text);
+  addPTMRecord: ("record": PTMRecord) -> (text);
+  addReportCard: (rc: ReportCard) -> (text);
+  addSchoolUpdate: (u: SchoolUpdate) -> (text);
+  addStaffProfile: (sp: StaffProfile) -> (text);
+  addStudent: (s: Student) -> (text);
+  addStudentRecord: (s: StudentRecord) -> (text);
+  addStudentRecordsBulk: (records: vec StudentRecord) -> (vec text);
+  addTask: (t: Task) -> (text);
+  addTeacher: (t: Teacher) -> (text);
+  addTeamMember: (m: TeamMember) -> (text);
+  addUserAccount: (a: UserAccount) -> (text);
+  addWhatsAppMessage: (msg: WhatsAppMessage) -> (text);
+  addWorksheet: (w: Worksheet) -> (text);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  deleteBlogPost: (id: text) -> ();
+  deleteBranch: (id: text) -> ();
+  deleteCalendarEvent: (id: text) -> ();
+  deleteCampaign: (id: text) -> ();
+  deleteCampaignTemplate: (id: text) -> ();
+  deleteClassActivity: (id: text) -> ();
+  deleteFollowUp: (id: text) -> ();
+  deleteForm: (id: text) -> ();
+  deleteLead: (id: text) -> ();
+  deleteLeadActivity: (id: text) -> ();
+  deleteLeadNote: (id: text) -> ();
+  deleteLeadSource: (id: text) -> ();
+  deleteReportCard: (id: text) -> ();
+  deleteSchoolUpdate: (id: text) -> ();
+  deleteStaffProfile: (id: text) -> ();
+  deleteStudent: (id: text) -> ();
+  deleteStudentRecord: (id: text) -> ();
+  deleteTask: (id: text) -> ();
+  deleteTeacher: (id: text) -> ();
+  deleteTeamMember: (id: text) -> ();
+  deleteUserAccount: (id: text) -> ();
+  deleteWorksheet: (id: text) -> ();
+  getActivitiesByLead: (leadId: text) -> (vec LeadActivity) query;
+  getAllBlogPosts: () -> (vec BlogPost) query;
+  getAllClassActivities: () -> (vec ClassActivity) query;
+  getAllForms: () -> (vec SchoolForm) query;
+  getAllLeadActivities: () -> (vec LeadActivity) query;
+  getAllReportCards: () -> (vec ReportCard) query;
+  getAllStudentRecords: () -> (vec StudentRecord) query;
+  getAllStudents: () -> (vec Student) query;
+  getAllTeachers: () -> (vec Teacher) query;
+  getAllWorksheets: () -> (vec Worksheet) query;
+  getBranches: () -> (vec Branch) query;
+  getCalendarEvents: () -> (vec CalendarEvent) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCampaignSends: () -> (vec CampaignSend) query;
+  getCampaignSendsByCampaign: (campaignId: text) -> (vec CampaignSend) query;
+  getCampaignSendsByLead: (leadId: text) -> (vec CampaignSend) query;
+  getCampaignTemplates: () -> (vec CampaignTemplate) query;
+  getCampaigns: () -> (vec Campaign) query;
+  getClassActivitiesByBranch: (branchId: text) -> (vec ClassActivity) query;
+  getClassActivitiesByGrade: (grade: text) -> (vec ClassActivity) query;
+  getClassActivitiesByTeacher: (teacherId: text) -> (vec ClassActivity) query;
+  getFollowUps: () -> (vec FollowUp) query;
+  getFormById: (id: text) -> (opt SchoolForm) query;
+  getFormResponses: (formId: text) -> (vec FormResponse) query;
+  getIntegrationConfig: () -> (opt IntegrationConfig) query;
+  getLeadSources: () -> (vec LeadSource) query;
+  getLeads: () -> (vec Lead) query;
+  getMyFormResponses: (parentUsername: text) -> (vec FormResponse) query;
+  getNotesByLead: (leadId: text) -> (vec LeadNote) query;
+  getNotificationsForParent: (parentUsername: text) ->
+   (vec ParentNotification) query;
+  getPTMRecords: () -> (vec PTMRecord) query;
+  getPTMRecordsByTeacher: (teacherId: text) -> (vec PTMRecord) query;
+  getParentFeedback: () -> (vec ParentFeedback) query;
+  getParentFeedbackByTeacher: (teacherId: text) -> (vec ParentFeedback) query;
+  getPublishedBlogPosts: () -> (vec BlogPost) query;
+  getPublishedForms: () -> (vec SchoolForm) query;
+  getReportCardsByStudent: (studentId: text) -> (vec ReportCard) query;
+  getSchoolUpdates: () -> (vec SchoolUpdate) query;
+  getStaffAttendance: () -> (vec StaffAttendance) query;
+  getStaffAttendanceByDate: (date: text) -> (vec StaffAttendance) query;
+  getStaffAttendanceByStaff: (staffId: text) -> (vec StaffAttendance) query;
+  getStaffProfiles: () -> (vec StaffProfile) query;
+  getStaffProfilesByBranch: (branchId: text) -> (vec StaffProfile) query;
+  getStaffProfilesByRole: (role: text) -> (vec StaffProfile) query;
+  getStudentRecordsByBranch: (branchId: text) -> (vec StudentRecord) query;
+  getStudentRecordsByGrade: (grade: text) -> (vec StudentRecord) query;
+  getStudentsByGrade: (grade: text) -> (vec Student) query;
+  getStudentsByParent: (parentUsername: text) -> (vec Student) query;
+  getTasks: () -> (vec Task) query;
+  getTasksByAssignee: (assignedTo: text) -> (vec Task) query;
+  getTasksByLead: (leadId: text) -> (vec Task) query;
+  getTeacherByUsername: (username: text) -> (opt Teacher) query;
+  getTeacherPerformanceByTeacher: (teacherId: text) ->
+   (vec TeacherPerformanceRecord) query;
+  getTeacherPerformanceRecords: () -> (vec TeacherPerformanceRecord) query;
+  getTeachersByBranch: (branchId: text) -> (vec Teacher) query;
+  getTeamMembers: () -> (vec TeamMember) query;
+  getUserAccounts: () -> (vec UserAccount) query;
+  getUserProfile: (user: principal) -> (opt UserProfile) query;
+  getWhatsAppMessages: () -> (vec WhatsAppMessage) query;
+  getWhatsAppMessagesByLead: (leadId: text) -> (vec WhatsAppMessage) query;
+  getWorksheetsByGrade: (grade: text) -> (vec Worksheet) query;
+  initSeedData: () -> ();
+  isCallerAdmin: () -> (bool) query;
+  login: (credentials: record {
+                         password: text;
+                         username: text;
+                       }) ->
+   (opt record {
+          name: text;
+          role: text;
+          username: text;
+        });
+  markAttendance: (a: StaffAttendance) -> (text);
+  markNotificationRead: (id: text) -> ();
+  receiveWebhookLead: (payload:
+   record {
+     email: text;
+     gradeLevel: text;
+     name: text;
+     notes: text;
+     phone: text;
+     source: text;
+   }) -> (text);
+  receiveWhatsAppWebhook: (payload: text) -> (text);
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  saveIntegrationConfig: (config: IntegrationConfig) -> ();
+  searchLeads: (term: text) -> (vec Lead) query;
+  searchTasks: (term: text) -> (vec Task) query;
+  sendWhatsAppMessage: (to: text, message: text) -> (WhatsAppMessageResult);
+  submitFormResponse: (response: FormResponse) -> (text);
+  submitParentFeedback: (feedback: ParentFeedback) -> (text);
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
+  updateAttendance: (a: StaffAttendance) -> ();
+  updateBlogPost: (post: BlogPost) -> ();
+  updateBranch: (b: Branch) -> ();
+  updateCalendarEvent: (e: CalendarEvent) -> ();
+  updateCampaign: (c: Campaign) -> ();
+  updateCampaignTemplate: (t: CampaignTemplate) -> ();
+  updateClassActivity: (a: ClassActivity) -> ();
+  updateFollowUp: (fu: FollowUp) -> ();
+  updateForm: (form: SchoolForm) -> ();
+  updateLead: (lead: Lead) -> ();
+  updateLeadSource: (s: LeadSource) -> ();
+  updateReportCard: (rc: ReportCard) -> ();
+  updateSchoolUpdate: (u: SchoolUpdate) -> ();
+  updateStaffProfile: (sp: StaffProfile) -> ();
+  updateStudent: (s: Student) -> ();
+  updateStudentRecord: (s: StudentRecord) -> ();
+  updateTask: (t: Task) -> ();
+  updateTeacher: (t: Teacher) -> ();
+  updateTeamMember: (m: TeamMember) -> ();
+  updateUserAccount: (a: UserAccount) -> ();
+  updateWhatsAppMessageStatus: (id: text, status: text) -> ();
+  updateWorksheet: (w: Worksheet) -> ();
+  upsertTeacherPerformance: ("record": TeacherPerformanceRecord) -> (text);
+}

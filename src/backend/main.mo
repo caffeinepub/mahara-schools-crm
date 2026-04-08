@@ -4,12 +4,12 @@ import Int "mo:core/Int";
 import Random "mo:core/Random";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import OutCall "http-outcalls/outcall";
+import OutCall "mo:caffeineai-http-outcalls/outcall";
 import List "mo:core/List";
 import Text "mo:core/Text";
 
-import AccessControl "authorization/access-control";
-import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "mo:caffeineai-authorization/access-control";
+import MixinAuthorization "mo:caffeineai-authorization/MixinAuthorization";
 
 actor {
   // Initialize the access control system
@@ -679,6 +679,31 @@ actor {
 
     campaignSends.add("cs1", { id = "cs1"; campaignId = "c1"; templateId = "ct2"; leadId = "l1"; leadName = "Arjun Reddy's Parents"; sentAt = "2026-03-26T09:00:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
     campaignSends.add("cs2", { id = "cs2"; campaignId = "c1"; templateId = "ct1"; leadId = "l3"; leadName = "Srinivas Rao"; sentAt = "2026-03-26T09:30:00Z"; sentBy = "Priya Sharma"; note = "Sent via WhatsApp" });
+
+    // V20 seed data
+    blogPosts.add("bp1", { id = "bp1"; title = "Why Early Childhood Education Shapes Your Child Future"; content = "Research shows the first five years are critical for brain development. At Mahara Schools, we design every activity to stimulate cognitive, emotional, and social growth.\n\nOur curriculum has four pillars: Play-based Learning, Language Development, Creative Expression, and Structured Exploration. Children in quality early childhood programmes show stronger literacy, social skills, and confidence.\n\nThe Mahara Difference: Our teachers observe each child individually, adapt activities to their learning style, and celebrate every milestone.\n\nTip for Parents: Spend 20 minutes daily reading with your child. Even picture books build vocabulary and strengthen the parent-child bond."; category = "Education"; authorName = "Ms. Manaswini Bandi"; publishedAt = "2026-03-15T09:00:00Z"; isDraft = false; tags = "early childhood, brain development, parenting" });
+    blogPosts.add("bp2", { id = "bp2"; title = "5 Ways to Build a Morning Routine Your Child Will Love"; content = "Mornings can be chaotic with young children. But a consistent routine builds executive function, reduces anxiety, and sets the tone for a focused, happy day.\n\n1. Wake Up With Music: Start the day with an upbeat song. Music activates the brain and shifts mood instantly.\n\n2. Visual Schedule: Create a picture chart: Wake Up, Brush Teeth, Get Dressed, Breakfast, School.\n\n3. Prep the Night Before: Lay out uniforms and pack bags the evening before.\n\n4. Breakfast Together: Ask one question at breakfast: What are you looking forward to today?\n\n5. Goodbye Ritual: A consistent goodbye signals safety and reduces separation anxiety.\n\nAt Mahara Schools, our teachers partner with parents on routines."; category = "Parenting"; authorName = "Teaching Team, Mahara Schools"; publishedAt = "2026-03-22T10:00:00Z"; isDraft = false; tags = "morning routine, parenting tips, school readiness" });
+
+    classActivities.add("ca1", { id = "ca1"; classGrade = "Nursery"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; title = "Colour Mixing Magic"; description = "Children explored primary colours using paint and water. They discovered how red and yellow make orange, blue and yellow make green. Every child created their own colour chart to take home!"; mediaUrls = []; createdAt = "2026-04-03T14:00:00Z" });
+    classActivities.add("ca2", { id = "ca2"; classGrade = "Pre Nursery"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; title = "Sensory Sand Play"; description = "Today we used kinetic sand to build shapes and letters. Children practised fine motor skills while building the letter A and their own name. Fantastic concentration from all!"; mediaUrls = []; createdAt = "2026-04-03T13:30:00Z" });
+    classActivities.add("ca3", { id = "ca3"; classGrade = "KG I"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; date = "2026-04-03"; title = "Number Patterns Workshop"; description = "KG I practised skip counting by 2s using colourful beads and a number line. Children worked in pairs and finished with a fun number relay race!"; mediaUrls = []; createdAt = "2026-04-03T14:30:00Z" });
+
+    schoolForms.add("sf1", { id = "sf1"; title = "Parent Satisfaction Survey - Term 2 2026"; description = "We value your feedback! Please take 3 minutes to help us improve our programmes."; questions = [{ id = "q1"; questionText = "How satisfied are you with your child progress this term?"; questionType = "rating"; options = []; required = true }, { id = "q2"; questionText = "How would you rate communication from the school?"; questionType = "multiple_choice"; options = ["Excellent", "Good", "Needs Improvement", "Poor"]; required = true }, { id = "q3"; questionText = "What would you like to see more of at Mahara Schools?"; questionType = "paragraph"; options = []; required = false }]; publishedAt = "2026-04-01T09:00:00Z"; isDraft = false; createdBy = "admin"; responseCount = 0 });
+
+    staffAttendance.add("att1", { id = "att1"; staffId = "sp1"; staffName = "Centre Head Kondapur"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:30:00Z" });
+    staffAttendance.add("att2", { id = "att2"; staffId = "sp3"; staffName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:32:00Z" });
+    staffAttendance.add("att3", { id = "att3"; staffId = "sp4"; staffName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; status = "late"; markedBy = "admin"; timestamp = "2026-04-03T09:15:00Z" });
+
+    teacherPerformance.add("tp1", { id = "tp1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 18; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 90 });
+    teacherPerformance.add("tp2", { id = "tp2"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 14; worksheetsSubmitted = 3; ptmAttended = 1; completionPercent = 75 });
+    teacherPerformance.add("tp3", { id = "tp3"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; month = "March"; year = "2026"; activitiesUploaded = 20; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 95 });
+
+    parentFeedback.add("pf1", { id = "pf1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; parentUsername = "parent1"; studentName = "Arjun Kumar"; rating = 5; comment = "Ms. Monica is wonderful! Arjun loves going to school. She communicates progress weekly and is so patient."; submittedAt = "2026-03-28T10:00:00Z" });
+    parentFeedback.add("pf2", { id = "pf2"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; parentUsername = "parent2"; studentName = "Aanya Srinivas"; rating = 4; comment = "Very dedicated teacher. Would love more updates on daily activities."; submittedAt = "2026-03-29T11:00:00Z" });
+
+    parentNotifications.add("pn1", { id = "pn1"; parentUsername = "parent1"; title = "New Blog Post"; message = "Check out: Why Early Childhood Education Shapes Your Child Future"; notifType = "blog"; isRead = false; createdAt = "2026-03-15T09:05:00Z"; linkId = "bp1" });
+    parentNotifications.add("pn2", { id = "pn2"; parentUsername = "parent1"; title = "New Survey Available"; message = "Parent Satisfaction Survey - Term 2 2026 is now open."; notifType = "form"; isRead = false; createdAt = "2026-04-01T09:05:00Z"; linkId = "sf1" });
+    parentNotifications.add("pn3", { id = "pn3"; parentUsername = "parent2"; title = "PTM Reminder"; message = "Parent-Teacher Meeting scheduled for April 10, 2026 at 10:00 AM."; notifType = "ptm"; isRead = false; createdAt = "2026-04-03T08:00:00Z"; linkId = "" });
   };
 
   // Integration Config - Admin only
@@ -1464,32 +1489,6 @@ actor {
     studentRecords.remove(id);
   };
 
-
-
-    // V20 seed data
-    blogPosts.add("bp1", { id = "bp1"; title = "Why Early Childhood Education Shapes Your Child Future"; content = "Research shows the first five years are critical for brain development. At Mahara Schools, we design every activity to stimulate cognitive, emotional, and social growth.\n\nOur curriculum has four pillars: Play-based Learning, Language Development, Creative Expression, and Structured Exploration. Children in quality early childhood programmes show stronger literacy, social skills, and confidence.\n\nThe Mahara Difference: Our teachers observe each child individually, adapt activities to their learning style, and celebrate every milestone.\n\nTip for Parents: Spend 20 minutes daily reading with your child. Even picture books build vocabulary and strengthen the parent-child bond."; category = "Education"; authorName = "Ms. Manaswini Bandi"; publishedAt = "2026-03-15T09:00:00Z"; isDraft = false; tags = "early childhood, brain development, parenting" });
-    blogPosts.add("bp2", { id = "bp2"; title = "5 Ways to Build a Morning Routine Your Child Will Love"; content = "Mornings can be chaotic with young children. But a consistent routine builds executive function, reduces anxiety, and sets the tone for a focused, happy day.\n\n1. Wake Up With Music: Start the day with an upbeat song. Music activates the brain and shifts mood instantly.\n\n2. Visual Schedule: Create a picture chart: Wake Up, Brush Teeth, Get Dressed, Breakfast, School.\n\n3. Prep the Night Before: Lay out uniforms and pack bags the evening before.\n\n4. Breakfast Together: Ask one question at breakfast: What are you looking forward to today?\n\n5. Goodbye Ritual: A consistent goodbye signals safety and reduces separation anxiety.\n\nAt Mahara Schools, our teachers partner with parents on routines."; category = "Parenting"; authorName = "Teaching Team, Mahara Schools"; publishedAt = "2026-03-22T10:00:00Z"; isDraft = false; tags = "morning routine, parenting tips, school readiness" });
-
-    classActivities.add("ca1", { id = "ca1"; classGrade = "Nursery"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; title = "Colour Mixing Magic"; description = "Children explored primary colours using paint and water. They discovered how red and yellow make orange, blue and yellow make green. Every child created their own colour chart to take home!"; mediaUrls = []; createdAt = "2026-04-03T14:00:00Z" });
-    classActivities.add("ca2", { id = "ca2"; classGrade = "Pre Nursery"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; title = "Sensory Sand Play"; description = "Today we used kinetic sand to build shapes and letters. Children practised fine motor skills while building the letter A and their own name. Fantastic concentration from all!"; mediaUrls = []; createdAt = "2026-04-03T13:30:00Z" });
-    classActivities.add("ca3", { id = "ca3"; classGrade = "KG I"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; date = "2026-04-03"; title = "Number Patterns Workshop"; description = "KG I practised skip counting by 2s using colourful beads and a number line. Children worked in pairs and finished with a fun number relay race!"; mediaUrls = []; createdAt = "2026-04-03T14:30:00Z" });
-
-    schoolForms.add("sf1", { id = "sf1"; title = "Parent Satisfaction Survey - Term 2 2026"; description = "We value your feedback! Please take 3 minutes to help us improve our programmes."; questions = [{ id = "q1"; questionText = "How satisfied are you with your child progress this term?"; questionType = "rating"; options = []; required = true }, { id = "q2"; questionText = "How would you rate communication from the school?"; questionType = "multiple_choice"; options = ["Excellent", "Good", "Needs Improvement", "Poor"]; required = true }, { id = "q3"; questionText = "What would you like to see more of at Mahara Schools?"; questionType = "paragraph"; options = []; required = false }]; publishedAt = "2026-04-01T09:00:00Z"; isDraft = false; createdBy = "admin"; responseCount = 0 });
-
-    staffAttendance.add("att1", { id = "att1"; staffId = "sp1"; staffName = "Centre Head Kondapur"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:30:00Z" });
-    staffAttendance.add("att2", { id = "att2"; staffId = "sp3"; staffName = "Ms. Monica Joseph"; branchId = "b1"; date = "2026-04-03"; status = "present"; markedBy = "admin"; timestamp = "2026-04-03T08:32:00Z" });
-    staffAttendance.add("att3", { id = "att3"; staffId = "sp4"; staffName = "Ms. Tulasi Reddy"; branchId = "b1"; date = "2026-04-03"; status = "late"; markedBy = "admin"; timestamp = "2026-04-03T09:15:00Z" });
-
-    teacherPerformance.add("tp1", { id = "tp1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 18; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 90 });
-    teacherPerformance.add("tp2", { id = "tp2"; teacherId = "tc2"; teacherName = "Ms. Tulasi Reddy"; branchId = "b1"; month = "March"; year = "2026"; activitiesUploaded = 14; worksheetsSubmitted = 3; ptmAttended = 1; completionPercent = 75 });
-    teacherPerformance.add("tp3", { id = "tp3"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; branchId = "b2"; month = "March"; year = "2026"; activitiesUploaded = 20; worksheetsSubmitted = 4; ptmAttended = 2; completionPercent = 95 });
-
-    parentFeedback.add("pf1", { id = "pf1"; teacherId = "tc1"; teacherName = "Ms. Monica Joseph"; parentUsername = "parent1"; studentName = "Arjun Kumar"; rating = 5; comment = "Ms. Monica is wonderful! Arjun loves going to school. She communicates progress weekly and is so patient."; submittedAt = "2026-03-28T10:00:00Z" });
-    parentFeedback.add("pf2", { id = "pf2"; teacherId = "tc3"; teacherName = "Ms. Reena Mathew"; parentUsername = "parent2"; studentName = "Aanya Srinivas"; rating = 4; comment = "Very dedicated teacher. Would love more updates on daily activities."; submittedAt = "2026-03-29T11:00:00Z" });
-
-    parentNotifications.add("pn1", { id = "pn1"; parentUsername = "parent1"; title = "New Blog Post"; message = "Check out: Why Early Childhood Education Shapes Your Child Future"; notifType = "blog"; isRead = false; createdAt = "2026-03-15T09:05:00Z"; linkId = "bp1" });
-    parentNotifications.add("pn2", { id = "pn2"; parentUsername = "parent1"; title = "New Survey Available"; message = "Parent Satisfaction Survey - Term 2 2026 is now open."; notifType = "form"; isRead = false; createdAt = "2026-04-01T09:05:00Z"; linkId = "sf1" });
-    parentNotifications.add("pn3", { id = "pn3"; parentUsername = "parent2"; title = "PTM Reminder"; message = "Parent-Teacher Meeting scheduled for April 10, 2026 at 10:00 AM."; notifType = "ptm"; isRead = false; createdAt = "2026-04-03T08:00:00Z"; linkId = "" });
 
   // ===== WhatsApp Messages =====
   public query ({ caller }) func getWhatsAppMessages() : async [WhatsAppMessage] {

@@ -1,0 +1,526 @@
+// Version: 1.0.0
+type BlogPost__543622485 =
+  {
+    authorName : Text;
+    category : Text;
+    content : Text;
+    id : Text;
+    isDraft : Bool;
+    publishedAt : Text;
+    tags : Text;
+    title : Text
+  };
+type Branch__778560928 = {id : Text; location : Text; name : Text};
+type CalendarEvent__740917318 =
+  {category : Text; color : Text; date : Text; id : Text; title : Text};
+type CampaignSend__951580243 =
+  {
+    campaignId : Text;
+    id : Text;
+    leadId : Text;
+    leadName : Text;
+    note : Text;
+    sentAt : Text;
+    sentBy : Text;
+    templateId : Text
+  };
+type CampaignTemplate__815178611 =
+  {
+    createdAt : Text;
+    id : Text;
+    mediaType : Text;
+    mediaUrl : Text;
+    messageText : Text;
+    name : Text
+  };
+type Campaign__370329394 =
+  {
+    createdAt : Text;
+    description : Text;
+    id : Text;
+    name : Text;
+    status : Text
+  };
+type ClassActivity__264205918 =
+  {
+    branchId : Text;
+    classGrade : Text;
+    createdAt : Text;
+    date : Text;
+    description : Text;
+    id : Text;
+    mediaUrls : [Text];
+    teacherId : Text;
+    teacherName : Text;
+    title : Text
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type FollowUp__688214347 =
+  {
+    assignedTo : Text;
+    completed : Bool;
+    dueDate : Text;
+    followUpType : Text;
+    id : Text;
+    leadId : Text;
+    notes : Text
+  };
+type FormAnswer__486088905 =
+  {answer : Text; questionId : Text; questionText : Text};
+type FormQuestion__944286018 =
+  {
+    id : Text;
+    options : [Text];
+    questionText : Text;
+    questionType : Text;
+    required : Bool
+  };
+type FormResponse__682911641 =
+  {
+    answers : [FormAnswer__486088905];
+    formId : Text;
+    id : Text;
+    parentUsername : Text;
+    studentName : Text;
+    submittedAt : Text
+  };
+type IntegrationConfig__1060918405 =
+  {
+    emailApiKey : Text;
+    emailFromAddress : Text;
+    emailFromName : Text;
+    emailProvider : Text;
+    metaWebhookVerifyToken : Text;
+    websiteWebhookSecret : Text;
+    whatsappAccessToken : Text;
+    whatsappApiUrl : Text;
+    whatsappPhoneNumberId : Text
+  };
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type LeadActivity__723722449 =
+  {
+    activityType : Text;
+    description : Text;
+    id : Text;
+    leadId : Text;
+    performedBy : Text;
+    timestamp : Text
+  };
+type LeadNote__64324888 =
+  {
+    content : Text;
+    createdAt : Text;
+    createdBy : Text;
+    id : Text;
+    leadId : Text
+  };
+type LeadSource__986633954 = {id : Text; name : Text};
+type Lead__21276013 =
+  {
+    assignedAgent : Text;
+    createdAt : Text;
+    email : Text;
+    gradeLevel : Text;
+    id : Text;
+    name : Text;
+    notes : Text;
+    phone : Text;
+    source : Text;
+    status : Text
+  };
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type PTMRecord__240491211 =
+  {
+    attendees : Text;
+    date : Text;
+    id : Text;
+    notes : Text;
+    teacherId : Text;
+    title : Text
+  };
+type ParentFeedback__185575590 =
+  {
+    comment : Text;
+    id : Text;
+    parentUsername : Text;
+    rating : Nat;
+    studentName : Text;
+    submittedAt : Text;
+    teacherId : Text;
+    teacherName : Text
+  };
+type ParentNotification__224804863 =
+  {
+    createdAt : Text;
+    id : Text;
+    isRead : Bool;
+    linkId : Text;
+    message : Text;
+    notifType : Text;
+    parentUsername : Text;
+    title : Text
+  };
+type ReportCard__696850780 =
+  {
+    academicYear : Text;
+    attendance : Text;
+    date : Text;
+    id : Text;
+    overallGrade : Text;
+    studentId : Text;
+    subjects : [SubjectGrade__525835315];
+    teacherComment : Text;
+    term : Text
+  };
+type SchoolForm__681209550 =
+  {
+    createdBy : Text;
+    description : Text;
+    id : Text;
+    isDraft : Bool;
+    publishedAt : Text;
+    questions : [FormQuestion__944286018];
+    responseCount : Nat;
+    title : Text
+  };
+type SchoolUpdate__474683987 =
+  {category : Text; content : Text; date : Text; id : Text; title : Text};
+type StaffAttendance__400511833 =
+  {
+    branchId : Text;
+    date : Text;
+    id : Text;
+    markedBy : Text;
+    staffId : Text;
+    staffName : Text;
+    status : Text;
+    timestamp : Text
+  };
+type StaffProfile__147332708 =
+  {
+    branchId : Text;
+    contactNumber : Text;
+    dailyActivities : Text;
+    designation : Text;
+    email : Text;
+    id : Text;
+    name : Text;
+    notes : Text;
+    role : Text
+  };
+type StudentRecord__91169700 =
+  {
+    address : Text;
+    admissionNumber : Text;
+    branchId : Text;
+    dateOfBirth : Text;
+    grade : Text;
+    id : Text;
+    name : Text;
+    parentContact : Text;
+    parentEmail : Text;
+    parentName : Text;
+    rollNumber : Text
+  };
+type Student__975845730 =
+  {
+    admissionNumber : Text;
+    grade : Text;
+    id : Text;
+    name : Text;
+    parentUsername : Text
+  };
+type SubjectGrade__525835315 =
+  {grade : Text; marks : Text; remarks : Text; subject : Text};
+type Task__972485619 =
+  {
+    assignedTo : Text;
+    completed : Bool;
+    createdAt : Text;
+    description : Text;
+    dueDate : Text;
+    id : Text;
+    leadId : Text;
+    priority : Text;
+    title : Text
+  };
+type TeacherPerformanceRecord__420780566 =
+  {
+    activitiesUploaded : Nat;
+    branchId : Text;
+    completionPercent : Nat;
+    id : Text;
+    month : Text;
+    ptmAttended : Nat;
+    teacherId : Text;
+    teacherName : Text;
+    worksheetsSubmitted : Nat;
+    year : Text
+  };
+type Teacher__842879450 =
+  {
+    branchId : Text;
+    grade : Text;
+    id : Text;
+    name : Text;
+    subjects : Text;
+    username : Text
+  };
+type TeamMember__720132507 =
+  {branchId : Text; id : Text; name : Text; role : Text};
+type UserAccount__518253964 =
+  {
+    email : Text;
+    fullName : Text;
+    id : Text;
+    password : Text;
+    role : Text;
+    username : Text
+  };
+type UserProfile__491224006 = {email : Text; name : Text; role : Text};
+type UserRecord__235003723 =
+  {fullName : Text; password : Text; role : Text; username : Text};
+type UserRole__1054455867 = {#admin; #guest; #user};
+type WhatsAppMessage__611053655 =
+  {
+    campaignId : Text;
+    direction : Text;
+    id : Text;
+    leadId : Text;
+    leadName : Text;
+    leadPhone : Text;
+    messageId : Text;
+    messageText : Text;
+    status : Text;
+    timestamp : Text
+  };
+type WorksheetSubject__204684467 =
+  {activities : Text; homework : Text; notes : Text; subject : Text};
+type Worksheet__126943656 =
+  {
+    date : Text;
+    grade : Text;
+    id : Text;
+    subjects : [WorksheetSubject__204684467];
+    teacherName : Text;
+    title : Text
+  };
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable blogPosts :
+    {
+      var root : Node__46230540<Text, BlogPost__543622485>;
+      var size : Nat__490723111
+    };
+  stable var blogPostsData : [(Text, BlogPost__543622485)];
+  stable branches :
+    {
+      var root : Node__46230540<Text, Branch__778560928>;
+      var size : Nat__490723111
+    };
+  stable var branchesData : [(Text, Branch__778560928)];
+  stable calendarEvents :
+    {
+      var root : Node__46230540<Text, CalendarEvent__740917318>;
+      var size : Nat__490723111
+    };
+  stable var calendarEventsData : [(Text, CalendarEvent__740917318)];
+  stable campaignSends :
+    {
+      var root : Node__46230540<Text, CampaignSend__951580243>;
+      var size : Nat__490723111
+    };
+  stable var campaignSendsData : [(Text, CampaignSend__951580243)];
+  stable campaignTemplates :
+    {
+      var root : Node__46230540<Text, CampaignTemplate__815178611>;
+      var size : Nat__490723111
+    };
+  stable var campaignTemplatesData : [(Text, CampaignTemplate__815178611)];
+  stable campaigns :
+    {
+      var root : Node__46230540<Text, Campaign__370329394>;
+      var size : Nat__490723111
+    };
+  stable var campaignsData : [(Text, Campaign__370329394)];
+  stable classActivities :
+    {
+      var root : Node__46230540<Text, ClassActivity__264205918>;
+      var size : Nat__490723111
+    };
+  stable var classActivitiesData : [(Text, ClassActivity__264205918)];
+  stable followUps :
+    {
+      var root : Node__46230540<Text, FollowUp__688214347>;
+      var size : Nat__490723111
+    };
+  stable var followUpsData : [(Text, FollowUp__688214347)];
+  stable formResponses :
+    {
+      var root : Node__46230540<Text, FormResponse__682911641>;
+      var size : Nat__490723111
+    };
+  stable var formResponsesData : [(Text, FormResponse__682911641)];
+  stable var integrationConfig : ?IntegrationConfig__1060918405;
+  stable var integrationConfigData : ?IntegrationConfig__1060918405;
+  stable leadActivities :
+    {
+      var root : Node__46230540<Text, LeadActivity__723722449>;
+      var size : Nat__490723111
+    };
+  stable var leadActivitiesData : [(Text, LeadActivity__723722449)];
+  stable leadNotes :
+    {
+      var root : Node__46230540<Text, LeadNote__64324888>;
+      var size : Nat__490723111
+    };
+  stable var leadNotesData : [(Text, LeadNote__64324888)];
+  stable leadSources :
+    {
+      var root : Node__46230540<Text, LeadSource__986633954>;
+      var size : Nat__490723111
+    };
+  stable var leadSourcesData : [(Text, LeadSource__986633954)];
+  stable leads :
+    {
+      var root : Node__46230540<Text, Lead__21276013>;
+      var size : Nat__490723111
+    };
+  stable var leadsData : [(Text, Lead__21276013)];
+  stable parentFeedback :
+    {
+      var root : Node__46230540<Text, ParentFeedback__185575590>;
+      var size : Nat__490723111
+    };
+  stable var parentFeedbackData : [(Text, ParentFeedback__185575590)];
+  stable parentNotifications :
+    {
+      var root : Node__46230540<Text, ParentNotification__224804863>;
+      var size : Nat__490723111
+    };
+  stable var parentNotificationsData :
+    [(Text, ParentNotification__224804863)];
+  stable ptmRecords :
+    {
+      var root : Node__46230540<Text, PTMRecord__240491211>;
+      var size : Nat__490723111
+    };
+  stable var ptmRecordsData : [(Text, PTMRecord__240491211)];
+  stable reportCards :
+    {
+      var root : Node__46230540<Text, ReportCard__696850780>;
+      var size : Nat__490723111
+    };
+  stable var reportCardsData : [(Text, ReportCard__696850780)];
+  stable schoolForms :
+    {
+      var root : Node__46230540<Text, SchoolForm__681209550>;
+      var size : Nat__490723111
+    };
+  stable var schoolFormsData : [(Text, SchoolForm__681209550)];
+  stable schoolUpdates :
+    {
+      var root : Node__46230540<Text, SchoolUpdate__474683987>;
+      var size : Nat__490723111
+    };
+  stable var schoolUpdatesData : [(Text, SchoolUpdate__474683987)];
+  stable var seeded : Bool;
+  stable var seededV20 : Bool;
+  stable var seededV6 : Bool;
+  stable var seededV7 : Bool;
+  stable var seededV8 : Bool;
+  stable var seededV9 : Bool;
+  stable staffAttendance :
+    {
+      var root : Node__46230540<Text, StaffAttendance__400511833>;
+      var size : Nat__490723111
+    };
+  stable var staffAttendanceData : [(Text, StaffAttendance__400511833)];
+  stable staffProfiles :
+    {
+      var root : Node__46230540<Text, StaffProfile__147332708>;
+      var size : Nat__490723111
+    };
+  stable var staffProfilesData : [(Text, StaffProfile__147332708)];
+  stable studentRecords :
+    {
+      var root : Node__46230540<Text, StudentRecord__91169700>;
+      var size : Nat__490723111
+    };
+  stable var studentRecordsData : [(Text, StudentRecord__91169700)];
+  stable students :
+    {
+      var root : Node__46230540<Text, Student__975845730>;
+      var size : Nat__490723111
+    };
+  stable var studentsData : [(Text, Student__975845730)];
+  stable tasks :
+    {
+      var root : Node__46230540<Text, Task__972485619>;
+      var size : Nat__490723111
+    };
+  stable var tasksData : [(Text, Task__972485619)];
+  stable teacherPerformance :
+    {
+      var root : Node__46230540<Text, TeacherPerformanceRecord__420780566>;
+      var size : Nat__490723111
+    };
+  stable var teacherPerformanceData :
+    [(Text, TeacherPerformanceRecord__420780566)];
+  stable teachers :
+    {
+      var root : Node__46230540<Text, Teacher__842879450>;
+      var size : Nat__490723111
+    };
+  stable var teachersData : [(Text, Teacher__842879450)];
+  stable teamMembers :
+    {
+      var root : Node__46230540<Text, TeamMember__720132507>;
+      var size : Nat__490723111
+    };
+  stable var teamMembersData : [(Text, TeamMember__720132507)];
+  stable userAccounts :
+    {
+      var root : Node__46230540<Text, UserAccount__518253964>;
+      var size : Nat__490723111
+    };
+  stable var userAccountsData : [(Text, UserAccount__518253964)];
+  stable userProfiles :
+    {
+      var root : Node__46230540<Principal, UserProfile__491224006>;
+      var size : Nat__490723111
+    };
+  stable var userProfilesData : [(Principal, UserProfile__491224006)];
+  stable users :
+    {
+      var root : Node__46230540<Text, UserRecord__235003723>;
+      var size : Nat__490723111
+    };
+  stable var usersData : [(Text, UserRecord__235003723)];
+  stable whatsAppMessages :
+    {
+      var root : Node__46230540<Text, WhatsAppMessage__611053655>;
+      var size : Nat__490723111
+    };
+  stable var whatsAppMessagesData : [(Text, WhatsAppMessage__611053655)];
+  stable worksheets :
+    {
+      var root : Node__46230540<Text, Worksheet__126943656>;
+      var size : Nat__490723111
+    };
+  stable var worksheetsData : [(Text, Worksheet__126943656)]
+};

@@ -27,7 +27,7 @@ export type Page =
   | "blog";
 
 export default function App() {
-  const { actor, isFetching, isError } = useActor();
+  const { actor, isFetching } = useActor();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
   const [seeded, setSeeded] = useState(false);
@@ -102,7 +102,7 @@ export default function App() {
   // Show a branded loading screen while the actor initializes.
   // Only show it on the first load (appReady=false) or if still fetching.
   // Once we have an actor or an error, proceed to login.
-  const isInitialLoading = !appReady || (isFetching && !actor && !isError);
+  const isInitialLoading = !appReady || (isFetching && !actor);
 
   if (isInitialLoading) {
     return (

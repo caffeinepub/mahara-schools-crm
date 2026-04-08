@@ -89,25 +89,23 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface LeadNote {
-    id: string;
-    content: string;
-    createdAt: string;
-    createdBy: string;
-    leadId: string;
-}
-export interface Branch {
-    id: string;
+export interface UserProfile {
     name: string;
-    location: string;
+    role: string;
+    email: string;
 }
-export interface Worksheet {
+export interface StudentRecord {
     id: string;
-    title: string;
-    subjects: Array<WorksheetSubject>;
-    date: string;
-    teacherName: string;
+    parentEmail: string;
+    parentContact: string;
+    dateOfBirth: string;
+    name: string;
+    admissionNumber: string;
     grade: string;
+    rollNumber: string;
+    address: string;
+    branchId: string;
+    parentName: string;
 }
 export interface TransformationOutput {
     status: bigint;
@@ -125,14 +123,6 @@ export interface ReportCard {
     attendance: string;
     teacherComment: string;
 }
-export interface LeadActivity {
-    id: string;
-    activityType: string;
-    description: string;
-    leadId: string;
-    performedBy: string;
-    timestamp: string;
-}
 export interface Task {
     id: string;
     title: string;
@@ -144,9 +134,24 @@ export interface Task {
     leadId: string;
     priority: string;
 }
-export interface LeadSource {
+export interface StaffProfile {
     id: string;
     name: string;
+    designation: string;
+    role: string;
+    email: string;
+    dailyActivities: string;
+    notes: string;
+    contactNumber: string;
+    branchId: string;
+}
+export interface UserAccount {
+    id: string;
+    username: string;
+    password: string;
+    role: string;
+    fullName: string;
+    email: string;
 }
 export interface Teacher {
     id: string;
@@ -156,20 +161,33 @@ export interface Teacher {
     grade: string;
     branchId: string;
 }
+export interface SchoolForm {
+    id: string;
+    title: string;
+    createdBy: string;
+    publishedAt: string;
+    description: string;
+    isDraft: boolean;
+    questions: Array<FormQuestion>;
+    responseCount: bigint;
+}
 export interface SubjectGrade {
     marks: string;
     subject: string;
     grade: string;
     remarks: string;
 }
-export interface http_request_result {
-    status: bigint;
-    body: Uint8Array;
-    headers: Array<http_header>;
-}
-export interface http_header {
-    value: string;
-    name: string;
+export interface TeacherPerformanceRecord {
+    id: string;
+    month: string;
+    activitiesUploaded: bigint;
+    year: string;
+    teacherName: string;
+    ptmAttended: bigint;
+    completionPercent: bigint;
+    teacherId: string;
+    branchId: string;
+    worksheetsSubmitted: bigint;
 }
 export interface Lead {
     id: string;
@@ -183,6 +201,13 @@ export interface Lead {
     notes: string;
     phone: string;
 }
+export interface FormQuestion {
+    id: string;
+    questionText: string;
+    questionType: string;
+    required: boolean;
+    options: Array<string>;
+}
 export interface CampaignSend {
     id: string;
     leadName: string;
@@ -192,13 +217,6 @@ export interface CampaignSend {
     sentAt: string;
     sentBy: string;
     leadId: string;
-}
-export interface CalendarEvent {
-    id: string;
-    title: string;
-    date: string;
-    color: string;
-    category: string;
 }
 export interface CampaignTemplate {
     id: string;
@@ -212,6 +230,140 @@ export interface TransformationInput {
     context: Uint8Array;
     response: http_request_result;
 }
+export interface Campaign {
+    id: string;
+    status: string;
+    name: string;
+    createdAt: string;
+    description: string;
+}
+export interface SchoolUpdate {
+    id: string;
+    title: string;
+    content: string;
+    date: string;
+    category: string;
+}
+export interface FormAnswer {
+    answer: string;
+    questionText: string;
+    questionId: string;
+}
+export interface ClassActivity {
+    id: string;
+    title: string;
+    date: string;
+    createdAt: string;
+    description: string;
+    teacherName: string;
+    teacherId: string;
+    mediaUrls: Array<string>;
+    branchId: string;
+    classGrade: string;
+}
+export interface ParentFeedback {
+    id: string;
+    studentName: string;
+    submittedAt: string;
+    teacherName: string;
+    comment: string;
+    teacherId: string;
+    rating: bigint;
+    parentUsername: string;
+}
+export interface Student {
+    id: string;
+    name: string;
+    admissionNumber: string;
+    grade: string;
+    parentUsername: string;
+}
+export interface BlogPost {
+    id: string;
+    title: string;
+    content: string;
+    tags: string;
+    authorName: string;
+    publishedAt: string;
+    isDraft: boolean;
+    category: string;
+}
+export interface Worksheet {
+    id: string;
+    title: string;
+    subjects: Array<WorksheetSubject>;
+    date: string;
+    teacherName: string;
+    grade: string;
+}
+export interface LeadActivity {
+    id: string;
+    activityType: string;
+    description: string;
+    leadId: string;
+    performedBy: string;
+    timestamp: string;
+}
+export interface ParentNotification {
+    id: string;
+    title: string;
+    notifType: string;
+    createdAt: string;
+    isRead: boolean;
+    message: string;
+    parentUsername: string;
+    linkId: string;
+}
+export interface LeadSource {
+    id: string;
+    name: string;
+}
+export interface FormResponse {
+    id: string;
+    studentName: string;
+    answers: Array<FormAnswer>;
+    submittedAt: string;
+    parentUsername: string;
+    formId: string;
+}
+export interface WhatsAppMessage {
+    id: string;
+    status: string;
+    direction: string;
+    leadName: string;
+    messageId: string;
+    campaignId: string;
+    messageText: string;
+    leadId: string;
+    leadPhone: string;
+    timestamp: string;
+}
+export interface http_header {
+    value: string;
+    name: string;
+}
+export interface http_request_result {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export interface StaffAttendance {
+    id: string;
+    status: string;
+    staffName: string;
+    staffId: string;
+    date: string;
+    markedBy: string;
+    timestamp: string;
+    branchId: string;
+}
+export interface CalendarEvent {
+    id: string;
+    title: string;
+    date: string;
+    color: string;
+    category: string;
+}
 export interface IntegrationConfig {
     emailProvider: string;
     whatsappAccessToken: string;
@@ -223,19 +375,6 @@ export interface IntegrationConfig {
     websiteWebhookSecret: string;
     metaWebhookVerifyToken: string;
 }
-export interface SchoolUpdate {
-    id: string;
-    title: string;
-    content: string;
-    date: string;
-    category: string;
-}
-export interface TeamMember {
-    id: string;
-    name: string;
-    role: string;
-    branchId: string;
-}
 export interface FollowUp {
     id: string;
     followUpType: string;
@@ -245,12 +384,24 @@ export interface FollowUp {
     leadId: string;
     notes: string;
 }
-export interface Campaign {
+export interface TeamMember {
     id: string;
-    status: string;
     name: string;
-    createdAt: string;
-    description: string;
+    role: string;
+    branchId: string;
+}
+export interface Branch {
+    id: string;
+    name: string;
+    location: string;
+}
+export interface PTMRecord {
+    id: string;
+    title: string;
+    date: string;
+    notes: string;
+    teacherId: string;
+    attendees: string;
 }
 export interface WorksheetSubject {
     subject: string;
@@ -262,17 +413,12 @@ export interface WhatsAppMessageResult {
     message: string;
     success: boolean;
 }
-export interface UserProfile {
-    name: string;
-    role: string;
-    email: string;
-}
-export interface Student {
+export interface LeadNote {
     id: string;
-    name: string;
-    admissionNumber: string;
-    grade: string;
-    parentUsername: string;
+    content: string;
+    createdAt: string;
+    createdBy: string;
+    leadId: string;
 }
 export enum UserRole {
     admin = "admin",
@@ -280,44 +426,64 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    _initializeAccessControl(): Promise<void>;
+    addBlogPost(post: BlogPost): Promise<string>;
     addBranch(b: Branch): Promise<string>;
     addCalendarEvent(e: CalendarEvent): Promise<string>;
     addCampaign(c: Campaign): Promise<string>;
     addCampaignSend(s: CampaignSend): Promise<string>;
     addCampaignTemplate(t: CampaignTemplate): Promise<string>;
+    addClassActivity(a: ClassActivity): Promise<string>;
     addFollowUp(fu: FollowUp): Promise<string>;
+    addForm(form: SchoolForm): Promise<string>;
     addLead(lead: Lead): Promise<string>;
     addLeadActivity(a: LeadActivity): Promise<string>;
     addLeadNote(n: LeadNote): Promise<string>;
     addLeadSource(s: LeadSource): Promise<string>;
+    addNotification(notification: ParentNotification): Promise<string>;
+    addPTMRecord(record: PTMRecord): Promise<string>;
     addReportCard(rc: ReportCard): Promise<string>;
     addSchoolUpdate(u: SchoolUpdate): Promise<string>;
+    addStaffProfile(sp: StaffProfile): Promise<string>;
     addStudent(s: Student): Promise<string>;
+    addStudentRecord(s: StudentRecord): Promise<string>;
+    addStudentRecordsBulk(records: Array<StudentRecord>): Promise<Array<string>>;
     addTask(t: Task): Promise<string>;
     addTeacher(t: Teacher): Promise<string>;
     addTeamMember(m: TeamMember): Promise<string>;
+    addUserAccount(a: UserAccount): Promise<string>;
+    addWhatsAppMessage(msg: WhatsAppMessage): Promise<string>;
     addWorksheet(w: Worksheet): Promise<string>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    deleteBlogPost(id: string): Promise<void>;
     deleteBranch(id: string): Promise<void>;
     deleteCalendarEvent(id: string): Promise<void>;
     deleteCampaign(id: string): Promise<void>;
     deleteCampaignTemplate(id: string): Promise<void>;
+    deleteClassActivity(id: string): Promise<void>;
     deleteFollowUp(id: string): Promise<void>;
+    deleteForm(id: string): Promise<void>;
     deleteLead(id: string): Promise<void>;
     deleteLeadActivity(id: string): Promise<void>;
     deleteLeadNote(id: string): Promise<void>;
     deleteLeadSource(id: string): Promise<void>;
     deleteReportCard(id: string): Promise<void>;
     deleteSchoolUpdate(id: string): Promise<void>;
+    deleteStaffProfile(id: string): Promise<void>;
     deleteStudent(id: string): Promise<void>;
+    deleteStudentRecord(id: string): Promise<void>;
     deleteTask(id: string): Promise<void>;
     deleteTeacher(id: string): Promise<void>;
     deleteTeamMember(id: string): Promise<void>;
+    deleteUserAccount(id: string): Promise<void>;
     deleteWorksheet(id: string): Promise<void>;
     getActivitiesByLead(leadId: string): Promise<Array<LeadActivity>>;
+    getAllBlogPosts(): Promise<Array<BlogPost>>;
+    getAllClassActivities(): Promise<Array<ClassActivity>>;
+    getAllForms(): Promise<Array<SchoolForm>>;
     getAllLeadActivities(): Promise<Array<LeadActivity>>;
     getAllReportCards(): Promise<Array<ReportCard>>;
+    getAllStudentRecords(): Promise<Array<StudentRecord>>;
     getAllStudents(): Promise<Array<Student>>;
     getAllTeachers(): Promise<Array<Teacher>>;
     getAllWorksheets(): Promise<Array<Worksheet>>;
@@ -330,22 +496,48 @@ export interface backendInterface {
     getCampaignSendsByLead(leadId: string): Promise<Array<CampaignSend>>;
     getCampaignTemplates(): Promise<Array<CampaignTemplate>>;
     getCampaigns(): Promise<Array<Campaign>>;
+    getClassActivitiesByBranch(branchId: string): Promise<Array<ClassActivity>>;
+    getClassActivitiesByGrade(grade: string): Promise<Array<ClassActivity>>;
+    getClassActivitiesByTeacher(teacherId: string): Promise<Array<ClassActivity>>;
     getFollowUps(): Promise<Array<FollowUp>>;
+    getFormById(id: string): Promise<SchoolForm | null>;
+    getFormResponses(formId: string): Promise<Array<FormResponse>>;
     getIntegrationConfig(): Promise<IntegrationConfig | null>;
     getLeadSources(): Promise<Array<LeadSource>>;
     getLeads(): Promise<Array<Lead>>;
+    getMyFormResponses(parentUsername: string): Promise<Array<FormResponse>>;
     getNotesByLead(leadId: string): Promise<Array<LeadNote>>;
+    getNotificationsForParent(parentUsername: string): Promise<Array<ParentNotification>>;
+    getPTMRecords(): Promise<Array<PTMRecord>>;
+    getPTMRecordsByTeacher(teacherId: string): Promise<Array<PTMRecord>>;
+    getParentFeedback(): Promise<Array<ParentFeedback>>;
+    getParentFeedbackByTeacher(teacherId: string): Promise<Array<ParentFeedback>>;
+    getPublishedBlogPosts(): Promise<Array<BlogPost>>;
+    getPublishedForms(): Promise<Array<SchoolForm>>;
     getReportCardsByStudent(studentId: string): Promise<Array<ReportCard>>;
     getSchoolUpdates(): Promise<Array<SchoolUpdate>>;
+    getStaffAttendance(): Promise<Array<StaffAttendance>>;
+    getStaffAttendanceByDate(date: string): Promise<Array<StaffAttendance>>;
+    getStaffAttendanceByStaff(staffId: string): Promise<Array<StaffAttendance>>;
+    getStaffProfiles(): Promise<Array<StaffProfile>>;
+    getStaffProfilesByBranch(branchId: string): Promise<Array<StaffProfile>>;
+    getStaffProfilesByRole(role: string): Promise<Array<StaffProfile>>;
+    getStudentRecordsByBranch(branchId: string): Promise<Array<StudentRecord>>;
+    getStudentRecordsByGrade(grade: string): Promise<Array<StudentRecord>>;
     getStudentsByGrade(grade: string): Promise<Array<Student>>;
     getStudentsByParent(parentUsername: string): Promise<Array<Student>>;
     getTasks(): Promise<Array<Task>>;
     getTasksByAssignee(assignedTo: string): Promise<Array<Task>>;
     getTasksByLead(leadId: string): Promise<Array<Task>>;
     getTeacherByUsername(username: string): Promise<Teacher | null>;
+    getTeacherPerformanceByTeacher(teacherId: string): Promise<Array<TeacherPerformanceRecord>>;
+    getTeacherPerformanceRecords(): Promise<Array<TeacherPerformanceRecord>>;
     getTeachersByBranch(branchId: string): Promise<Array<Teacher>>;
     getTeamMembers(): Promise<Array<TeamMember>>;
+    getUserAccounts(): Promise<Array<UserAccount>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    getWhatsAppMessages(): Promise<Array<WhatsAppMessage>>;
+    getWhatsAppMessagesByLead(leadId: string): Promise<Array<WhatsAppMessage>>;
     getWorksheetsByGrade(grade: string): Promise<Array<Worksheet>>;
     initSeedData(): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
@@ -357,6 +549,8 @@ export interface backendInterface {
         name: string;
         role: string;
     } | null>;
+    markAttendance(a: StaffAttendance): Promise<string>;
+    markNotificationRead(id: string): Promise<void>;
     receiveWebhookLead(payload: {
         source: string;
         name: string;
@@ -365,41 +559,67 @@ export interface backendInterface {
         notes: string;
         phone: string;
     }): Promise<string>;
+    receiveWhatsAppWebhook(payload: string): Promise<string>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     saveIntegrationConfig(config: IntegrationConfig): Promise<void>;
     searchLeads(term: string): Promise<Array<Lead>>;
     searchTasks(term: string): Promise<Array<Task>>;
     sendWhatsAppMessage(to: string, message: string): Promise<WhatsAppMessageResult>;
+    submitFormResponse(response: FormResponse): Promise<string>;
+    submitParentFeedback(feedback: ParentFeedback): Promise<string>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
+    updateAttendance(a: StaffAttendance): Promise<void>;
+    updateBlogPost(post: BlogPost): Promise<void>;
     updateBranch(b: Branch): Promise<void>;
     updateCalendarEvent(e: CalendarEvent): Promise<void>;
     updateCampaign(c: Campaign): Promise<void>;
     updateCampaignTemplate(t: CampaignTemplate): Promise<void>;
+    updateClassActivity(a: ClassActivity): Promise<void>;
     updateFollowUp(fu: FollowUp): Promise<void>;
+    updateForm(form: SchoolForm): Promise<void>;
     updateLead(lead: Lead): Promise<void>;
     updateLeadSource(s: LeadSource): Promise<void>;
     updateReportCard(rc: ReportCard): Promise<void>;
     updateSchoolUpdate(u: SchoolUpdate): Promise<void>;
+    updateStaffProfile(sp: StaffProfile): Promise<void>;
     updateStudent(s: Student): Promise<void>;
+    updateStudentRecord(s: StudentRecord): Promise<void>;
     updateTask(t: Task): Promise<void>;
     updateTeacher(t: Teacher): Promise<void>;
     updateTeamMember(m: TeamMember): Promise<void>;
+    updateUserAccount(a: UserAccount): Promise<void>;
+    updateWhatsAppMessageStatus(id: string, status: string): Promise<void>;
     updateWorksheet(w: Worksheet): Promise<void>;
+    upsertTeacherPerformance(record: TeacherPerformanceRecord): Promise<string>;
 }
-import type { IntegrationConfig as _IntegrationConfig, Teacher as _Teacher, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { IntegrationConfig as _IntegrationConfig, SchoolForm as _SchoolForm, Teacher as _Teacher, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
+    async _initializeAccessControl(): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor._initializeAccessControlWithSecret(arg0);
+                const result = await this.actor._initializeAccessControl();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor._initializeAccessControlWithSecret(arg0);
+            const result = await this.actor._initializeAccessControl();
+            return result;
+        }
+    }
+    async addBlogPost(arg0: BlogPost): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addBlogPost(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addBlogPost(arg0);
             return result;
         }
     }
@@ -473,6 +693,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async addClassActivity(arg0: ClassActivity): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addClassActivity(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addClassActivity(arg0);
+            return result;
+        }
+    }
     async addFollowUp(arg0: FollowUp): Promise<string> {
         if (this.processError) {
             try {
@@ -484,6 +718,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addFollowUp(arg0);
+            return result;
+        }
+    }
+    async addForm(arg0: SchoolForm): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addForm(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addForm(arg0);
             return result;
         }
     }
@@ -543,6 +791,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async addNotification(arg0: ParentNotification): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addNotification(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addNotification(arg0);
+            return result;
+        }
+    }
+    async addPTMRecord(arg0: PTMRecord): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addPTMRecord(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addPTMRecord(arg0);
+            return result;
+        }
+    }
     async addReportCard(arg0: ReportCard): Promise<string> {
         if (this.processError) {
             try {
@@ -571,6 +847,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async addStaffProfile(arg0: StaffProfile): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addStaffProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addStaffProfile(arg0);
+            return result;
+        }
+    }
     async addStudent(arg0: Student): Promise<string> {
         if (this.processError) {
             try {
@@ -582,6 +872,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addStudent(arg0);
+            return result;
+        }
+    }
+    async addStudentRecord(arg0: StudentRecord): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addStudentRecord(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addStudentRecord(arg0);
+            return result;
+        }
+    }
+    async addStudentRecordsBulk(arg0: Array<StudentRecord>): Promise<Array<string>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addStudentRecordsBulk(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addStudentRecordsBulk(arg0);
             return result;
         }
     }
@@ -627,6 +945,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async addUserAccount(arg0: UserAccount): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addUserAccount(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addUserAccount(arg0);
+            return result;
+        }
+    }
+    async addWhatsAppMessage(arg0: WhatsAppMessage): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addWhatsAppMessage(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addWhatsAppMessage(arg0);
+            return result;
+        }
+    }
     async addWorksheet(arg0: Worksheet): Promise<string> {
         if (this.processError) {
             try {
@@ -652,6 +998,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async deleteBlogPost(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteBlogPost(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteBlogPost(arg0);
             return result;
         }
     }
@@ -711,6 +1071,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteClassActivity(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteClassActivity(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteClassActivity(arg0);
+            return result;
+        }
+    }
     async deleteFollowUp(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -722,6 +1096,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteFollowUp(arg0);
+            return result;
+        }
+    }
+    async deleteForm(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteForm(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteForm(arg0);
             return result;
         }
     }
@@ -809,6 +1197,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteStaffProfile(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteStaffProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteStaffProfile(arg0);
+            return result;
+        }
+    }
     async deleteStudent(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -820,6 +1222,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteStudent(arg0);
+            return result;
+        }
+    }
+    async deleteStudentRecord(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteStudentRecord(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteStudentRecord(arg0);
             return result;
         }
     }
@@ -865,6 +1281,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteUserAccount(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteUserAccount(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteUserAccount(arg0);
+            return result;
+        }
+    }
     async deleteWorksheet(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -893,6 +1323,48 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllBlogPosts(): Promise<Array<BlogPost>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllBlogPosts();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllBlogPosts();
+            return result;
+        }
+    }
+    async getAllClassActivities(): Promise<Array<ClassActivity>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllClassActivities();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllClassActivities();
+            return result;
+        }
+    }
+    async getAllForms(): Promise<Array<SchoolForm>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllForms();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllForms();
+            return result;
+        }
+    }
     async getAllLeadActivities(): Promise<Array<LeadActivity>> {
         if (this.processError) {
             try {
@@ -918,6 +1390,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllReportCards();
+            return result;
+        }
+    }
+    async getAllStudentRecords(): Promise<Array<StudentRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllStudentRecords();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllStudentRecords();
             return result;
         }
     }
@@ -1089,6 +1575,48 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getClassActivitiesByBranch(arg0: string): Promise<Array<ClassActivity>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getClassActivitiesByBranch(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getClassActivitiesByBranch(arg0);
+            return result;
+        }
+    }
+    async getClassActivitiesByGrade(arg0: string): Promise<Array<ClassActivity>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getClassActivitiesByGrade(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getClassActivitiesByGrade(arg0);
+            return result;
+        }
+    }
+    async getClassActivitiesByTeacher(arg0: string): Promise<Array<ClassActivity>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getClassActivitiesByTeacher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getClassActivitiesByTeacher(arg0);
+            return result;
+        }
+    }
     async getFollowUps(): Promise<Array<FollowUp>> {
         if (this.processError) {
             try {
@@ -1103,18 +1631,46 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getIntegrationConfig(): Promise<IntegrationConfig | null> {
+    async getFormById(arg0: string): Promise<SchoolForm | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getIntegrationConfig();
+                const result = await this.actor.getFormById(arg0);
                 return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getIntegrationConfig();
+            const result = await this.actor.getFormById(arg0);
             return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getFormResponses(arg0: string): Promise<Array<FormResponse>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getFormResponses(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getFormResponses(arg0);
+            return result;
+        }
+    }
+    async getIntegrationConfig(): Promise<IntegrationConfig | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getIntegrationConfig();
+                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getIntegrationConfig();
+            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
         }
     }
     async getLeadSources(): Promise<Array<LeadSource>> {
@@ -1145,6 +1701,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getMyFormResponses(arg0: string): Promise<Array<FormResponse>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyFormResponses(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyFormResponses(arg0);
+            return result;
+        }
+    }
     async getNotesByLead(arg0: string): Promise<Array<LeadNote>> {
         if (this.processError) {
             try {
@@ -1156,6 +1726,104 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getNotesByLead(arg0);
+            return result;
+        }
+    }
+    async getNotificationsForParent(arg0: string): Promise<Array<ParentNotification>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getNotificationsForParent(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getNotificationsForParent(arg0);
+            return result;
+        }
+    }
+    async getPTMRecords(): Promise<Array<PTMRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPTMRecords();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPTMRecords();
+            return result;
+        }
+    }
+    async getPTMRecordsByTeacher(arg0: string): Promise<Array<PTMRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPTMRecordsByTeacher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPTMRecordsByTeacher(arg0);
+            return result;
+        }
+    }
+    async getParentFeedback(): Promise<Array<ParentFeedback>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getParentFeedback();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getParentFeedback();
+            return result;
+        }
+    }
+    async getParentFeedbackByTeacher(arg0: string): Promise<Array<ParentFeedback>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getParentFeedbackByTeacher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getParentFeedbackByTeacher(arg0);
+            return result;
+        }
+    }
+    async getPublishedBlogPosts(): Promise<Array<BlogPost>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPublishedBlogPosts();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPublishedBlogPosts();
+            return result;
+        }
+    }
+    async getPublishedForms(): Promise<Array<SchoolForm>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPublishedForms();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPublishedForms();
             return result;
         }
     }
@@ -1184,6 +1852,118 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getSchoolUpdates();
+            return result;
+        }
+    }
+    async getStaffAttendance(): Promise<Array<StaffAttendance>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffAttendance();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffAttendance();
+            return result;
+        }
+    }
+    async getStaffAttendanceByDate(arg0: string): Promise<Array<StaffAttendance>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffAttendanceByDate(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffAttendanceByDate(arg0);
+            return result;
+        }
+    }
+    async getStaffAttendanceByStaff(arg0: string): Promise<Array<StaffAttendance>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffAttendanceByStaff(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffAttendanceByStaff(arg0);
+            return result;
+        }
+    }
+    async getStaffProfiles(): Promise<Array<StaffProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffProfiles();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffProfiles();
+            return result;
+        }
+    }
+    async getStaffProfilesByBranch(arg0: string): Promise<Array<StaffProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffProfilesByBranch(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffProfilesByBranch(arg0);
+            return result;
+        }
+    }
+    async getStaffProfilesByRole(arg0: string): Promise<Array<StaffProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStaffProfilesByRole(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStaffProfilesByRole(arg0);
+            return result;
+        }
+    }
+    async getStudentRecordsByBranch(arg0: string): Promise<Array<StudentRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStudentRecordsByBranch(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStudentRecordsByBranch(arg0);
+            return result;
+        }
+    }
+    async getStudentRecordsByGrade(arg0: string): Promise<Array<StudentRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStudentRecordsByGrade(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStudentRecordsByGrade(arg0);
             return result;
         }
     }
@@ -1261,14 +2041,42 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getTeacherByUsername(arg0);
-                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getTeacherByUsername(arg0);
-            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTeacherPerformanceByTeacher(arg0: string): Promise<Array<TeacherPerformanceRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTeacherPerformanceByTeacher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTeacherPerformanceByTeacher(arg0);
+            return result;
+        }
+    }
+    async getTeacherPerformanceRecords(): Promise<Array<TeacherPerformanceRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTeacherPerformanceRecords();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTeacherPerformanceRecords();
+            return result;
         }
     }
     async getTeachersByBranch(arg0: string): Promise<Array<Teacher>> {
@@ -1299,6 +2107,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getUserAccounts(): Promise<Array<UserAccount>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserAccounts();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserAccounts();
+            return result;
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -1311,6 +2133,34 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getUserProfile(arg0);
             return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getWhatsAppMessages(): Promise<Array<WhatsAppMessage>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getWhatsAppMessages();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getWhatsAppMessages();
+            return result;
+        }
+    }
+    async getWhatsAppMessagesByLead(arg0: string): Promise<Array<WhatsAppMessage>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getWhatsAppMessagesByLead(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getWhatsAppMessagesByLead(arg0);
+            return result;
         }
     }
     async getWorksheetsByGrade(arg0: string): Promise<Array<Worksheet>> {
@@ -1366,14 +2216,42 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.login(arg0);
-                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n9(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.login(arg0);
-            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n9(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async markAttendance(arg0: StaffAttendance): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.markAttendance(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.markAttendance(arg0);
+            return result;
+        }
+    }
+    async markNotificationRead(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.markNotificationRead(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.markNotificationRead(arg0);
+            return result;
         }
     }
     async receiveWebhookLead(arg0: {
@@ -1394,6 +2272,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.receiveWebhookLead(arg0);
+            return result;
+        }
+    }
+    async receiveWhatsAppWebhook(arg0: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.receiveWhatsAppWebhook(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.receiveWhatsAppWebhook(arg0);
             return result;
         }
     }
@@ -1467,6 +2359,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async submitFormResponse(arg0: FormResponse): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitFormResponse(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitFormResponse(arg0);
+            return result;
+        }
+    }
+    async submitParentFeedback(arg0: ParentFeedback): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitParentFeedback(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitParentFeedback(arg0);
+            return result;
+        }
+    }
     async transform(arg0: TransformationInput): Promise<TransformationOutput> {
         if (this.processError) {
             try {
@@ -1478,6 +2398,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.transform(arg0);
+            return result;
+        }
+    }
+    async updateAttendance(arg0: StaffAttendance): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateAttendance(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateAttendance(arg0);
+            return result;
+        }
+    }
+    async updateBlogPost(arg0: BlogPost): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateBlogPost(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateBlogPost(arg0);
             return result;
         }
     }
@@ -1537,6 +2485,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateClassActivity(arg0: ClassActivity): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateClassActivity(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateClassActivity(arg0);
+            return result;
+        }
+    }
     async updateFollowUp(arg0: FollowUp): Promise<void> {
         if (this.processError) {
             try {
@@ -1548,6 +2510,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updateFollowUp(arg0);
+            return result;
+        }
+    }
+    async updateForm(arg0: SchoolForm): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateForm(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateForm(arg0);
             return result;
         }
     }
@@ -1607,6 +2583,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateStaffProfile(arg0: StaffProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateStaffProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateStaffProfile(arg0);
+            return result;
+        }
+    }
     async updateStudent(arg0: Student): Promise<void> {
         if (this.processError) {
             try {
@@ -1618,6 +2608,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updateStudent(arg0);
+            return result;
+        }
+    }
+    async updateStudentRecord(arg0: StudentRecord): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateStudentRecord(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateStudentRecord(arg0);
             return result;
         }
     }
@@ -1663,6 +2667,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateUserAccount(arg0: UserAccount): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateUserAccount(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateUserAccount(arg0);
+            return result;
+        }
+    }
+    async updateWhatsAppMessageStatus(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateWhatsAppMessageStatus(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateWhatsAppMessageStatus(arg0, arg1);
+            return result;
+        }
+    }
     async updateWorksheet(arg0: Worksheet): Promise<void> {
         if (this.processError) {
             try {
@@ -1677,6 +2709,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async upsertTeacherPerformance(arg0: TeacherPerformanceRecord): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.upsertTeacherPerformance(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.upsertTeacherPerformance(arg0);
+            return result;
+        }
+    }
 }
 function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
     return from_candid_variant_n5(_uploadFile, _downloadFile, value);
@@ -1684,13 +2730,16 @@ function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Ui
 function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_IntegrationConfig]): IntegrationConfig | null {
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SchoolForm]): SchoolForm | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Teacher]): Teacher | null {
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_IntegrationConfig]): IntegrationConfig | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
+function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Teacher]): Teacher | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
         username: string;
         name: string;
         role: string;

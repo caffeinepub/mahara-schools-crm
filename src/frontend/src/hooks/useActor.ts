@@ -1,69 +1,25 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import type { backendInterface } from "../backend";
-import { createActorWithConfig } from "../config";
-import { getSecretParameter } from "../utils/urlParams";
-import { useInternetIdentity } from "./useInternetIdentity";
+/**
+ * Project-local useActor wrapper.
+ *
+ * The actual hook lives in @caffeineai/core-infrastructure.
+ * This file re-exports it pre-bound to the generated `createActor` function
+ * from backend.ts, so all pages can do:
+ *
+ *   import { useActor } from "../hooks/useActor";
+ *   const { actor, isFetching } = useActor();
+ *
+ * and get a fully-typed Backend instance without needing to pass createActor.
+ */
 
-const ACTOR_QUERY_KEY = "actor";
-export function useActor() {
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-  const actorQuery = useQuery<backendInterface>({
-    queryKey: [ACTOR_QUERY_KEY, identity?.getPrincipal().toString()],
-    queryFn: async () => {
-      const isAuthenticated = !!identity;
+import { useActor as _useActor } from "@caffeineai/core-infrastructure";
+import { type backendInterface, createActor } from "../backend";
 
-      if (!isAuthenticated) {
-        // Return anonymous actor if not authenticated
-        return await createActorWithConfig();
-      }
-
-      const actorOptions = {
-        agentOptions: {
-          identity,
-        },
-      };
-
-      const actor = await createActorWithConfig(actorOptions);
-      // Initialize access control — wrap in try/catch so a bad token never
-      // prevents the app from loading
-      try {
-        const adminToken = getSecretParameter("caffeineAdminToken") || "";
-        await actor._initializeAccessControlWithSecret(adminToken);
-      } catch {
-        // Non-fatal: continue with unauthenticated actor capabilities
-      }
-      return actor;
-    },
-    // Only refetch when identity changes
-    staleTime: Number.POSITIVE_INFINITY,
-    // This will cause the actor to be recreated when the identity changes
-    enabled: true,
-    // Don't throw errors to the component tree
-    retry: 2,
-    retryDelay: 1500,
-  });
-
-  // When the actor changes, invalidate dependent queries
-  useEffect(() => {
-    if (actorQuery.data) {
-      queryClient.invalidateQueries({
-        predicate: (query) => {
-          return !query.queryKey.includes(ACTOR_QUERY_KEY);
-        },
-      });
-      queryClient.refetchQueries({
-        predicate: (query) => {
-          return !query.queryKey.includes(ACTOR_QUERY_KEY);
-        },
-      });
-    }
-  }, [actorQuery.data, queryClient]);
-
-  return {
-    actor: actorQuery.data || null,
-    isFetching: actorQuery.isFetching,
-    isError: actorQuery.isError,
+export function useActor(): {
+  actor: backendInterface | null;
+  isFetching: boolean;
+} {
+  return _useActor(createActor) as {
+    actor: backendInterface | null;
+    isFetching: boolean;
   };
 }

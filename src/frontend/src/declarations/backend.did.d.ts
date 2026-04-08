@@ -10,6 +10,16 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface BlogPost {
+  'id' : string,
+  'title' : string,
+  'content' : string,
+  'tags' : string,
+  'authorName' : string,
+  'publishedAt' : string,
+  'isDraft' : boolean,
+  'category' : string,
+}
 export interface Branch { 'id' : string, 'name' : string, 'location' : string }
 export interface CalendarEvent {
   'id' : string,
@@ -43,6 +53,18 @@ export interface CampaignTemplate {
   'messageText' : string,
   'mediaType' : string,
 }
+export interface ClassActivity {
+  'id' : string,
+  'title' : string,
+  'date' : string,
+  'createdAt' : string,
+  'description' : string,
+  'teacherName' : string,
+  'teacherId' : string,
+  'mediaUrls' : Array<string>,
+  'branchId' : string,
+  'classGrade' : string,
+}
 export interface FollowUp {
   'id' : string,
   'followUpType' : string,
@@ -51,6 +73,26 @@ export interface FollowUp {
   'dueDate' : string,
   'leadId' : string,
   'notes' : string,
+}
+export interface FormAnswer {
+  'answer' : string,
+  'questionText' : string,
+  'questionId' : string,
+}
+export interface FormQuestion {
+  'id' : string,
+  'questionText' : string,
+  'questionType' : string,
+  'required' : boolean,
+  'options' : Array<string>,
+}
+export interface FormResponse {
+  'id' : string,
+  'studentName' : string,
+  'answers' : Array<FormAnswer>,
+  'submittedAt' : string,
+  'parentUsername' : string,
+  'formId' : string,
 }
 export interface IntegrationConfig {
   'emailProvider' : string,
@@ -91,6 +133,34 @@ export interface LeadNote {
   'leadId' : string,
 }
 export interface LeadSource { 'id' : string, 'name' : string }
+export interface PTMRecord {
+  'id' : string,
+  'title' : string,
+  'date' : string,
+  'notes' : string,
+  'teacherId' : string,
+  'attendees' : string,
+}
+export interface ParentFeedback {
+  'id' : string,
+  'studentName' : string,
+  'submittedAt' : string,
+  'teacherName' : string,
+  'comment' : string,
+  'teacherId' : string,
+  'rating' : bigint,
+  'parentUsername' : string,
+}
+export interface ParentNotification {
+  'id' : string,
+  'title' : string,
+  'notifType' : string,
+  'createdAt' : string,
+  'isRead' : boolean,
+  'message' : string,
+  'parentUsername' : string,
+  'linkId' : string,
+}
 export interface ReportCard {
   'id' : string,
   'studentId' : string,
@@ -102,12 +172,43 @@ export interface ReportCard {
   'attendance' : string,
   'teacherComment' : string,
 }
+export interface SchoolForm {
+  'id' : string,
+  'title' : string,
+  'createdBy' : string,
+  'publishedAt' : string,
+  'description' : string,
+  'isDraft' : boolean,
+  'questions' : Array<FormQuestion>,
+  'responseCount' : bigint,
+}
 export interface SchoolUpdate {
   'id' : string,
   'title' : string,
   'content' : string,
   'date' : string,
   'category' : string,
+}
+export interface StaffAttendance {
+  'id' : string,
+  'status' : string,
+  'staffName' : string,
+  'staffId' : string,
+  'date' : string,
+  'markedBy' : string,
+  'timestamp' : string,
+  'branchId' : string,
+}
+export interface StaffProfile {
+  'id' : string,
+  'name' : string,
+  'designation' : string,
+  'role' : string,
+  'email' : string,
+  'dailyActivities' : string,
+  'notes' : string,
+  'contactNumber' : string,
+  'branchId' : string,
 }
 export interface Student {
   'id' : string,
@@ -118,16 +219,16 @@ export interface Student {
 }
 export interface StudentRecord {
   'id' : string,
-  'rollNumber' : string,
+  'parentEmail' : string,
+  'parentContact' : string,
+  'dateOfBirth' : string,
   'name' : string,
+  'admissionNumber' : string,
   'grade' : string,
+  'rollNumber' : string,
+  'address' : string,
   'branchId' : string,
   'parentName' : string,
-  'parentContact' : string,
-  'parentEmail' : string,
-  'dateOfBirth' : string,
-  'address' : string,
-  'admissionNumber' : string,
 }
 export interface SubjectGrade {
   'marks' : string,
@@ -154,6 +255,18 @@ export interface Teacher {
   'grade' : string,
   'branchId' : string,
 }
+export interface TeacherPerformanceRecord {
+  'id' : string,
+  'month' : string,
+  'activitiesUploaded' : bigint,
+  'year' : string,
+  'teacherName' : string,
+  'ptmAttended' : bigint,
+  'completionPercent' : bigint,
+  'teacherId' : string,
+  'branchId' : string,
+  'worksheetsSubmitted' : bigint,
+}
 export interface TeamMember {
   'id' : string,
   'name' : string,
@@ -169,6 +282,14 @@ export interface TransformationOutput {
   'body' : Uint8Array,
   'headers' : Array<http_header>,
 }
+export interface UserAccount {
+  'id' : string,
+  'username' : string,
+  'password' : string,
+  'role' : string,
+  'fullName' : string,
+  'email' : string,
+}
 export interface UserProfile {
   'name' : string,
   'role' : string,
@@ -177,6 +298,18 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface WhatsAppMessage {
+  'id' : string,
+  'status' : string,
+  'direction' : string,
+  'leadName' : string,
+  'messageId' : string,
+  'campaignId' : string,
+  'messageText' : string,
+  'leadId' : string,
+  'leadPhone' : string,
+  'timestamp' : string,
+}
 export interface WhatsAppMessageResult {
   'message' : string,
   'success' : boolean,
@@ -201,191 +334,65 @@ export interface http_request_result {
   'body' : Uint8Array,
   'headers' : Array<http_header>,
 }
-export interface StaffProfile {
-  'id' : string,
-  'name' : string,
-  'designation' : string,
-  'contactNumber' : string,
-  'branchId' : string,
-  'role' : string,
-  'dailyActivities' : string,
-  'notes' : string,
-  'email' : string,
-}
-export interface UserAccount {
-  'id' : string,
-  'username' : string,
-  'password' : string,
-  'role' : string,
-  'fullName' : string,
-  'email' : string,
-}
-export interface WhatsAppMessage {
-  'id' : string,
-  'leadId' : string,
-  'leadName' : string,
-  'leadPhone' : string,
-  'direction' : string,
-  'messageText' : string,
-  'status' : string,
-  'timestamp' : string,
-  'messageId' : string,
-  'campaignId' : string,
-}
-export interface StaffAttendance {
-  'id' : string,
-  'staffId' : string,
-  'staffName' : string,
-  'branchId' : string,
-  'date' : string,
-  'status' : string,
-  'markedBy' : string,
-  'timestamp' : string,
-}
-export interface TeacherPerformanceRecord {
-  'id' : string,
-  'teacherId' : string,
-  'teacherName' : string,
-  'branchId' : string,
-  'month' : string,
-  'year' : string,
-  'activitiesUploaded' : bigint,
-  'worksheetsSubmitted' : bigint,
-  'ptmAttended' : bigint,
-  'completionPercent' : bigint,
-}
-export interface ParentFeedback {
-  'id' : string,
-  'teacherId' : string,
-  'teacherName' : string,
-  'parentUsername' : string,
-  'studentName' : string,
-  'rating' : bigint,
-  'comment' : string,
-  'submittedAt' : string,
-}
-export interface PTMRecord {
-  'id' : string,
-  'teacherId' : string,
-  'date' : string,
-  'title' : string,
-  'attendees' : string,
-  'notes' : string,
-}
-export interface ClassActivity {
-  'id' : string,
-  'classGrade' : string,
-  'teacherId' : string,
-  'teacherName' : string,
-  'branchId' : string,
-  'date' : string,
-  'title' : string,
-  'description' : string,
-  'mediaUrls' : Array<string>,
-  'createdAt' : string,
-}
-export interface FormQuestion {
-  'id' : string,
-  'questionText' : string,
-  'questionType' : string,
-  'options' : Array<string>,
-  'required' : boolean,
-}
-export interface FormAnswer {
-  'questionId' : string,
-  'questionText' : string,
-  'answer' : string,
-}
-export interface SchoolForm {
-  'id' : string,
-  'title' : string,
-  'description' : string,
-  'questions' : Array<FormQuestion>,
-  'publishedAt' : string,
-  'isDraft' : boolean,
-  'createdBy' : string,
-  'responseCount' : bigint,
-}
-export interface FormResponse {
-  'id' : string,
-  'formId' : string,
-  'parentUsername' : string,
-  'studentName' : string,
-  'answers' : Array<FormAnswer>,
-  'submittedAt' : string,
-}
-export interface BlogPost {
-  'id' : string,
-  'title' : string,
-  'content' : string,
-  'category' : string,
-  'authorName' : string,
-  'publishedAt' : string,
-  'isDraft' : boolean,
-  'tags' : string,
-}
-export interface ParentNotification {
-  'id' : string,
-  'parentUsername' : string,
-  'title' : string,
-  'message' : string,
-  'notifType' : string,
-  'isRead' : boolean,
-  'createdAt' : string,
-  'linkId' : string,
-}
-
 export interface _SERVICE {
-  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  // Staff Profiles
-  'addStaffProfile' : ActorMethod<[StaffProfile], string>,
-  'addUserAccount' : ActorMethod<[UserAccount], string>,
-  'deleteStaffProfile' : ActorMethod<[string], undefined>,
-  'deleteUserAccount' : ActorMethod<[string], undefined>,
-  'getStaffProfiles' : ActorMethod<[], Array<StaffProfile>>,
-  'getStaffProfilesByBranch' : ActorMethod<[string], Array<StaffProfile>>,
-  'getStaffProfilesByRole' : ActorMethod<[string], Array<StaffProfile>>,
-  'getUserAccounts' : ActorMethod<[], Array<UserAccount>>,
-  'updateStaffProfile' : ActorMethod<[StaffProfile], undefined>,
-  'updateUserAccount' : ActorMethod<[UserAccount], undefined>,
-  // Core
+  '_initializeAccessControl' : ActorMethod<[], undefined>,
+  'addBlogPost' : ActorMethod<[BlogPost], string>,
   'addBranch' : ActorMethod<[Branch], string>,
   'addCalendarEvent' : ActorMethod<[CalendarEvent], string>,
   'addCampaign' : ActorMethod<[Campaign], string>,
   'addCampaignSend' : ActorMethod<[CampaignSend], string>,
   'addCampaignTemplate' : ActorMethod<[CampaignTemplate], string>,
+  'addClassActivity' : ActorMethod<[ClassActivity], string>,
   'addFollowUp' : ActorMethod<[FollowUp], string>,
+  'addForm' : ActorMethod<[SchoolForm], string>,
   'addLead' : ActorMethod<[Lead], string>,
   'addLeadActivity' : ActorMethod<[LeadActivity], string>,
   'addLeadNote' : ActorMethod<[LeadNote], string>,
   'addLeadSource' : ActorMethod<[LeadSource], string>,
+  'addNotification' : ActorMethod<[ParentNotification], string>,
+  'addPTMRecord' : ActorMethod<[PTMRecord], string>,
   'addReportCard' : ActorMethod<[ReportCard], string>,
   'addSchoolUpdate' : ActorMethod<[SchoolUpdate], string>,
+  'addStaffProfile' : ActorMethod<[StaffProfile], string>,
   'addStudent' : ActorMethod<[Student], string>,
+  'addStudentRecord' : ActorMethod<[StudentRecord], string>,
+  'addStudentRecordsBulk' : ActorMethod<[Array<StudentRecord>], Array<string>>,
   'addTask' : ActorMethod<[Task], string>,
   'addTeacher' : ActorMethod<[Teacher], string>,
   'addTeamMember' : ActorMethod<[TeamMember], string>,
+  'addUserAccount' : ActorMethod<[UserAccount], string>,
+  'addWhatsAppMessage' : ActorMethod<[WhatsAppMessage], string>,
   'addWorksheet' : ActorMethod<[Worksheet], string>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'deleteBlogPost' : ActorMethod<[string], undefined>,
   'deleteBranch' : ActorMethod<[string], undefined>,
   'deleteCalendarEvent' : ActorMethod<[string], undefined>,
   'deleteCampaign' : ActorMethod<[string], undefined>,
   'deleteCampaignTemplate' : ActorMethod<[string], undefined>,
+  'deleteClassActivity' : ActorMethod<[string], undefined>,
   'deleteFollowUp' : ActorMethod<[string], undefined>,
+  'deleteForm' : ActorMethod<[string], undefined>,
   'deleteLead' : ActorMethod<[string], undefined>,
   'deleteLeadActivity' : ActorMethod<[string], undefined>,
   'deleteLeadNote' : ActorMethod<[string], undefined>,
   'deleteLeadSource' : ActorMethod<[string], undefined>,
   'deleteReportCard' : ActorMethod<[string], undefined>,
   'deleteSchoolUpdate' : ActorMethod<[string], undefined>,
+  'deleteStaffProfile' : ActorMethod<[string], undefined>,
   'deleteStudent' : ActorMethod<[string], undefined>,
+  'deleteStudentRecord' : ActorMethod<[string], undefined>,
   'deleteTask' : ActorMethod<[string], undefined>,
   'deleteTeacher' : ActorMethod<[string], undefined>,
   'deleteTeamMember' : ActorMethod<[string], undefined>,
+  'deleteUserAccount' : ActorMethod<[string], undefined>,
   'deleteWorksheet' : ActorMethod<[string], undefined>,
   'getActivitiesByLead' : ActorMethod<[string], Array<LeadActivity>>,
+  'getAllBlogPosts' : ActorMethod<[], Array<BlogPost>>,
+  'getAllClassActivities' : ActorMethod<[], Array<ClassActivity>>,
+  'getAllForms' : ActorMethod<[], Array<SchoolForm>>,
   'getAllLeadActivities' : ActorMethod<[], Array<LeadActivity>>,
   'getAllReportCards' : ActorMethod<[], Array<ReportCard>>,
+  'getAllStudentRecords' : ActorMethod<[], Array<StudentRecord>>,
   'getAllStudents' : ActorMethod<[], Array<Student>>,
   'getAllTeachers' : ActorMethod<[], Array<Teacher>>,
   'getAllWorksheets' : ActorMethod<[], Array<Worksheet>>,
@@ -398,22 +405,57 @@ export interface _SERVICE {
   'getCampaignSendsByLead' : ActorMethod<[string], Array<CampaignSend>>,
   'getCampaignTemplates' : ActorMethod<[], Array<CampaignTemplate>>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,
+  'getClassActivitiesByBranch' : ActorMethod<[string], Array<ClassActivity>>,
+  'getClassActivitiesByGrade' : ActorMethod<[string], Array<ClassActivity>>,
+  'getClassActivitiesByTeacher' : ActorMethod<[string], Array<ClassActivity>>,
   'getFollowUps' : ActorMethod<[], Array<FollowUp>>,
+  'getFormById' : ActorMethod<[string], [] | [SchoolForm]>,
+  'getFormResponses' : ActorMethod<[string], Array<FormResponse>>,
   'getIntegrationConfig' : ActorMethod<[], [] | [IntegrationConfig]>,
   'getLeadSources' : ActorMethod<[], Array<LeadSource>>,
   'getLeads' : ActorMethod<[], Array<Lead>>,
+  'getMyFormResponses' : ActorMethod<[string], Array<FormResponse>>,
   'getNotesByLead' : ActorMethod<[string], Array<LeadNote>>,
+  'getNotificationsForParent' : ActorMethod<
+    [string],
+    Array<ParentNotification>
+  >,
+  'getPTMRecords' : ActorMethod<[], Array<PTMRecord>>,
+  'getPTMRecordsByTeacher' : ActorMethod<[string], Array<PTMRecord>>,
+  'getParentFeedback' : ActorMethod<[], Array<ParentFeedback>>,
+  'getParentFeedbackByTeacher' : ActorMethod<[string], Array<ParentFeedback>>,
+  'getPublishedBlogPosts' : ActorMethod<[], Array<BlogPost>>,
+  'getPublishedForms' : ActorMethod<[], Array<SchoolForm>>,
   'getReportCardsByStudent' : ActorMethod<[string], Array<ReportCard>>,
   'getSchoolUpdates' : ActorMethod<[], Array<SchoolUpdate>>,
+  'getStaffAttendance' : ActorMethod<[], Array<StaffAttendance>>,
+  'getStaffAttendanceByDate' : ActorMethod<[string], Array<StaffAttendance>>,
+  'getStaffAttendanceByStaff' : ActorMethod<[string], Array<StaffAttendance>>,
+  'getStaffProfiles' : ActorMethod<[], Array<StaffProfile>>,
+  'getStaffProfilesByBranch' : ActorMethod<[string], Array<StaffProfile>>,
+  'getStaffProfilesByRole' : ActorMethod<[string], Array<StaffProfile>>,
+  'getStudentRecordsByBranch' : ActorMethod<[string], Array<StudentRecord>>,
+  'getStudentRecordsByGrade' : ActorMethod<[string], Array<StudentRecord>>,
   'getStudentsByGrade' : ActorMethod<[string], Array<Student>>,
   'getStudentsByParent' : ActorMethod<[string], Array<Student>>,
   'getTasks' : ActorMethod<[], Array<Task>>,
   'getTasksByAssignee' : ActorMethod<[string], Array<Task>>,
   'getTasksByLead' : ActorMethod<[string], Array<Task>>,
   'getTeacherByUsername' : ActorMethod<[string], [] | [Teacher]>,
+  'getTeacherPerformanceByTeacher' : ActorMethod<
+    [string],
+    Array<TeacherPerformanceRecord>
+  >,
+  'getTeacherPerformanceRecords' : ActorMethod<
+    [],
+    Array<TeacherPerformanceRecord>
+  >,
   'getTeachersByBranch' : ActorMethod<[string], Array<Teacher>>,
   'getTeamMembers' : ActorMethod<[], Array<TeamMember>>,
+  'getUserAccounts' : ActorMethod<[], Array<UserAccount>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getWhatsAppMessages' : ActorMethod<[], Array<WhatsAppMessage>>,
+  'getWhatsAppMessagesByLead' : ActorMethod<[string], Array<WhatsAppMessage>>,
   'getWorksheetsByGrade' : ActorMethod<[string], Array<Worksheet>>,
   'initSeedData' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
@@ -421,6 +463,8 @@ export interface _SERVICE {
     [{ 'username' : string, 'password' : string }],
     [] | [{ 'username' : string, 'name' : string, 'role' : string }]
   >,
+  'markAttendance' : ActorMethod<[StaffAttendance], string>,
+  'markNotificationRead' : ActorMethod<[string], undefined>,
   'receiveWebhookLead' : ActorMethod<
     [
       {
@@ -434,82 +478,38 @@ export interface _SERVICE {
     ],
     string
   >,
+  'receiveWhatsAppWebhook' : ActorMethod<[string], string>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'saveIntegrationConfig' : ActorMethod<[IntegrationConfig], undefined>,
   'searchLeads' : ActorMethod<[string], Array<Lead>>,
   'searchTasks' : ActorMethod<[string], Array<Task>>,
   'sendWhatsAppMessage' : ActorMethod<[string, string], WhatsAppMessageResult>,
+  'submitFormResponse' : ActorMethod<[FormResponse], string>,
+  'submitParentFeedback' : ActorMethod<[ParentFeedback], string>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
+  'updateAttendance' : ActorMethod<[StaffAttendance], undefined>,
+  'updateBlogPost' : ActorMethod<[BlogPost], undefined>,
   'updateBranch' : ActorMethod<[Branch], undefined>,
   'updateCalendarEvent' : ActorMethod<[CalendarEvent], undefined>,
   'updateCampaign' : ActorMethod<[Campaign], undefined>,
   'updateCampaignTemplate' : ActorMethod<[CampaignTemplate], undefined>,
+  'updateClassActivity' : ActorMethod<[ClassActivity], undefined>,
   'updateFollowUp' : ActorMethod<[FollowUp], undefined>,
+  'updateForm' : ActorMethod<[SchoolForm], undefined>,
   'updateLead' : ActorMethod<[Lead], undefined>,
   'updateLeadSource' : ActorMethod<[LeadSource], undefined>,
   'updateReportCard' : ActorMethod<[ReportCard], undefined>,
   'updateSchoolUpdate' : ActorMethod<[SchoolUpdate], undefined>,
+  'updateStaffProfile' : ActorMethod<[StaffProfile], undefined>,
   'updateStudent' : ActorMethod<[Student], undefined>,
+  'updateStudentRecord' : ActorMethod<[StudentRecord], undefined>,
   'updateTask' : ActorMethod<[Task], undefined>,
   'updateTeacher' : ActorMethod<[Teacher], undefined>,
   'updateTeamMember' : ActorMethod<[TeamMember], undefined>,
-  'updateWorksheet' : ActorMethod<[Worksheet], undefined>,
-  // Student Records
-  'addStudentRecord' : ActorMethod<[StudentRecord], string>,
-  'addStudentRecordsBulk' : ActorMethod<[Array<StudentRecord>], Array<string>>,
-  'updateStudentRecord' : ActorMethod<[StudentRecord], undefined>,
-  'deleteStudentRecord' : ActorMethod<[string], undefined>,
-  'getAllStudentRecords' : ActorMethod<[], Array<StudentRecord>>,
-  'getStudentRecordsByGrade' : ActorMethod<[string], Array<StudentRecord>>,
-  'getStudentRecordsByBranch' : ActorMethod<[string], Array<StudentRecord>>,
-  // WhatsApp History
-  'getWhatsAppMessages' : ActorMethod<[], Array<WhatsAppMessage>>,
-  'getWhatsAppMessagesByLead' : ActorMethod<[string], Array<WhatsAppMessage>>,
-  'addWhatsAppMessage' : ActorMethod<[WhatsAppMessage], string>,
+  'updateUserAccount' : ActorMethod<[UserAccount], undefined>,
   'updateWhatsAppMessageStatus' : ActorMethod<[string, string], undefined>,
-  // Staff Attendance
-  'getStaffAttendance' : ActorMethod<[], Array<StaffAttendance>>,
-  'getStaffAttendanceByDate' : ActorMethod<[string], Array<StaffAttendance>>,
-  'getStaffAttendanceByStaff' : ActorMethod<[string], Array<StaffAttendance>>,
-  'markAttendance' : ActorMethod<[StaffAttendance], string>,
-  'updateAttendance' : ActorMethod<[StaffAttendance], undefined>,
-  // Teacher Performance
-  'getTeacherPerformanceRecords' : ActorMethod<[], Array<TeacherPerformanceRecord>>,
-  'getTeacherPerformanceByTeacher' : ActorMethod<[string], Array<TeacherPerformanceRecord>>,
-  'getParentFeedback' : ActorMethod<[], Array<ParentFeedback>>,
-  'getParentFeedbackByTeacher' : ActorMethod<[string], Array<ParentFeedback>>,
-  'submitParentFeedback' : ActorMethod<[ParentFeedback], string>,
-  'getPTMRecords' : ActorMethod<[], Array<PTMRecord>>,
-  'getPTMRecordsByTeacher' : ActorMethod<[string], Array<PTMRecord>>,
-  'addPTMRecord' : ActorMethod<[PTMRecord], string>,
-  // Classroom Activities
-  'getAllClassActivities' : ActorMethod<[], Array<ClassActivity>>,
-  'getClassActivitiesByGrade' : ActorMethod<[string], Array<ClassActivity>>,
-  'getClassActivitiesByTeacher' : ActorMethod<[string], Array<ClassActivity>>,
-  'getClassActivitiesByBranch' : ActorMethod<[string], Array<ClassActivity>>,
-  'addClassActivity' : ActorMethod<[ClassActivity], string>,
-  'updateClassActivity' : ActorMethod<[ClassActivity], undefined>,
-  'deleteClassActivity' : ActorMethod<[string], undefined>,
-  // Forms
-  'getAllForms' : ActorMethod<[], Array<SchoolForm>>,
-  'getPublishedForms' : ActorMethod<[], Array<SchoolForm>>,
-  'getFormById' : ActorMethod<[string], [] | [SchoolForm]>,
-  'addForm' : ActorMethod<[SchoolForm], string>,
-  'updateForm' : ActorMethod<[SchoolForm], undefined>,
-  'deleteForm' : ActorMethod<[string], undefined>,
-  'getFormResponses' : ActorMethod<[string], Array<FormResponse>>,
-  'getMyFormResponses' : ActorMethod<[string], Array<FormResponse>>,
-  'submitFormResponse' : ActorMethod<[FormResponse], string>,
-  // Blog
-  'getAllBlogPosts' : ActorMethod<[], Array<BlogPost>>,
-  'getPublishedBlogPosts' : ActorMethod<[], Array<BlogPost>>,
-  'addBlogPost' : ActorMethod<[BlogPost], string>,
-  'updateBlogPost' : ActorMethod<[BlogPost], undefined>,
-  'deleteBlogPost' : ActorMethod<[string], undefined>,
-  // Parent Notifications
-  'getParentNotifications' : ActorMethod<[string], Array<ParentNotification>>,
-  'addParentNotification' : ActorMethod<[ParentNotification], string>,
-  'markNotificationRead' : ActorMethod<[string], undefined>,
+  'updateWorksheet' : ActorMethod<[Worksheet], undefined>,
+  'upsertTeacherPerformance' : ActorMethod<[TeacherPerformanceRecord], string>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
